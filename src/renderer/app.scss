@@ -1,0 +1,75 @@
+html,
+body {
+	overflow: hidden;
+	font-family: sans-serif;
+	caret-color: var(--scheme-5);
+	color: var(--scheme-9);
+	font-size: 13.5px;
+	user-select: none;
+}
+* {
+	margin: 0px;
+	padding: 0px;
+	border: none;
+	outline: none;
+	background: none;
+}
+.draggable {
+	-webkit-app-region: drag;
+}
+.none-draggable {
+	-webkit-app-region: no-drag;
+}
+:root {
+	// palette
+	--scheme-0: #080808;
+	--scheme-1: #111111;
+	--scheme-2: #222222;
+	--scheme-3: #333333;
+	--scheme-4: #444444;
+	--scheme-5: #555555;
+	--scheme-6: #9e9e9e;
+	--scheme-7: #b6b6b6;
+	--scheme-8: #cecece;
+	--scheme-9: #e6e6e6;
+	// status
+	--error: #ff5050;
+	--sucess: #99ff99;
+	--warning: #ff9900;
+	// global
+	--transition: 250ms ease-in-out;
+	// components
+	--titlebar-height: 30px;
+	--treeview-width: 150px;
+	--taskbar-height: 30px;
+}
+.contrast {
+	border-style: solid;
+	border-width: thin;
+	border-color: var(--scheme-0);
+}
+.center {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+#container > * {
+	position: fixed;
+}
+#titlebar {
+	z-index: 1;
+}
+#content {
+	width: 100%;
+	top: var(--titlebar-height);
+	bottom: var(--taskbar-height);
+	#treeview {
+		z-index: 0;
+	}
+	#iterable {
+		z-index: -1;
+	}
+}
+#taskbar {
+	z-index: 1;
+}

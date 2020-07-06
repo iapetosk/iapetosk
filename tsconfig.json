@@ -1,0 +1,36 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"target": "ES5",
+		"baseUrl": "./",
+		"outDir": "./dist",
+		"paths": {
+			"@/*": [
+				"src/*"
+			]
+		},
+		"strict": true,
+		"allowJs": true,
+		"importHelpers": true,
+		"resolveJsonModule": true,
+		"experimentalDecorators": true
+	},
+	"lib": [
+		"dom",
+		"dom.iterable",
+		"scripthost",
+		"esnext"
+	],
+	"files": [
+		"src/typings/vue.ts",
+		"src/typings/vue_node.ts"
+	],
+	"include": [
+		"**/*.ts",
+		"**/*.vue",
+		"**/*.json"
+	],
+	"exclude": [
+		"node_modules/"
+	]
+}

@@ -1,0 +1,72 @@
+#iterable {
+	position: absolute;
+	height: 100%;
+	right: 0px;
+	left: var(--treeview-width);
+}
+#scroll_area {
+	position: absolute;
+	overflow: hidden;
+	height: 100%;
+	right: 10px;
+	left: 0px;
+	background-color: var(--scheme-2);
+}
+#process {
+	overflow: hidden;
+	height: 100px;
+	margin: 10px;
+	background-color: var(--error);
+	&.highlight {
+		background-color: var(--sucess);
+	}
+}
+#wrapper {
+	height: 100px;
+	margin: 0px 0px 0px 10px;
+	border-width: 0px 0px 0px thin;
+	background-color: var(--scheme-3);
+	transition: background-color var(--transition);
+	will-change: background-color;
+	> * {
+		position: absolute;
+
+	}
+	&:hover {
+		background-color: var(--scheme-4);
+	}
+}
+#thumbnail {
+	width: 150px;
+	height: 80px;
+	margin: 10px;
+	border-radius: 5px;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: center;
+	background-color: var(--scheme-2);
+}
+#title {
+	margin: 10px 180px;
+}
+#scroll_track {
+	position: absolute;
+	width: 10px;
+	height: 100%;
+	top: 0px;
+	right: 0px;
+}
+#scroll_metre {
+	display: block;
+	width: 10px;
+	height: 10%;
+	background-color: var(--scheme-2);
+	transition: background-color var(--transition);
+	will-change: background-color;
+	&:nth-child(2n) {
+		background-color: var(--scheme-3);
+	}
+	&.highlight {
+		background-color: var(--sucess);
+	}
+}
