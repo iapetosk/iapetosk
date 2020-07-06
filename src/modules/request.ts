@@ -3,20 +3,21 @@ import * as http from "http";
 import * as https from "https";
 
 export type RequestOptions = {
-	url: string,
-	method: "GET" | "POST" | "PUT" | "DELETE";
+	url?: string,
+	method?: "GET" | "POST" | "PUT" | "DELETE";
 	headers?: { [key: string]: any; },
 	encoding?: "binary" | "ascii" | "utf8" | "base64" | "hex",
 };
 
 class Request {
-
 	public async adapt(options: RequestOptions, directory?: string) {
 		return new Promise<{ response: http.IncomingMessage, body: string }>((resolve, rejects) => {
-			const SSL: boolean = options.url.startsWith("https");
+			const SSL: boolean = options.url!.startsWith("https");
+			const URI: string[] = options.url!.replace(/https?:\/\/(www.)?/, "").split(/\//);
 
 			(SSL ? https : http).get({
-				host: options.url,
+				hostname: URI[0],
+				path: URI.join("/").replace(new RegExp(`^${URI[0]}`), ""),
 				method: options.method,
 				headers: options.headers,
 				protocol: SSL ? "https:" : "http:"
@@ -58,19 +59,15 @@ class Request {
 			});
 		});
 	};
-
 	public async get(url: string, options?: RequestOptions) {
 		return this.adapt({ url: url, method: "GET", ...options || {} });
 	}
-
 	public async post(url: string, options?: RequestOptions) {
 		return this.adapt({ url: url, method: "POST", ...options || {} });
 	}
-
 	public async put(url: string, options?: RequestOptions) {
 		return this.adapt({ url: url, method: "PUT", ...options || {} });
 	}
-
 	public async delete(url: string, options?: RequestOptions) {
 		return this.adapt({ url: url, method: "DELETE", ...options || {} });
 	}
