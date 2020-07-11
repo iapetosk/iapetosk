@@ -2,5 +2,9 @@
 	{
 		"loader": "hitomi.la",
 		"test": "^https?:\\\/\\\/hitomi.la\\\/(manga|doujinshi|gamecg|cg|reader)\\\/([\\D\\d]+)-([\\D\\d]+)-([0-9]+).html$"
+	},
+	{
+		"loader": "hitomi.la",
+		"test": "^https?:\\\/\\\/hitomi.la\\\/galleries\\\/([0-9]+).html$"
 	}
 ]

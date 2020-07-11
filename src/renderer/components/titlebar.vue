@@ -1,7 +1,7 @@
 <template>
 	<keep-alive>
 		<header id="titlebar" class="contrast draggable">
-			<button id="focus" class="none-draggable" @click="focus = !focus">
+			<button id="focus" class="none-draggable" @click="app.minimize()">
 				<!--
 				<object :data="require(`@/assets/focus.svg`).default" type="image/svg+xml"></object>
 				-->
@@ -11,9 +11,9 @@
 				<!--
 				<object :data="require(`@/assets/minimize.svg`).default" type="image/svg+xml"></object>
 				-->
-				<svg v-html="require(`!html-loader!@/assets/${restore ? `maximize` : `minimize`}.svg`)"></svg>
+				<svg v-html="require(`!html-loader!@/assets/${restore ? `minimize` : `maximize`}.svg`)"></svg>
 			</button>
-			<button id="close" class="none-draggable">
+			<button id="close" class="none-draggable" @click="app.close()">
 				<!--
 				<object :data="require(`@/assets/close.svg`).default" type="image/svg+xml"></object>
 				-->

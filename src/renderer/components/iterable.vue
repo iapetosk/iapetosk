@@ -3,8 +3,8 @@
 		<main id="iterable" @wheel="wheel">
 			<section id="scroll_area">
 				<section id="process" class="contrast" v-for="(download, index) in downloadable" :key="index" :class="{ highlight: scroll_index === index }">
+					<legend id="title" class="contrast center">{{ download.title }}</legend>
 					<figure id="wrapper" class="contrast" @click="scroll_index = index">
-						<legend id="title">{{ download.title }}</legend>
 						<canvas id="thumbnail" class="contrast"></canvas>
 					</figure>
 				</section>

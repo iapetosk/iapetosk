@@ -2,18 +2,21 @@ import * as fs from "fs";
 import * as http from "http";
 import * as https from "https";
 
-export type RequestOptions = {
-	url?: string,
-	method?: "GET" | "POST" | "PUT" | "DELETE";
-	headers?: { [key: string]: any; },
-	encoding?: "binary" | "ascii" | "utf8" | "base64" | "hex",
+export type RequestOptions = PartialOptions & {
+	url: string,
+	method: "GET" | "POST" | "PUT" | "DELETE";
 };
 
+export type PartialOptions = {
+	headers?: { [key: string]: any; },
+	encoding?: "binary" | "ascii" | "utf8" | "base64" | "hex",
+}
+
 class Request {
-	public async adapt(options: RequestOptions, directory?: string) {
+	public async send(options: RequestOptions, directory?: string) {
 		return new Promise<{ response: http.IncomingMessage, body: string }>((resolve, rejects) => {
-			const SSL: boolean = options.url!.startsWith("https");
-			const URI: string[] = options.url!.replace(/https?:\/\/(www.)?/, "").split(/\//);
+			const SSL: boolean = options.url.startsWith("https");
+			const URI: string[] = options.url.replace(/https?:\/\/(www.)?/, "").split(/\//);
 
 			(SSL ? https : http).get({
 				hostname: URI[0],
@@ -59,17 +62,17 @@ class Request {
 			});
 		});
 	};
-	public async get(url: string, options?: RequestOptions) {
-		return this.adapt({ url: url, method: "GET", ...options || {} });
+	public async get(url: string, options?: PartialOptions, directory?: string) {
+		return this.send({ url: url, method: "GET", ...options || {} }, directory);
 	}
-	public async post(url: string, options?: RequestOptions) {
-		return this.adapt({ url: url, method: "POST", ...options || {} });
+	public async post(url: string, options?: PartialOptions, directory?: string) {
+		return this.send({ url: url, method: "POST", ...options || {} }, directory);
 	}
-	public async put(url: string, options?: RequestOptions) {
-		return this.adapt({ url: url, method: "PUT", ...options || {} });
+	public async put(url: string, options?: PartialOptions, directory?: string) {
+		return this.send({ url: url, method: "PUT", ...options || {} }, directory);
 	}
-	public async delete(url: string, options?: RequestOptions) {
-		return this.adapt({ url: url, method: "DELETE", ...options || {} });
+	public async delete(url: string, options?: PartialOptions, directory?: string) {
+		return this.send({ url: url, method: "DELETE", ...options || {} }, directory);
 	}
 }
 
