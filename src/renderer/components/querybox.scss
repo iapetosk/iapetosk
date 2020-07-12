@@ -3,15 +3,23 @@
 #querybox {
 	position: fixed;
 	height: layout.$querybox-height;
-	right: 0px;
+	right: layout.$scrollbar-width;
 	left: layout.$treeview-width;
-	border-width: 0px thin thin 0px;
 	background-color: layout.$scheme-2;
 	input {
 		display: block;
-		width: 100%;
-		height: 100%;
+		width: calc(100% - 20px);
+		height: calc(100% - 20px);
+		color: layout.$scheme-6;
+		font-size: medium;
+		margin: 10px;
 		padding: 10px;
-		color: layout.$scheme-9;
+		background-color: layout.$scheme-3;
+		transition: color 250ms ease-in-out, border-color 250ms ease-in-out;
+		will-change: color, border-color;
+		&:hover, &:focus {
+			color: layout.$scheme-8;
+			border-color: layout.$scheme-5;
+		}
 	}
 }

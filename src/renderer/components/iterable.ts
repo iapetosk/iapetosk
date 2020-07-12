@@ -15,7 +15,7 @@ export default class Iterable extends Vue {
 	private scroll_index: number = 0;
 	private downloadable: BlockPanel[] = new Array();
 	created(): void {
-		for (let index: number = 0; index < 100; index++) {
+		for (let index: number = 0; index < 5; index++) {
 			this.downloadable.push({
 				title: `Black Butler - Chapter ${index} / English`,
 				from: "unknown",

@@ -22,10 +22,11 @@
 	margin: 10px;
 	background-color: layout.$error;
 	&, * {
-		transition: border-color 250ms ease-in-out;
-		will-change: border-color;
+		transition: color 250ms ease-in-out, border-color 250ms ease-in-out;
+		will-change: color, border-color;
 	}
 	&:hover, &:hover * {
+		color: layout.$scheme-9;
 		border-color: layout.$scheme-5;
 	}
 	&.highlight {
@@ -56,7 +57,7 @@
 }
 #scroll_track {
 	position: fixed;
-	width: 10px;
+	width: layout.$scrollbar-width;
 	top: layout.$titlebar-height;
 	right: 0px;
 	bottom: layout.$taskbar-height;

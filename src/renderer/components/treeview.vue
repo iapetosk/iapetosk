@@ -5,4 +5,4 @@
 	</keep-alive>
 </template>
 <script src="./treeview.ts"></script>
-<style scoped src="./treeview.scss"></style> 
+<style scoped src="./treeview.scss"></style>

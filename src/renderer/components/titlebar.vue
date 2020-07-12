@@ -23,4 +23,4 @@
 	</keep-alive>
 </template>
 <script src="./titlebar.ts"></script>
-<style scoped src="./titlebar.scss"></style> 
+<style scoped src="./titlebar.scss"></style>

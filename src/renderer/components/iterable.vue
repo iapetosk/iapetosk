@@ -16,4 +16,4 @@
 	</keep-alive>
 </template>
 <script src="./iterable.ts"></script>
-<style scoped src="./iterable.scss"></style> 
+<style scoped src="./iterable.scss"></style>

@@ -5,17 +5,20 @@ body {
 	overflow: hidden;
 	font-family: sans-serif;
 	caret-color: layout.$scheme-5;
-	color: layout.$scheme-9;
-	font-size: 13.5px;
+	color: layout.$scheme-6;
+	font-size: small;
 	user-select: none;
 }
 * {
 	margin: 0px;
 	padding: 0px;
 	border: none;
-	background: none;
 	outline: none;
+	background: none;
 	box-sizing: border-box;
+}
+::selection {
+	background: layout.$scheme-6;
 }
 .draggable {
 	-webkit-app-region: drag;

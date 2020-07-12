@@ -4,4 +4,4 @@
 	</keep-alive>
 </template>
 <script src="./taskbar.ts"></script>
-<style scoped src="./taskbar.scss"></style> 
+<style scoped src="./taskbar.scss"></style>
