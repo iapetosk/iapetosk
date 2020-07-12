@@ -30,7 +30,7 @@ export default class Iterable extends Vue {
 	private adjust_scroll(): void {
 		const target: HTMLElement = document.getElementById("scroll_area")!;
 
-		const height: number = Math.round(target.scrollHeight / this.downloadable.length);
+		const height: number = utility.truncate(target.scrollHeight / this.downloadable.length);
 
 		let start: number = (target.scrollTop) / height;
 		let finish: number = (target.scrollTop + target.clientHeight) / height;

@@ -5,19 +5,19 @@
 				<!--
 				<object :data="require(`@/assets/focus.svg`).default" type="image/svg+xml"></object>
 				-->
-				<svg v-html="require(`!html-loader!@/assets/focus.svg`)"></svg>
+				<svg v-html="require(`!html-loader!@/assets/icons/focus.svg`)"></svg>
 			</button>
 			<button id="restore" class="none-draggable" @click="restore = !restore">
 				<!--
 				<object :data="require(`@/assets/minimize.svg`).default" type="image/svg+xml"></object>
 				-->
-				<svg v-html="require(`!html-loader!@/assets/${restore ? `minimize` : `maximize`}.svg`)"></svg>
+				<svg v-html="require(`!html-loader!@/assets/icons/${restore ? `minimize` : `maximize`}.svg`)"></svg>
 			</button>
 			<button id="close" class="none-draggable" @click="app.close()">
 				<!--
 				<object :data="require(`@/assets/close.svg`).default" type="image/svg+xml"></object>
 				-->
-				<svg v-html="require(`!html-loader!@/assets/close.svg`)"></svg>
+				<svg v-html="require(`!html-loader!@/assets/icons/close.svg`)"></svg>
 			</button>
 		</header>
 	</keep-alive>

@@ -1,6 +1,10 @@
+@use "@/assets/layout.scss";
+
 #treeview {
-	position: absolute;
-	width: var(--treeview-width);
-	height: 100%;
-	background-color: var(--scheme-1);
+	position: fixed;
+	width: layout.$treeview-width;
+	top: layout.$titlebar-height;
+	bottom: layout.$taskbar-height;
+	background-color: layout.$scheme-1;
+	border-width: 0px thin 0px thin;
 }

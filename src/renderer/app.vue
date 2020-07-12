@@ -3,6 +3,7 @@
 		<main id="container">
 			<titlebar></titlebar>
 			<article id="content">
+				<querybox></querybox>
 				<treeview></treeview>
 				<iterable></iterable>
 			</article>

@@ -1,17 +1,19 @@
+@use "@/assets/layout.scss";
+
 #titlebar {
 	width: 100%;
-	height: var(--titlebar-height);
+	height: layout.$titlebar-height;
 	top: 0px;
-	background-color: var(--scheme-1);
+	background-color: layout.$scheme-1;
 }
 button {
 	position: absolute;
 	width: 45px;
-	height: var(--titlebar-height);
-	transition: background-color var(--transition);
+	height: 100%;
+	transition: background-color layout.$transition;
 	will-change: background-color;
 	&:hover {
-		background-color: var(--scheme-2);
+		background-color: layout.$scheme-2;
 	}
 }
 svg {
@@ -24,7 +26,7 @@ svg {
 	left: 0px;
 	margin: auto;
 	pointer-events: none;
-	fill: var(--scheme-9);
+	fill: layout.$scheme-9;
 }
 #focus {
 	right: 90px;
@@ -35,6 +37,6 @@ svg {
 #close {
 	right: 0px;
 	&:hover {
-		background-color: var(--error);
+		background-color: layout.$error;
 	}
 }
