@@ -1,7 +1,7 @@
 <template>
 	<keep-alive>
 		<section id="querybox">
-			<input class="contrast" placeholder="https://www.youtube.com/watch?v=aNqFhyNeibs&t=31">
+			<input id="query" class="contrast" autocomplete="off" placeholder="https://www.youtube.com/watch?v=aNqFhyNeibs&t=31" :value="$store.getters[`querybox/query`]" @keyup.enter="$store.commit(`querybox/query`, { value: $event.target.value })">
 		</section>
 	</keep-alive>
 </template>

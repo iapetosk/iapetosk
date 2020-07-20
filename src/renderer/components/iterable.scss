@@ -20,7 +20,6 @@
 	overflow: hidden;
 	height: 150px;
 	margin: 10px;
-	background-color: layout.$error;
 	&, * {
 		transition: color 250ms ease-in-out, border-color 250ms ease-in-out;
 		will-change: color, border-color;
@@ -29,8 +28,17 @@
 		color: layout.$scheme-9;
 		border-color: layout.$scheme-5;
 	}
+	&.error {
+		background-color: layout.$error;
+	}
+	&.success {
+		background-color: layout.$success;
+	}
+	&.warning {
+		background-color: layout.$warning;
+	}
 	&.highlight {
-		background-color: layout.$sucess;
+		border-color: layout.$scheme-6;
 	}
 }
 #title {
@@ -74,6 +82,6 @@
 		background-color: layout.$scheme-3;
 	}
 	&.highlight {
-		background-color: layout.$sucess;
+		background-color: layout.$success;
 	}
 }

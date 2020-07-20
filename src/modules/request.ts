@@ -1,7 +1,7 @@
 import * as fs from "fs";
+import * as path from "path";
 import * as http from "http";
 import * as https from "https";
-
 export type RequestOptions = PartialOptions & {
 	url: string,
 	method: "GET" | "POST" | "PUT" | "DELETE";
@@ -10,11 +10,10 @@ export type RequestOptions = PartialOptions & {
 export type PartialOptions = {
 	headers?: { [key: string]: any; },
 	encoding?: "binary" | "ascii" | "utf8" | "base64" | "hex",
-}
-
+};
 class Request {
 	public async send(options: RequestOptions, directory?: string) {
-		return new Promise<{ response: http.IncomingMessage, body: string }>((resolve, rejects) => {
+		return new Promise<{ response: http.IncomingMessage, body: string; }>((resolve, rejects) => {
 			const SSL: boolean = options.url.startsWith("https");
 			const URI: string[] = options.url.replace(/https?:\/\/(www.)?/, "").split(/\//);
 
@@ -29,6 +28,9 @@ class Request {
 					response.setEncoding(options.encoding);
 				}
 				if (directory) {
+					// recursively renders directory
+					fs.mkdirSync(path.dirname(directory), { recursive: true });
+					// create filestream
 					var file = fs.createWriteStream(directory);
 
 					response.pipe(file);
@@ -75,5 +77,4 @@ class Request {
 		return this.send({ url: url, method: "DELETE", ...options || {} }, directory);
 	}
 }
-
 export default (new Request());

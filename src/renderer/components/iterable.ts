@@ -1,28 +1,21 @@
 import { Component, Vue, Watch } from "vue-property-decorator";
 
-import download, { File } from "@/modules/download";
+import download, { Status, Thread } from "@/modules/download";
 import utility from "@/modules/utility";
 
-export type BlockPanel = {
+export type Grid = {
 	title: string,
 	from: string,
-	date: number,
-	files: File[];
+	status: Status,
+	thread: Thread;
 };
 
 @Component({})
 export default class Iterable extends Vue {
 	private scroll_index: number = 0;
-	private downloadable: BlockPanel[] = new Array();
+	private downloadable: Grid[] = new Array();
 	created(): void {
-		for (let index: number = 0; index < 5; index++) {
-			this.downloadable.push({
-				title: `Black Butler - Chapter ${index} / English`,
-				from: "unknown",
-				date: index,
-				files: []
-			});
-		}
+		this.$store.commit("querybox/query", { value: "https://hitomi.la/galleries/1000.html" });
 	}
 	private wheel(event: WheelEvent): void | boolean {
 		this.scroll_index = utility.clamp(this.scroll_index + (event.deltaY > 0 ? 1 : -1), 0, this.downloadable.length - 1);
@@ -36,7 +29,25 @@ export default class Iterable extends Vue {
 		let finish: number = (target.scrollTop + target.clientHeight) / height;
 		let ranging: number = finish - start;
 
-		target.scroll(0, height * (this.scroll_index - Math.round(ranging / 2)));
+		target.scroll(0, height * (this.scroll_index - Math.floor(ranging / 2)));
+	}
+	private status_colour(status: Status): undefined | "success" | "warning" | "error" {
+		switch (status) {
+			case Status.NONE:
+			case Status.REMOVED:
+			case Status.PROGRESS: {
+				return undefined;
+			}
+			case Status.FINISHED: {
+				return "success";
+			}
+			case Status.QUEUED: {
+				return "warning";
+			}
+			case Status.ERROR: {
+				return "error";
+			}
+		}
 	}
 	@Watch("scroll_index")
 	private watch_scroll_index(): void {
@@ -45,5 +56,22 @@ export default class Iterable extends Vue {
 	@Watch("downloadable")
 	private watch_downloadable(): void {
 		this.scroll_index = utility.clamp(this.scroll_index, 0, this.downloadable.length - 1);
+	}
+	@Watch("$store.state.querybox.query")
+	private $store_state_querybox_query($new: string): void {
+		if ($new && $new.length) {
+			$new.split(/\s+/).forEach((value) => {
+				download.modulator(value).then((callback) => {
+					download.start(callback.files, callback.headers).then((callback_second) => {
+						this.downloadable.push({
+							title: value,
+							from: value,
+							...callback_second
+						});
+					});
+				});
+			});
+			this.$store.dispatch("querybox/clear");
+		}
 	}
 }

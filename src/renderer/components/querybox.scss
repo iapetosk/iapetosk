@@ -6,20 +6,20 @@
 	right: layout.$scrollbar-width;
 	left: layout.$treeview-width;
 	background-color: layout.$scheme-2;
-	input {
-		display: block;
-		width: calc(100% - 20px);
-		height: calc(100% - 20px);
-		color: layout.$scheme-6;
-		font-size: medium;
-		margin: 10px;
-		padding: 10px;
-		background-color: layout.$scheme-3;
-		transition: color 250ms ease-in-out, border-color 250ms ease-in-out;
-		will-change: color, border-color;
-		&:hover, &:focus {
-			color: layout.$scheme-8;
-			border-color: layout.$scheme-5;
-		}
+}
+#query {
+	display: block;
+	width: calc(100% - 20px);
+	height: calc(100% - 20px);
+	color: layout.$scheme-6;
+	font-size: medium;
+	margin: 10px;
+	padding: 10px;
+	background-color: layout.$scheme-3;
+	transition: color 250ms ease-in-out, border-color 250ms ease-in-out;
+	will-change: color, border-color;
+	&:hover, &:focus {
+		color: layout.$scheme-8;
+		border-color: layout.$scheme-5;
 	}
 }

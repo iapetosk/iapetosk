@@ -15,6 +15,18 @@ export enum Status {
 	QUEUED,
 	ERROR
 }
+export type Loader = {
+	start(url: string): Promise<Loaded>;
+};
+export type Loaded = {
+	readonly links: string[],
+	readonly headers: {
+		[key: string]: any;
+	};
+	readonly placeholders: {
+		[key: string]: any;
+	};
+};
 export class File {
 	private _link: string;
 	private _path: string;
@@ -52,15 +64,27 @@ export class File {
 	}
 }
 export class Thread {
+	private _id: number;
 	private _yields: number;
 	private _finished: number;
 	private _max_yields: number;
 	private _files: File[];
 	constructor(max_yields: number, files: File[]) {
+		// generate id
+		this._id = Date.now();
+		// initial setup
 		this._yields = 0;
 		this._finished = 0;
+		// limit max yields
 		this._max_yields = max_yields;
+		// define files
 		this._files = files;
+	}
+	get id(): number {
+		return this._id;
+	}
+	set id(value: number) {
+		this._id = value;
 	}
 	get yields(): number {
 		return this._yields;
@@ -83,7 +107,7 @@ export class Thread {
 }
 export class Download {
 	private _threads: Thread[];
-	private _queued: File[][];
+	private _queued: Thread[];
 	private _max_threads: number;
 	private _max_yields: number;
 	constructor(max_threads: number, max_yields: number) {
@@ -113,10 +137,10 @@ export class Download {
 	set threads(value: Thread[]) {
 		this._threads = value;
 	}
-	get queued(): File[][] {
+	get queued(): Thread[] {
 		return this._queued;
 	}
-	set queued(value: File[][]) {
+	set queued(value: Thread[]) {
 		this._queued = value;
 	}
 	get max_threads(): number {
@@ -131,25 +155,29 @@ export class Download {
 	set max_yields(value: number) {
 		this._max_yields = value;
 	}
-	public start(files: File[]): Promise<Status | number> {
-		return new Promise<Status | number>((resolve, rejects): void => {
+	public start(manifest: Thread | File[], headers?: { [key: string]: any; }): Promise<{ thread: Thread, status: Status; }> {
+		return new Promise<{ thread: Thread, status: Status; }>((resolve, rejects): void => {
 			let slot: number = NaN;
-			
+			let files: File[] = manifest instanceof Thread ? manifest.files : manifest;
+			let thread: Thread = manifest instanceof Thread ? manifest : new Thread(this._max_yields, files);
+
+			console.table(thread);
+
 			for (let index: number = 0; index < this.max_threads; index++) {
 				if (!this.threads[index]) {
 					slot = index;
 					break;
 				}
 			}
-			if (slot === NaN) {
-				this.queued.push(files);
-				return resolve(Status.QUEUED);
+			if (isNaN(slot)) {
+				this.queued.push(thread);
+				return resolve({ thread: thread, status: Status.QUEUED });
 			}
 
-			this.threads[slot] = new Thread(this.max_yields, files);
+			this.threads[slot] = thread;
 
 			const valid: number[] = [];
-			
+
 			for (let index: number = 0; index < files.length; index++) {
 				if (!files[index].written) {
 					valid.push(index);
@@ -157,59 +185,62 @@ export class Download {
 			}
 			if (!valid.length) {
 				delete this.threads[slot];
-				return resolve(Status.FINISHED);
+				return resolve({ thread: thread, status: Status.FINISHED });
 			}
 			const I: Download = this;
 			function condition(): boolean {
-				return !!valid[I.threads[slot].yields] && I.threads[slot].yields - I.threads[slot].finished < I.threads[slot].max_yields;
+				return !!valid[thread.yields] && thread.yields - thread.finished < thread.max_yields;
 			}
 			function recursive(index: number): void {
-				if (!I.threads[slot]) {
-					return resolve(Status.REMOVED);
+				if (!thread) {
+					return resolve({ thread: thread, status: Status.REMOVED });
 				}
-				I.threads[slot].yields++;
-				request.get(files[valid[index]].link).then((callback): void => {
-					if (!I.threads[slot]) {
-						return resolve(Status.REMOVED);
+				thread.yields++;
+				request.get(files[valid[index]].link, { headers: headers }, files[valid[index]].path).then((callback): void => {
+					if (!thread) {
+						return resolve({ thread: thread, status: Status.REMOVED });
 					}
-					fs.writeFile(files[valid[index]].path, callback.body, () => {
+					thread.finished++;
+					thread.files[valid[index]].written = true;
 
-						I.threads[slot].finished++;
-						I.threads[slot].files[valid[index]].written = true;
+					// (files.length - valid.length + thread.finished) / files.length
+					resolve({ thread: thread, status: Status.PROGRESS });
 
-						resolve((files.length - valid.length + I.threads[slot].finished) / files.length);
+					if (valid.length === thread.finished) {
+						delete I.threads[slot];
 
-						if (valid.length === I.threads[slot].finished) {
-							delete I.threads[slot];
+						if (I.queued.length) {
 							const queue = I.queued[0];
-
 							I.queued.splice(0, 1);
 							I.start(queue);
-
-							return resolve(Status.FINISHED);
 						}
-						if (condition()) {
-							return recursive(I.threads[slot].yields);
-						}
-					});
+						return resolve({ thread: thread, status: Status.FINISHED });
+					}
+					if (condition()) {
+						return recursive(thread.yields);
+					}
 				});
 				if (condition()) {
-					return recursive(I.threads[slot].yields);
+					return recursive(thread.yields);
 				}
 			}
 			return recursive(0);
 		});
 	}
-	public modulator(link: string): Promise<File[]> {
-		return new Promise<File[]>((resolve, rejects): void => {
-			for (let index: number = 0; index < API.length; index++) {
-				if (new RegExp(API[index].test).test(link)) {
-					(require(`@/assets/loaders/${API[index].loader}`).default).start(link).then((response: string[]): void => {
+	public modulator(link: string): Promise<{ files: File[], headers: { [key: string]: any; } }> {
+		return new Promise<{ files: File[], headers: { [key: string]: any; } }>((resolve, rejects): void => {
+			for (const LOADER of API) {
+				if (new RegExp(LOADER.test).test(link)) {
+					(require(`@/assets/loaders/${LOADER.loader}`).default as Loader).start(link).then((callback): void => {
 						const files: File[] = [];
-						for (const url of response) {
-							files.push(new File(url, path.join(".", Folder.DOWNLOADS, API[index].loader, Date.now().toString(), url.split(/\./).pop()!), false));
-						}
-						return resolve(files);
+						const folder: string = Date.now().toString();
+						callback.links.forEach((link, index) => {
+							files[index] = new File(link, path.join(".", Folder.DOWNLOADS, LOADER.loader, folder, `${index}${path.extname(link)}`), false);
+						});
+						return resolve({
+							files: files,
+							headers: callback.headers
+						});
 					}).catch((error: Error): void => {
 						fs.writeFile(path.join(".", Folder.DEBUGS, `${Date.now()}.log`), error.message, () => {
 							return rejects(error);

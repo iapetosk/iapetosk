@@ -1,4 +1,6 @@
 import request from "@/modules/request";
+import utility from "@/modules/utility";
+import { Loaded } from "@/modules/download";
 
 export type GalleryBlock = {
 	language_localname: string,
@@ -21,40 +23,58 @@ class Hitomi_La {
 			this._number_of_frontends = parseInt(/var number_of_frontends = ([0-9]+)/.exec(callback.body)![1]);
 		});
 	}
-	public start(url: string): Promise<string[]> {
-		return new Promise<string[]>(async (resolve, rejects) => {
+	public start(url: string): Promise<Loaded> {
+		return new Promise<Loaded>(async (resolve, rejects) => {
 			const I: Hitomi_La = this;
-			function format(regex: RegExp, url: string, base: number) {
+			const ID: string = /([0-9]+).html$/.exec(url)![1];
+			function format(regex: RegExp, url: string, base: number): string {
 				const channel = parseInt(regex.exec(url)![1], base);
-				return url.replace(/\[@\]/, String.fromCharCode(97 + (channel < 0x09 ? 1 : channel) % (channel < 0x30 ? 2 : I._number_of_frontends)) + "a");
+				return url.replace("[@]", String.fromCharCode(97 + (channel < 0x09 ? 1 : channel) % (channel < 0x30 ? 2 : I._number_of_frontends)).toString());
 			}
 			async function recursive(galleryblock?: GalleryBlock) {
-				galleryblock = galleryblock || await request.get(`https://ltn.hitomi.la/galleries/${/([0-9]+).html$/.exec(url)![1]}.js`).then((callback) => {
+				galleryblock = galleryblock || await request.get(`https://ltn.hitomi.la/galleries/${ID}.js`).then((callback) => {
 					return callback.response.statusCode === 404 ? undefined : JSON.parse(/var galleryinfo = ([\D\d]+)/.exec(callback.body)![1]) as GalleryBlock;
 				});
 				if (!galleryblock) {
 					return rejects();
 				}
-				if (I._number_of_frontends === NaN) {
+				if (isNaN(I._number_of_frontends)) {
 					setTimeout(() => {
 						return recursive(galleryblock);
 					}, 1000);
 				} else {
-					const links: string[] = [];
-
-					for (const file of galleryblock.files) {
+					const LOADED: Loaded = {
+						links: [],
+						headers: {
+							referer: `https://hitomi.la/reader/${ID}.html`
+						},
+						placeholders: {}
+					};
+					galleryblock.files.forEach((file, index) => {
 						if (file.hash) {
 							const hash: string = file.hash.length < 3 ? file.hash : file.hash.replace(/^.*(..)(.)$/, "$2/$1/" + file.hash);
+
 							if (file.haswebp) {
-								links.push(format(/webp\/[0-9a-f]\/([0-9a-f]{2})/, `https://[@].hitomi.la/webp/${hash}.webp`, 16));
+								LOADED.links[index] = format(/webp\/[0-9a-f]\/([0-9a-f]{2})/, `https://[@]a.hitomi.la/webp/${hash}.webp`, 16);
 							} else {
-								links.push(format(/images\/[0-9a-f]\/([0-9a-f]{2})/, `https://[@].hitomi.la/images/${hash}.${file.name.split(/\./).pop()}`, 16));
+								LOADED.links[index] = format(/images\/[0-9a-f]\/([0-9a-f]{2})/, `https://[@]a.hitomi.la/images/${hash}.${file.name.split(/\./).pop()}`, 16);
 							}
 						} else {
-							links.push(format(/galleries\/\[0-9]*(0-9)/, `https://[@].hitomi.la/galleries/${/([0-9]+).html$/.exec(url)![1]}/${file.name}`, 10));
+							LOADED.links[index] = format(/galleries\/\[0-9]*(0-9)/, `https://[@]a.hitomi.la/galleries/${ID}/${file.name}`, 10);
 						}
-					}
-					return resolve(links);
+					});
+					request.get(`https://ltn.hitomi.la/galleryblock/${ID}.html`).then((callback) => {
+						new DOMParser().parseFromString(callback.body, "text/html").querySelectorAll("td").forEach((element, index) => {
+							const value: string[] = element.innerText.split(/\s\s+/g).filter((value) => { return value.length; });
+
+							if (index % 2) {
+								LOADED.placeholders[Object.keys(LOADED.placeholders).pop()!] = utility.minify(value);
+							} else {
+								LOADED.placeholders[value[0].toLowerCase()] = undefined;
+							}
+						});
+						return resolve(LOADED);
+					});
 				}
 			}
 			return recursive();
