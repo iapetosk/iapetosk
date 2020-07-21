@@ -7,6 +7,7 @@ class Storage {
 		field.split(".").forEach((key, index, array) => {
 			if (key === array[array.length - 1]) {
 				object[key] = value;
+				return;
 			} else if (typeof object[key] === "undefined") {
 				object[key] = {};
 			}
@@ -17,8 +18,9 @@ class Storage {
 		field.split(".").forEach((key, index, array) => {
 			if (key === array[array.length - 1]) {
 				delete object[key];
+				return;
 			} else if (typeof object[key] === "undefined") {
-				object[key] = {};
+				return;
 			}
 			object = object[key];
 		});
