@@ -9,7 +9,7 @@ export type RequestOptions = PartialOptions & {
 
 export type PartialOptions = {
 	headers?: { [key: string]: any; },
-	encoding?: "binary" | "ascii" | "utf8" | "base64" | "hex",
+	encoding?: "binary" | "ascii" | "utf8" | "base64" | "hex";
 };
 class Request {
 	public async send(options: RequestOptions, directory?: string) {

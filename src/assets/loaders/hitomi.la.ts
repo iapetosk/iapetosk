@@ -45,8 +45,10 @@ class Hitomi_La {
 				} else {
 					const LOADED: Loaded = {
 						links: [],
-						headers: {
-							referer: `https://hitomi.la/reader/${ID}.html`
+						options: {
+							headers: {
+								referer: `https://hitomi.la/reader/${ID}.html`
+							}
 						},
 						placeholders: {}
 					};

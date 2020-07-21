@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
-import request from "@/modules/request";
+import request, { PartialOptions } from "@/modules/request";
 import * as API from "@/assets/modules.json";
 export enum Folder {
 	DEBUGS = "debugs",
@@ -20,12 +20,11 @@ export type Loader = {
 };
 export type Loaded = {
 	readonly links: string[],
-	readonly headers: {
-		[key: string]: any;
-	};
-	readonly placeholders: {
-		[key: string]: any;
-	};
+	readonly options?: PartialOptions,
+	readonly placeholders: PlaceHolders;
+};
+export type PlaceHolders = {
+	[key: string]: any;
 };
 export class File {
 	private _link: string;
@@ -155,7 +154,7 @@ export class Download {
 	set max_yields(value: number) {
 		this._max_yields = value;
 	}
-	public start(manifest: Thread | File[], headers?: { [key: string]: any; }): Promise<{ thread: Thread, status: Status; }> {
+	public start(manifest: Thread | File[], options?: PartialOptions): Promise<{ thread: Thread, status: Status; }> {
 		return new Promise<{ thread: Thread, status: Status; }>((resolve, rejects): void => {
 			let slot: number = NaN;
 			let files: File[] = manifest instanceof Thread ? manifest.files : manifest;
@@ -196,7 +195,7 @@ export class Download {
 					return resolve({ thread: thread, status: Status.REMOVED });
 				}
 				thread.yields++;
-				request.get(files[valid[index]].link, { headers: headers }, files[valid[index]].path).then((callback): void => {
+				request.get(files[valid[index]].link, options, files[valid[index]].path).then((callback): void => {
 					if (!thread) {
 						return resolve({ thread: thread, status: Status.REMOVED });
 					}
@@ -227,10 +226,11 @@ export class Download {
 			return recursive(0);
 		});
 	}
-	public modulator(link: string): Promise<{ files: File[], headers: { [key: string]: any; } }> {
-		return new Promise<{ files: File[], headers: { [key: string]: any; } }>((resolve, rejects): void => {
+	public modulator(link: string): Promise<{ files: File[], options?: PartialOptions; }> {
+		return new Promise<{ files: File[], options?: PartialOptions; }>((resolve, rejects): void => {
 			for (const LOADER of API) {
 				if (new RegExp(LOADER.test).test(link)) {
+					// require("module")._load(LOADER.loader, this, false) | https://nearsoft.com/blog/nodejs-how-to-load-a-module-with-require/
 					(require(`@/assets/loaders/${LOADER.loader}`).default as Loader).start(link).then((callback): void => {
 						const files: File[] = [];
 						const folder: string = Date.now().toString();
@@ -239,7 +239,7 @@ export class Download {
 						});
 						return resolve({
 							files: files,
-							headers: callback.headers
+							options: callback.options
 						});
 					}).catch((error: Error): void => {
 						fs.writeFile(path.join(".", Folder.DEBUGS, `${Date.now()}.log`), error.message, () => {

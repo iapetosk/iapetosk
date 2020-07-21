@@ -15,7 +15,7 @@ export default class Iterable extends Vue {
 	private scroll_index: number = 0;
 	private downloadable: Grid[] = new Array();
 	created(): void {
-		this.$store.commit("querybox/query", { value: "https://hitomi.la/galleries/1000.html" });
+		this.$store.commit("querybox/query", { value: "https://hitomi.la/galleries/1000.html https://hitomi.la/galleries/2000.html" });
 	}
 	private wheel(event: WheelEvent): void | boolean {
 		this.scroll_index = utility.clamp(this.scroll_index + (event.deltaY > 0 ? 1 : -1), 0, this.downloadable.length - 1);
@@ -62,7 +62,7 @@ export default class Iterable extends Vue {
 		if ($new && $new.length) {
 			$new.split(/\s+/).forEach((value) => {
 				download.modulator(value).then((callback) => {
-					download.start(callback.files, callback.headers).then((callback_second) => {
+					download.start(callback.files, callback.options).then((callback_second) => {
 						this.downloadable.push({
 							title: value,
 							from: value,
