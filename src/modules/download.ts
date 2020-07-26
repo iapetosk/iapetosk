@@ -226,8 +226,8 @@ export class Download {
 			return recursive(0);
 		});
 	}
-	public modulator(link: string): Promise<{ files: File[], options?: PartialOptions; }> {
-		return new Promise<{ files: File[], options?: PartialOptions; }>((resolve, rejects): void => {
+	public modulator(link: string): Promise<{ files: File[], options?: PartialOptions, placeholders: PlaceHolders; }> {
+		return new Promise<{ files: File[], options?: PartialOptions, placeholders: PlaceHolders; }>((resolve, rejects): void => {
 			for (const LOADER of API) {
 				if (new RegExp(LOADER.test).test(link)) {
 					// require("module")._load(LOADER.loader, this, false) | https://nearsoft.com/blog/nodejs-how-to-load-a-module-with-require/
@@ -239,7 +239,8 @@ export class Download {
 						});
 						return resolve({
 							files: files,
-							options: callback.options
+							options: callback.options,
+							placeholders: callback.placeholders
 						});
 					}).catch((error: Error): void => {
 						fs.writeFile(path.join(".", Folder.DEBUGS, `${Date.now()}.log`), error.message, () => {

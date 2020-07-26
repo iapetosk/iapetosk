@@ -1,7 +1,6 @@
-import request from "@/modules/request";
+import request, { PartialOptions } from "@/modules/request";
+import { Loaded, PlaceHolders } from "@/modules/download";
 import utility from "@/modules/utility";
-import { Loaded } from "@/modules/download";
-
 export type GalleryBlock = {
 	language_localname: string,
 	language: string,
@@ -15,7 +14,6 @@ export type GalleryBlock = {
 		hash: string;
 	}[];
 };
-
 class Hitomi_La {
 	private _number_of_frontends: number = NaN;
 	constructor() {
@@ -43,39 +41,48 @@ class Hitomi_La {
 						return recursive(galleryblock);
 					}, 1000);
 				} else {
-					const LOADED: Loaded = {
-						links: [],
-						options: {
-							headers: {
-								referer: `https://hitomi.la/reader/${ID}.html`
-							}
-						},
-						placeholders: {}
+					const links: string[] = [
+						// TODO: none
+					];
+					const options: PartialOptions = {
+						headers: {
+							referer: `https://hitomi.la/reader/${ID}.html`
+						}
+					};
+					const placeholders: PlaceHolders = {
+						id: ID
 					};
 					galleryblock.files.forEach((file, index) => {
 						if (file.hash) {
+							// server logic
 							const hash: string = file.hash.length < 3 ? file.hash : file.hash.replace(/^.*(..)(.)$/, "$2/$1/" + file.hash);
-
+							// condition
 							if (file.haswebp) {
-								LOADED.links[index] = format(/webp\/[0-9a-f]\/([0-9a-f]{2})/, `https://[@]a.hitomi.la/webp/${hash}.webp`, 16);
+								links[index] = format(/webp\/[0-9a-f]\/([0-9a-f]{2})/, `https://[@]a.hitomi.la/webp/${hash}.webp`, 16);
 							} else {
-								LOADED.links[index] = format(/images\/[0-9a-f]\/([0-9a-f]{2})/, `https://[@]a.hitomi.la/images/${hash}.${file.name.split(/\./).pop()}`, 16);
+								links[index] = format(/images\/[0-9a-f]\/([0-9a-f]{2})/, `https://[@]a.hitomi.la/images/${hash}.${file.name.split(/\./).pop()}`, 16);
 							}
 						} else {
-							LOADED.links[index] = format(/galleries\/\[0-9]*(0-9)/, `https://[@]a.hitomi.la/galleries/${ID}/${file.name}`, 10);
+							links[index] = format(/galleries\/\[0-9]*(0-9)/, `https://[@]a.hitomi.la/galleries/${ID}/${file.name}`, 10);
 						}
 					});
 					request.get(`https://ltn.hitomi.la/galleryblock/${ID}.html`).then((callback) => {
-						new DOMParser().parseFromString(callback.body, "text/html").querySelectorAll("td").forEach((element, index) => {
-							const value: string[] = element.innerText.split(/\s\s+/g).filter((value) => { return value.length; });
-
+						(utility.parser(callback.body, "td") as string[]).forEach((value, index) => {
 							if (index % 2) {
-								LOADED.placeholders[Object.keys(LOADED.placeholders).pop()!] = utility.minify(value);
+								placeholders[Object.keys(placeholders).pop()!] = utility.unwrap(value.split(/\s\s+/g).filter((value) => { return value.length; }));
 							} else {
-								LOADED.placeholders[value[0].toLowerCase()] = undefined;
+								placeholders[value.toLowerCase()] = undefined;
 							}
 						});
-						return resolve(LOADED);
+						return resolve({
+							links: links,
+							options: options,
+							placeholders: {
+								title: utility.parser(callback.body, ".lillie a")[0],
+								date: utility.parser(callback.body, ".date")[0],
+								...placeholders
+							}
+						});
 					});
 				}
 			}

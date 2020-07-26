@@ -8,8 +8,15 @@ class Utility {
 	public random(minimum: number, maximum: number): number {
 		return Math.floor(Math.random() * (maximum - minimum + 1.0)) + minimum;
 	}
-	public minify(value: any[]): any[] | any {
+	public unwrap<type>(value: type[]): type[] | type {
 		return value.length - 1.0 ? value : value[0];
+	}
+	public parser(value: string, path: string, attribute?: string): string[] | string {
+		const array: string[] = [];
+		new DOMParser().parseFromString(value, "text/html").querySelectorAll(path).forEach((element, index) => {
+			array[index] = attribute ? element.getAttribute(attribute)! : (element as HTMLElement).innerText;
+		});
+		return this.unwrap(array);
 	}
 }
 

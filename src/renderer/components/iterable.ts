@@ -4,8 +4,8 @@ import download, { Status, Thread } from "@/modules/download";
 import utility from "@/modules/utility";
 
 export type Grid = {
-	title: string,
 	from: string,
+	title: string,
 	status: Status,
 	thread: Thread;
 };
@@ -60,12 +60,12 @@ export default class Iterable extends Vue {
 	@Watch("$store.state.querybox.query")
 	private $store_state_querybox_query($new: string): void {
 		if ($new && $new.length) {
-			$new.split(/\s+/).forEach((value) => {
-				download.modulator(value).then((callback) => {
+			$new.split(/\s+/).forEach((link) => {
+				download.modulator(link).then((callback) => {
 					download.start(callback.files, callback.options).then((callback_second) => {
 						this.downloadable.push({
-							title: value,
-							from: value,
+							from: link,
+							title: callback.placeholders.title,
 							...callback_second
 						});
 					});
