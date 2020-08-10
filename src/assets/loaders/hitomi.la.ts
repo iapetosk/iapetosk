@@ -78,8 +78,8 @@ class Hitomi_La {
 							links: links,
 							options: options,
 							placeholders: {
-								title: utility.parser(callback.body, ".lillie a")[0],
-								date: utility.parser(callback.body, ".date")[0],
+								title: utility.parser(callback.body, ".lillie a"),
+								date: utility.parser(callback.body, ".date"),
 								...placeholders
 							}
 						});
