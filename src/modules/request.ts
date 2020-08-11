@@ -19,7 +19,7 @@ class Request {
 
 			(SSL ? https : http).get({
 				hostname: URI[0],
-				path: URI.join("/").replace(new RegExp(`^${URI[0]}`), ""),
+				path: ["", ...URI.slice(1)].join("/"),
 				method: options.method,
 				headers: options.headers,
 				protocol: SSL ? "https:" : "http:"

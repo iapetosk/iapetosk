@@ -1,6 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
+import storage from "./storage";
 import request, { PartialOptions } from "@/modules/request";
+import { Resource } from "@/renderer/store/modules/download";
 import * as API from "@/assets/modules.json";
 export enum Folder {
 	DEBUGS = "debugs",
@@ -19,9 +21,10 @@ export type Loader = {
 	start(url: string): Promise<Loaded>;
 };
 export type Loaded = {
+	readonly title: string,
 	readonly links: string[],
 	readonly options?: PartialOptions,
-	readonly placeholders: PlaceHolders;
+	readonly placeholders?: PlaceHolders;
 };
 export type PlaceHolders = {
 	[key: string]: any;
@@ -63,66 +66,46 @@ export class File {
 	}
 }
 export class Thread {
-	private _id: number;
-	private _yields: number;
-	private _finished: number;
-	private _max_yields: number;
-	private _files: File[];
-	constructor(max_yields: number, files: File[]) {
-		// generate id
-		this._id = Date.now();
-		// initial setup
-		this._yields = 0;
-		this._finished = 0;
+	public id: number;
+	public yields: number = 0;
+	public finished: number = 0;
+	public max_yields: number;
+	public files: File[];
+	constructor(max_yields: number, files: File[], id: number = Date.now()) {
 		// limit max yields
-		this._max_yields = max_yields;
+		this.max_yields = max_yields;
 		// define files
-		this._files = files;
-	}
-	get id(): number {
-		return this._id;
-	}
-	set id(value: number) {
-		this._id = value;
-	}
-	get yields(): number {
-		return this._yields;
-	}
-	set yields(value: number) {
-		this._yields = value;
-	}
-	get finished(): number {
-		return this._finished;
-	}
-	set finished(value: number) {
-		this._finished = value;
-	}
-	get max_yields(): number {
-		return this._max_yields;
-	}
-	get files(): File[] {
-		return this._files;
+		this.files = files;
+		// unique id
+		this.id = id;
 	}
 }
 export class Download {
-	private _threads: Thread[];
-	private _queued: Thread[];
-	private _max_threads: number;
-	private _max_yields: number;
+	public threads: Thread[];
+	public queued: Thread[];
+	public max_threads: number;
+	public max_yields: number;
 	constructor(max_threads: number, max_yields: number) {
-		this._max_threads = max_threads;
-		this._max_yields = max_yields;
+		this.max_threads = max_threads;
+		this.max_yields = max_yields;
 		// limit max threads
-		this._threads = new Array(max_threads);
-		this._queued = new Array();
+		this.threads = new Array(max_threads);
+		this.queued = new Array();
+		// loop all within folder
 		/*
 		for (const bundle of fs.readdirSync(Folder.BUNDLES)) {
+			// check if it's JSON file
 			if (fs.statSync(bundle).isFile() && path.extname(bundle) === ".json") {
 				const ID: string = path.basename(bundle);
-				database.register(ID, path.join(Folder.BUNDLES, bundle), "[import]");
-				switch (database.get_data(ID)) {
+
+				storage.register(ID, path.join(Folder.BUNDLES, bundle), "@import");
+
+				const resource: Resource = storage.get_data(ID);
+
+				switch (resource.status) {
 					case Status.PROGRESS: {
-						this.start(database.get_data(ID));
+						// @ts-ignore
+						this.start(new Thread(this.max_yields, resource.files, ID * 1));
 						break;
 					}
 				}
@@ -130,35 +113,11 @@ export class Download {
 		}
 		*/
 	}
-	get threads(): Thread[] {
-		return this._threads;
-	}
-	set threads(value: Thread[]) {
-		this._threads = value;
-	}
-	get queued(): Thread[] {
-		return this._queued;
-	}
-	set queued(value: Thread[]) {
-		this._queued = value;
-	}
-	get max_threads(): number {
-		return this._max_threads;
-	}
-	set max_threads(value: number) {
-		this._max_threads = value;
-	}
-	get max_yields(): number {
-		return this._max_yields;
-	}
-	set max_yields(value: number) {
-		this._max_yields = value;
-	}
 	public start(manifest: Thread | File[], options?: PartialOptions): Promise<{ thread: Thread, status: Status; }> {
 		return new Promise<{ thread: Thread, status: Status; }>((resolve, rejects): void => {
 			let slot: number = NaN;
 			let files: File[] = manifest instanceof Thread ? manifest.files : manifest;
-			let thread: Thread = manifest instanceof Thread ? manifest : new Thread(this._max_yields, files);
+			let thread: Thread = manifest instanceof Thread ? manifest : new Thread(this.max_yields, files);
 
 			console.table(thread);
 
@@ -186,6 +145,11 @@ export class Download {
 				delete this.threads[slot];
 				return resolve({ thread: thread, status: Status.FINISHED });
 			}
+			if (!storage.exist(thread.id.toString())) {
+				storage.register(thread.id.toString(), path.dirname(files[valid[0]].path), {
+					// TODO: from, title, files, status
+				});
+			}
 			const I: Download = this;
 			function condition(): boolean {
 				return !!valid[thread.yields] && thread.yields - thread.finished < thread.max_yields;
@@ -201,6 +165,8 @@ export class Download {
 					}
 					thread.finished++;
 					thread.files[valid[index]].written = true;
+
+					storage.set_data(thread.id.toString(), { ...storage.get_data(thread.id.toString()), files: files });
 
 					// (files.length - valid.length + thread.finished) / files.length
 					resolve({ thread: thread, status: Status.PROGRESS });
@@ -226,8 +192,8 @@ export class Download {
 			return recursive(0);
 		});
 	}
-	public modulator(link: string): Promise<{ files: File[], options?: PartialOptions, placeholders: PlaceHolders; }> {
-		return new Promise<{ files: File[], options?: PartialOptions, placeholders: PlaceHolders; }>((resolve, rejects): void => {
+	public modulator(link: string): Promise<{ resource: Resource, options?: PartialOptions, placeholders?: PlaceHolders; }> {
+		return new Promise<{ resource: Resource, options?: PartialOptions, placeholders?: PlaceHolders; }>((resolve, rejects): void => {
 			for (const LOADER of API) {
 				if (new RegExp(LOADER.test).test(link)) {
 					// require("module")._load(LOADER.loader, this, false) | https://nearsoft.com/blog/nodejs-how-to-load-a-module-with-require/
@@ -238,7 +204,12 @@ export class Download {
 							files[index] = new File(link, path.join(".", Folder.DOWNLOADS, LOADER.loader, folder, `${index}${path.extname(link)}`), false);
 						});
 						return resolve({
-							files: files,
+							resource: {
+								from: link,
+								title: callback.title,
+								files: files,
+								status: Status.NONE
+							},
 							options: callback.options,
 							placeholders: callback.placeholders
 						});

@@ -1,12 +1,12 @@
-import { Status, Thread } from "@/modules/download";
-export type Grid = {
+import { Status, File } from "@/modules/download";
+export type Resource = {
 	from: string,
 	title: string,
-	status: Status,
-	thread: Thread;
+	files: File[],
+	status: Status
 };
 class Download {
-	public list: Grid[] = [];
+	public list: Resource[] = [];
 };
 // getters | getters
 const getters = {
@@ -16,28 +16,28 @@ const getters = {
 };
 // actions | dispatch
 const actions = {
-	append: (state: { commit: Function, getters: { [key: string]: any; }; }, options: { value: Grid; }): void => {
+	append: (state: { commit: Function, getters: { [key: string]: any; }; }, options: { value: Resource; }): void => {
 		state.commit("list", {
 			value: [
-				...state.getters["list"] as Grid[],
+				...state.getters["list"] as Resource[],
 				options.value
 			]
 		});
 	},
-	prepend: (state: { commit: Function, getters: { [key: string]: any; }; }, options: { value: Grid; }): void => {
+	prepend: (state: { commit: Function, getters: { [key: string]: any; }; }, options: { value: Resource; }): void => {
 		state.commit("list", {
 			value: [
 				options.value,
-				...state.getters["list"] as Grid[]
+				...state.getters["list"] as Resource[]
 			]
 		});
 	},
-	insert: (state: { commit: Function, getters: { [key: string]: any; }; }, options: { value: Grid, index: number; }): void => {
+	insert: (state: { commit: Function, getters: { [key: string]: any; }; }, options: { value: Resource, index: number; }): void => {
 		state.commit("list", {
 			value: [
-				...(state.getters["list"] as Grid[]).slice(0, options.index),
+				...(state.getters["list"] as Resource[]).slice(0, options.index),
 				options.value,
-				...(state.getters["list"] as Grid[]).slice(options.index + 1),
+				...(state.getters["list"] as Resource[]).slice(options.index + 1),
 			].filter((value) => {
 				return value;
 			})
