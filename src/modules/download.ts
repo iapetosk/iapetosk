@@ -1,9 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
-import storage from "./storage";
+import storage from "@/modules/storage";
 import request, { PartialOptions } from "@/modules/request";
-import { Resource } from "@/renderer/store/modules/download";
 import * as API from "@/assets/modules.json";
+import $store from "@/renderer/store/index";
 export enum Folder {
 	DEBUGS = "debugs",
 	BUNDLES = "bundles",
@@ -30,54 +30,30 @@ export type PlaceHolders = {
 	[key: string]: any;
 };
 export class File {
-	private _link: string;
-	private _path: string;
-	private _written: boolean;
+	public link: string;
+	public path: string;
+	public written: boolean;
 	constructor(link: string, path: string, written: boolean = false) {
-		this._link = link;
-		this._path = path;
-		this._written = written;
-	}
-	get link(): string {
-		return this._link;
-	}
-	set link(value: string) {
-		if (new RegExp("[(http(s)?):\/\/(www\.)?a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)").test(value)) {
-			this._path = value;
-		} else {
-			throw new SyntaxError("invalid url");
-		}
-	}
-	get path(): string {
-		return this._path;
-	}
-	set path(value: string) {
-		if (new RegExp("((?:[^/]*/)*)(.*)").exec(value)?.[2]) {
-			this._path = value;
-		} else {
-			throw new SyntaxError("invalid path");
-		}
-	}
-	get written(): boolean {
-		return this._written;
-	}
-	set written(value: boolean) {
-		this._written = value;
+		this.link = link;
+		this.path = path;
+		this.written = written;
 	}
 }
 export class Thread {
 	public id: number;
+	public from: string;
+	public title: string;
+	public files: File[];
+	public status: Status = Status.NONE;
+	public options: PartialOptions;
 	public yields: number = 0;
 	public finished: number = 0;
-	public max_yields: number;
-	public files: File[];
-	constructor(max_yields: number, files: File[], id: number = Date.now()) {
-		// limit max yields
-		this.max_yields = max_yields;
-		// define files
-		this.files = files;
-		// unique id
+	constructor(from: string, title: string, files: File[], options: PartialOptions = {}, id: number = Date.now()) {
 		this.id = id;
+		this.from = from;
+		this.title = title;
+		this.files = files;
+		this.options = options;
 	}
 }
 export class Download {
@@ -92,32 +68,39 @@ export class Download {
 		this.threads = new Array(max_threads);
 		this.queued = new Array();
 		// loop all within folder
-		/*
-		for (const bundle of fs.readdirSync(Folder.BUNDLES)) {
-			// check if it's JSON file
-			if (fs.statSync(bundle).isFile() && path.extname(bundle) === ".json") {
-				const ID: string = path.basename(bundle);
+		try {
+			for (const bundle of fs.readdirSync(Folder.BUNDLES)) {
+				// check if it's JSON file
+				try {
+					if (fs.statSync(path.join(Folder.BUNDLES, bundle)).isFile() && path.extname(bundle) === ".json") {
+						const ID: string = bundle.split(".")[0];
 
-				storage.register(ID, path.join(Folder.BUNDLES, bundle), "@import");
+						storage.register(ID, path.join(Folder.BUNDLES, bundle), "@import");
 
-				const resource: Resource = storage.get_data(ID);
+						const thread: Thread = storage.get_data(ID);
 
-				switch (resource.status) {
-					case Status.PROGRESS: {
-						// @ts-ignore
-						this.start(new Thread(this.max_yields, resource.files, ID * 1));
-						break;
+						switch (thread.status) {
+							case Status.PROGRESS: {
+								this.start(thread);
+								break;
+							}
+							default: {
+								$store.dispatch("thread/append", {
+									value: thread
+								});
+								break;
+							}
+						}
 					}
+				} catch (error) {
+					console.log(error);
 				}
 			}
-		}
-		*/
+		} catch { }
 	}
-	public start(manifest: Thread | File[], options?: PartialOptions): Promise<{ thread: Thread, status: Status; }> {
-		return new Promise<{ thread: Thread, status: Status; }>((resolve, rejects): void => {
+	public start(thread: Thread): Promise<void> {
+		return new Promise<void>((resolve, rejects): void => {
 			let slot: number = NaN;
-			let files: File[] = manifest instanceof Thread ? manifest.files : manifest;
-			let thread: Thread = manifest instanceof Thread ? manifest : new Thread(this.max_yields, files);
 
 			console.table(thread);
 
@@ -129,49 +112,59 @@ export class Download {
 			}
 			if (isNaN(slot)) {
 				this.queued.push(thread);
-				return resolve({ thread: thread, status: Status.QUEUED });
+				return resolve();
 			}
+
+			$store.dispatch("thread/append", {
+				value: thread
+			});
 
 			this.threads[slot] = thread;
 
 			const valid: number[] = [];
 
-			for (let index: number = 0; index < files.length; index++) {
-				if (!files[index].written) {
+			for (let index: number = 0; index < thread.files.length; index++) {
+				if (!thread.files[index].written) {
 					valid.push(index);
 				}
 			}
 			if (!valid.length) {
 				delete this.threads[slot];
-				return resolve({ thread: thread, status: Status.FINISHED });
+				return resolve();
 			}
 			if (!storage.exist(thread.id.toString())) {
-				storage.register(thread.id.toString(), path.dirname(files[valid[0]].path), {
-					// TODO: from, title, files, status
+				storage.register(thread.id.toString(), path.join(Folder.BUNDLES, thread.id.toString() + ".json"), {
+					...thread
 				});
 			}
 			const I: Download = this;
 			function condition(): boolean {
-				return !!valid[thread.yields] && thread.yields - thread.finished < thread.max_yields;
+				return !!valid[thread.yields] && thread.yields - thread.finished < I.max_yields;
 			}
 			function recursive(index: number): void {
 				if (!thread) {
-					return resolve({ thread: thread, status: Status.REMOVED });
+					return resolve();
 				}
 				thread.yields++;
-				request.get(files[valid[index]].link, options, files[valid[index]].path).then((callback): void => {
+				request.get(thread.files[valid[index]].link, thread.options, thread.files[valid[index]].path).then((): void => {
 					if (!thread) {
-						return resolve({ thread: thread, status: Status.REMOVED });
+						return resolve();
 					}
 					thread.finished++;
 					thread.files[valid[index]].written = true;
+					thread.status = I.status(thread.files);
 
-					storage.set_data(thread.id.toString(), { ...storage.get_data(thread.id.toString()), files: files });
+					storage.set_data(thread.id.toString(), thread);
+
+					$store.dispatch("thread/update", {
+						value: thread,
+						id: thread.id
+					});
 
 					// (files.length - valid.length + thread.finished) / files.length
-					resolve({ thread: thread, status: Status.PROGRESS });
 
 					if (valid.length === thread.finished) {
+
 						delete I.threads[slot];
 
 						if (I.queued.length) {
@@ -179,7 +172,7 @@ export class Download {
 							I.queued.splice(0, 1);
 							I.start(queue);
 						}
-						return resolve({ thread: thread, status: Status.FINISHED });
+						return resolve();
 					}
 					if (condition()) {
 						return recursive(thread.yields);
@@ -192,8 +185,8 @@ export class Download {
 			return recursive(0);
 		});
 	}
-	public modulator(link: string): Promise<{ resource: Resource, options?: PartialOptions, placeholders?: PlaceHolders; }> {
-		return new Promise<{ resource: Resource, options?: PartialOptions, placeholders?: PlaceHolders; }>((resolve, rejects): void => {
+	public modulator(link: string): Promise<{ thread: Thread }> {
+		return new Promise<{ thread: Thread }>((resolve, rejects): void => {
 			for (const LOADER of API) {
 				if (new RegExp(LOADER.test).test(link)) {
 					// require("module")._load(LOADER.loader, this, false) | https://nearsoft.com/blog/nodejs-how-to-load-a-module-with-require/
@@ -204,14 +197,7 @@ export class Download {
 							files[index] = new File(link, path.join(".", Folder.DOWNLOADS, LOADER.loader, folder, `${index}${path.extname(link)}`), false);
 						});
 						return resolve({
-							resource: {
-								from: link,
-								title: callback.title,
-								files: files,
-								status: Status.NONE
-							},
-							options: callback.options,
-							placeholders: callback.placeholders
+							thread: new Thread(link, callback.title, files, callback.options)
 						});
 					}).catch((error: Error): void => {
 						fs.writeFile(path.join(".", Folder.DEBUGS, `${Date.now()}.log`), error.message, () => {
@@ -224,7 +210,7 @@ export class Download {
 	}
 	public status(files: File[]): Status {
 		for (const file of files) {
-			if (file.written) {
+			if (!file.written) {
 				return Status.PROGRESS;
 			}
 		}

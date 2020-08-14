@@ -75,7 +75,7 @@ class Hitomi_La {
 							}
 						});
 						return resolve({
-							title: utility.parser(callback.body, "title") as string,
+							title: utility.parser(callback.body, ".lillie a") as string,
 							links: links,
 							options: options,
 							placeholders: {

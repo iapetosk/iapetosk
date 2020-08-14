@@ -14,37 +14,43 @@ class Storage {
 	constructor(store: Storage["store"]) {
 		this.store = store;
 	}
-	public $define(object: { [key: string]: any; }, field: string, value: any): void {
-		field.split(".").forEach((key, index, array) => {
-			if (key === array[array.length - 1]) {
-				object[key] = value;
+	public $define(object: { [key: string]: any; }, field: string, data: any): any {
+        const array: string[] = field.split(".");
+
+        for (const [index, value] of array.entries()) {
+            if (index === array.length - 1) {
+				object[value] = data;
 				return;
-			} else if (typeof object[key] === "undefined") {
-				object[key] = {};
+			} else if (typeof object[value] === "undefined") {
+				object[value] = {};
 			}
-			object = object[key];
-		});
+			object = object[value];
+        }
 	}
-	public $delete(object: { [key: string]: any; }, field: string): void {
-		field.split(".").forEach((key, index, array) => {
-			if (key === array[array.length - 1]) {
-				delete object[key];
+	public $delete(object: { [key: string]: any; }, field: string): any {
+        const array: string[] = field.split(".");
+
+        for (const [index, value] of array.entries()) {
+            if (index === array.length - 1) {
+				delete object[value];
 				return;
-			} else if (typeof object[key] === "undefined") {
+			} else if (typeof object[value] === "undefined") {
 				return;
 			}
-			object = object[key];
-		});
+			object = object[value];
+        }
 	}
 	public $return(object: { [key: string]: any; }, field: string): any {
-		field.split(".").forEach((key, index, array) => {
-			if (key === array[array.length - 1]) {
-				return object[key];
-			} else if (typeof object[key] === "undefined") {
+        const array: string[] = field.split(".");
+
+        for (const [index, value] of array.entries()) {
+            if (index === array.length - 1) {
+				return object[value];
+			} else if (typeof object[value] === "undefined") {
 				return;
 			}
-			object = object[key];
-		});
+			object = object[value];
+        }
 	}
 	public get_path(key: string): string {
 		return this.$return(this.store, key + ".path");
@@ -65,8 +71,8 @@ class Storage {
 			path: path,
 			data: data === "@import" ? this.import(path) : data
 		});
-		this.export(key);
 		console.log(this.store);
+		this.export(key);
 	}
 	public un_register(key: string): void {
 		fs.rmdirSync(path.dirname(this.get_path(key)), { recursive: true });

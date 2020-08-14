@@ -1,4 +1,12 @@
 class Utility {
+	public index_of<type>(array: type[], value: type): number {
+		for (let index: number = 0; index < array.length; index++) {
+			if (array[index] === value) {
+				return index;
+			}
+		}
+		return NaN;
+	}
 	public clamp(value: number, minimum: number, maximum: number): number {
 		return Math.min(Math.max(value, minimum), maximum);
 	}

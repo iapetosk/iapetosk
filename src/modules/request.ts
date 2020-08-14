@@ -6,7 +6,6 @@ export type RequestOptions = PartialOptions & {
 	url: string,
 	method: "GET" | "POST" | "PUT" | "DELETE";
 };
-
 export type PartialOptions = {
 	headers?: { [key: string]: any; },
 	encoding?: "binary" | "ascii" | "utf8" | "base64" | "hex";
