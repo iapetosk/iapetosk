@@ -7,7 +7,6 @@ import iterable from "@/renderer/components/iterable.vue";
 import taskbar from "@/renderer/components/taskbar.vue";
 
 import listener from "@/modules/listener";
-import download from "@/modules/download";
 
 @Component({
 	components: {

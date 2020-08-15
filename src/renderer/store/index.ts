@@ -1,8 +1,8 @@
 import vue from "vue";
 import vuex from "vuex";
 
-import thread from "./modules/thread";
-import querybox from "./modules/querybox";
+import thread from "@/renderer/store/modules/thread";
+import querybox from "@/renderer/store/modules/querybox";
 
 vue.use(vuex);
 

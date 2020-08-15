@@ -27,5 +27,4 @@ class Utility {
 		return this.unwrap(array);
 	}
 }
-
 export default (new Utility());

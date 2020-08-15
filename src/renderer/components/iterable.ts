@@ -1,5 +1,5 @@
 import { Component, Vue, Watch } from "vue-property-decorator";
-import download, { Status } from "@/modules/download";
+import download, { Status, Thread } from "@/modules/download";
 import utility from "@/modules/utility";
 
 @Component({})
@@ -9,9 +9,9 @@ export default class Iterable extends Vue {
 		// this.$store.commit("querybox/query", { value: "https://hitomi.la/galleries/1097524.html" });
 	}
 	private wheel(event: WheelEvent): void | boolean {
-		if (event.deltaY > 0) {
+		if (event.deltaY > 0 && this.$store.getters["thread/list"].length - 1 > this.scroll_index) {
 			this.scroll_index++;
-		} else {
+		} else if (this.scroll_index > 0) {
 			this.scroll_index--;
 		}
 	}
@@ -46,20 +46,18 @@ export default class Iterable extends Vue {
 	}
 	@Watch("scroll_index")
 	private watch_scroll_index($new: number): void {
-		this.scroll_index = utility.clamp($new, 0, this.$store.getters["thread/list"].length - 1);
-		// update viewport
 		this.adjust_scroll();
 	}
-	@Watch("downloadable")
-	private watch_downloadable(): void {
-		this.scroll_index = utility.clamp(this.scroll_index, 0, this.$store.getters["thread/list"].length - 1);
+	@Watch("$store.state.thread.list")
+	private watch_$store_state_thread_list($new: Thread[]): void {
+		this.scroll_index = utility.clamp(this.scroll_index, 0, $new.length - 1);
 	}
 	@Watch("$store.state.querybox.query")
-	private $store_state_querybox_query($new: string): void {
+	private watch_$store_state_querybox_query($new: string): void {
 		if ($new && $new.length) {
 			$new.split(/\s+/).forEach((link) => {
 				download.modulator(link).then((callback) => {
-					download.start(callback.thread).then((callback_second) => {
+					download.start(callback.thread).then(() => {
 						// TODO: none
 					});
 				});

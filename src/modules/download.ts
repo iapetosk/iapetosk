@@ -70,30 +70,25 @@ export class Download {
 		// loop all within folder
 		try {
 			for (const bundle of fs.readdirSync(Folder.BUNDLES)) {
-				// check if it's JSON file
-				try {
-					if (fs.statSync(path.join(Folder.BUNDLES, bundle)).isFile() && path.extname(bundle) === ".json") {
-						const ID: string = bundle.split(".")[0];
+				if (fs.statSync(path.join(Folder.BUNDLES, bundle)).isFile() && path.extname(bundle) === ".json") {
+					const ID: string = bundle.split(".")[0];
 
-						storage.register(ID, path.join(Folder.BUNDLES, bundle), "@import");
+					storage.register(ID, path.join(Folder.BUNDLES, bundle), "@import");
 
-						const thread: Thread = storage.get_data(ID);
+					const thread: Thread = storage.get_data(ID);
 
-						switch (thread.status) {
-							case Status.PROGRESS: {
-								this.start(thread);
-								break;
-							}
-							default: {
-								$store.dispatch("thread/append", {
-									value: thread
-								});
-								break;
-							}
+					switch (thread.status) {
+						case Status.PROGRESS: {
+							this.start(thread);
+							break;
+						}
+						default: {
+							$store.dispatch("thread/append", {
+								value: thread
+							});
+							break;
 						}
 					}
-				} catch (error) {
-					console.log(error);
 				}
 			}
 		} catch { }
@@ -160,7 +155,6 @@ export class Download {
 						value: thread,
 						id: thread.id
 					});
-
 					// (files.length - valid.length + thread.finished) / files.length
 
 					if (valid.length === thread.finished) {

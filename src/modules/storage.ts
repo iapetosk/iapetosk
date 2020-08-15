@@ -1,8 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 export enum StoragePreset {
-	SETTINGS = "settings",
-	RESOURCES = "resources"
+	SETTINGS = "settings"
 }
 class Storage {
 	private store: {
@@ -69,9 +68,8 @@ class Storage {
 	public register(key: string, path: string, data: any): void {
 		this.$define(this.store, key, {
 			path: path,
-			data: data === "@import" ? this.import(path) : data
+			data: data === "@import" ? this.import(path) : {}
 		});
-		console.log(this.store);
 		this.export(key);
 	}
 	public un_register(key: string): void {
@@ -96,10 +94,6 @@ class Storage {
 export default (new Storage({
 	[StoragePreset.SETTINGS]: {
 		path: "./settings.json",
-		data: "@import"
-	},
-	[StoragePreset.RESOURCES]: {
-		path: "./resources.json",
 		data: "@import"
 	}
 }));
