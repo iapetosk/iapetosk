@@ -13,12 +13,12 @@ export default class TreeView extends Vue {
 		}
 	} = {};
 	created(): void {
+		this.treeview_update(this.$store.getters["thread/list"] as Thread[]);
 	}
-	@Watch("$store.state.thread.list")
-	private async watch_$store_state_thread_list($new: Thread[]): Promise<void> {
+	public async treeview_update(worker: Thread[]) {
 		const treeview: TreeView["treeview"] = {};
 
-		for (const thread of $new) {
+		for (const thread of worker) {
 			const hostname = thread.from.replace(/https?:\/\/(www.)?/, "").split("/")[0];
 
 			if (treeview[hostname]) {
@@ -30,12 +30,16 @@ export default class TreeView extends Vue {
 				}
 			} else {
 				treeview[hostname] = {
-					favicon: await request.get(hostname).then((callback) => { return utility.parser(callback.body, "link[rel=\"icon\"]", "href")[0] }),
+					favicon: await request.get(`https://${hostname}`).then((callback) => { return utility.parser(callback.body, "link[rel=\"icon\"]", "href")[0] }),
 					list: [thread.from],
 					show: false
 				};
 			}
 		}
 		this.treeview = treeview;
+	}
+	@Watch("$store.state.thread.list")
+	private async watch_$store_state_thread_list($new: Thread[]): Promise<void> {
+		this.treeview_update($new);
 	}
 }

@@ -13,7 +13,7 @@ export type PartialOptions = {
 class Request {
 	public async send(options: RequestOptions, directory?: string) {
 		return new Promise<{ response: http.IncomingMessage, body: string; }>((resolve, rejects) => {
-			const SSL: boolean = options.url.startsWith("https");
+			const SSL: boolean = /^https/.test(options.url);
 			const URI: string[] = options.url.replace(/https?:\/\/(www.)?/, "").split("/");
 
 			(SSL ? https : http).get({

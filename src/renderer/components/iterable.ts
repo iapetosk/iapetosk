@@ -15,17 +15,6 @@ export default class Iterable extends Vue {
 			this.scroll_index--;
 		}
 	}
-	private adjust_scroll(): void {
-		const target: HTMLElement = document.getElementById("scroll_area")!;
-
-		const height: number = utility.truncate(target.scrollHeight / this.$store.getters["thread/list"].length);
-
-		let start: number = (target.scrollTop) / height;
-		let finish: number = (target.scrollTop + target.clientHeight) / height;
-		let ranging: number = finish - start;
-
-		target.scroll(0, height * (this.scroll_index - Math.floor(ranging / 2)));
-	}
 	private status_colour(status: Status): undefined | "success" | "warning" | "error" {
 		switch (status) {
 			case Status.NONE:
@@ -46,7 +35,15 @@ export default class Iterable extends Vue {
 	}
 	@Watch("scroll_index")
 	private watch_scroll_index($new: number): void {
-		this.adjust_scroll();
+		const target: HTMLElement = document.getElementById("scroll_area")!;
+
+		const height: number = utility.truncate(target.scrollHeight / this.$store.getters["thread/list"].length);
+
+		let start: number = (target.scrollTop) / height;
+		let finish: number = (target.scrollTop + target.clientHeight) / height;
+		let ranging: number = finish - start;
+
+		target.scroll(0, height * (this.scroll_index - Math.floor(ranging / 2)));
 	}
 	@Watch("$store.state.thread.list")
 	private watch_$store_state_thread_list($new: Thread[]): void {
