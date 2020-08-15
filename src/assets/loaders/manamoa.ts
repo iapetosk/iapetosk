@@ -3,16 +3,16 @@ import { Loaded, PlaceHolders } from "@/modules/download";
 import utility from "@/modules/utility";
 class Manamoa {
 	public start(url: string): Promise<Loaded> {
+		const links: string[] = [
+			// TODO: none
+		];
+		const options: PartialOptions = {
+			// TODO: none
+		};
+		const placeholders: PlaceHolders = {
+			// TODO: none
+		};
 		return new Promise<Loaded>(async (resolve, rejects) => {
-			const links: string[] = [
-				// TODO: none
-			];
-			const options: PartialOptions = {
-				// TODO: none
-			};
-			const placeholders: PlaceHolders = {
-				// TODO: none
-			};
 			request.get(url).then((callback) => {
 				const list: string[][] = [
 					utility.extract(callback.body, "img_list", "array"),

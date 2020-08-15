@@ -54,7 +54,7 @@ export default class Iterable extends Vue {
 		if ($new && $new.length) {
 			$new.split(/\s+/).forEach((link) => {
 				download.modulator(link).then((callback) => {
-					download.start(callback.thread).then(() => {
+					download.start(callback).then(() => {
 						// TODO: none
 					});
 				});

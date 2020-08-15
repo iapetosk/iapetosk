@@ -179,8 +179,8 @@ export class Download {
 			return recursive(0);
 		});
 	}
-	public modulator(link: string): Promise<{ thread: Thread }> {
-		return new Promise<{ thread: Thread }>((resolve, rejects): void => {
+	public modulator(link: string): Promise<Thread> {
+		return new Promise<Thread>((resolve, rejects): void => {
 			for (const LOADER of API) {
 				if (new RegExp(LOADER.test).test(link)) {
 					// require("module")._load(LOADER.loader, this, false) | https://nearsoft.com/blog/nodejs-how-to-load-a-module-with-require/
@@ -190,9 +190,7 @@ export class Download {
 						callback.links.forEach((link, index) => {
 							files[index] = new File(link, path.join(".", Folder.DOWNLOADS, LOADER.loader, folder, `${index}${path.extname(link)}`), false);
 						});
-						return resolve({
-							thread: new Thread(link, callback.title, files, callback.options)
-						});
+						return resolve(new Thread(link, callback.title, files, callback.options));
 					}).catch((error: Error): void => {
 						fs.writeFile(path.join(".", Folder.DEBUGS, `${Date.now()}.log`), error.message, () => {
 							return rejects(error);
