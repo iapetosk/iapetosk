@@ -3,6 +3,12 @@ import { Thread } from "@/modules/download";
 import request from "@/modules/request";
 import utility from "@/modules/utility";
 
+function favicon(hostname: string, value: string | string[]): string {
+	const url: string = value instanceof Array ? value[0] : value;
+
+	return /^\/\//.test(url) ? url : hostname + url;
+}
+
 @Component({})
 export default class TreeView extends Vue {
 	public treeview: {
@@ -19,7 +25,7 @@ export default class TreeView extends Vue {
 		const treeview: TreeView["treeview"] = {};
 
 		for (const thread of worker) {
-			const hostname = thread.from.replace(/https?:\/\/(www.)?/, "").split("/")[0];
+			const hostname = thread.from.replace(/https?:\/\/(www.)?/, "").split(/\//)[0];
 
 			if (treeview[hostname]) {
 				treeview[hostname].list.push(thread.from);
@@ -30,7 +36,7 @@ export default class TreeView extends Vue {
 				}
 			} else {
 				treeview[hostname] = {
-					favicon: await request.get(`https://${hostname}`).then((callback) => { return utility.parser(callback.body, "link[rel=\"icon\"]", "href")[0] }),
+					favicon: await request.get(`https://${hostname}`).then((callback) => { return favicon(hostname, utility.parser(callback.body, "link[rel=\"icon\"]", "href")); }),
 					list: [thread.from],
 					show: false
 				};

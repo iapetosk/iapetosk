@@ -23,9 +23,15 @@ class Request {
 				headers: options.headers,
 				protocol: SSL ? "https:" : "http:"
 			}, (response) => {
+				// redirects
+				if (response.headers.location) {
+					return this.send({...options, url: response.headers.location }, directory);
+				}
+				// encoding
 				if (options.encoding) {
 					response.setEncoding(options.encoding);
 				}
+				// write file
 				if (directory) {
 					// recursively renders directory
 					fs.mkdirSync(path.dirname(directory), { recursive: true });

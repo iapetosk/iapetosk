@@ -71,7 +71,7 @@ export class Download {
 		try {
 			for (const bundle of fs.readdirSync(Folder.BUNDLES)) {
 				if (fs.statSync(path.join(Folder.BUNDLES, bundle)).isFile() && path.extname(bundle) === ".json") {
-					const ID: string = bundle.split(".")[0];
+					const ID: string = bundle.split(/\./)[0];
 
 					storage.register(ID, path.join(Folder.BUNDLES, bundle), "@import");
 

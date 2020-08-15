@@ -6,5 +6,9 @@
 	{
 		"loader": "hitomi.la",
 		"test": "^https?:\\\/\\\/hitomi.la\\\/galleries\\\/([0-9]+).html$"
+	},
+	{
+		"loader": "manamoa",
+		"test": "^https:\\\/\\\/manamoa.net\\\/bbs\\\/board.php\\?bo_table=manga&wr_id=([\\d]+)$"
 	}
 ]

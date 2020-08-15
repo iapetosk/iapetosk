@@ -26,5 +26,10 @@ class Utility {
 		});
 		return this.unwrap(array);
 	}
+	public extract(value: string, path: string, type: "string" | "number" | "array" | "object"): any {
+		const capture: string = new RegExp(`var ${path} = (.+?)(?=;)`).exec(value)![1];
+		
+		return type === "string" ? capture : type === "number" ? parseInt(capture) : type === "array" ? capture.replace(/[\[\]\"]/g, "").split(/,/) : JSON.parse(capture);
+	}
 }
 export default (new Utility());

@@ -14,7 +14,7 @@ class Storage {
 		this.store = store;
 	}
 	public $define(object: { [key: string]: any; }, field: string, data: any): any {
-        const array: string[] = field.split(".");
+        const array: string[] = field.split(/\./);
 
         for (const [index, value] of array.entries()) {
             if (index === array.length - 1) {
@@ -27,7 +27,7 @@ class Storage {
         }
 	}
 	public $delete(object: { [key: string]: any; }, field: string): any {
-        const array: string[] = field.split(".");
+        const array: string[] = field.split(/\./);
 
         for (const [index, value] of array.entries()) {
             if (index === array.length - 1) {
@@ -40,7 +40,7 @@ class Storage {
         }
 	}
 	public $return(object: { [key: string]: any; }, field: string): any {
-        const array: string[] = field.split(".");
+        const array: string[] = field.split(/\./);
 
         for (const [index, value] of array.entries()) {
             if (index === array.length - 1) {
