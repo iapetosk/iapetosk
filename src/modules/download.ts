@@ -128,9 +128,7 @@ export class Download {
 				return resolve();
 			}
 			if (!storage.exist(thread.id.toString())) {
-				storage.register(thread.id.toString(), path.join(Folder.BUNDLES, thread.id.toString() + ".json"), {
-					...thread
-				});
+				storage.register(thread.id.toString(), path.join(Folder.BUNDLES, thread.id.toString() + ".json"), thread);
 			}
 			const I: Download = this;
 			function condition(): boolean {

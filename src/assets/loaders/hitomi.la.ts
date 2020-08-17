@@ -42,7 +42,7 @@ class Hitomi_La {
 			}
 			async function recursive(galleryblock?: GalleryBlock) {
 				galleryblock = galleryblock || await request.get(`https://ltn.hitomi.la/galleries/${I.ID(url)}.js`).then((callback) => {
-					return callback.response.statusCode === 404 ? undefined : JSON.parse(/var galleryinfo = ([\D\d]+)/.exec(callback.body)![1]) as GalleryBlock;
+					return callback.response.statusCode === 404 ? undefined : utility.extract(`${callback.body};`, "galleryinfo", "object") as GalleryBlock;
 				});
 				if (!galleryblock) {
 					return rejects();

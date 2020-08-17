@@ -23,8 +23,13 @@ class Manamoa {
 
 				for (let x: number = 0; x < list.length; x++) {
 					for (let y: number = 0; y < list[x].length; y++) {
+						if (!list[x][y]) {
+							continue;
+						}
+						links[y] = list[x][y];
+
 						for (const charset of ["cdntigermask.xyz", "cdnmadmax.xyz", "filecdn.xyz"]) {
-							links[y] = list[x][y].replace(charset, domains[(chapter + 4 * y) % domains.length]).replace(/\\/g, "");
+							links[y] = links[y].replace(charset, domains[(chapter + 4 * y) % domains.length]).replace(/\\/g, "");
 						}
 					}
 				}
