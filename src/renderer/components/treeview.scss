@@ -8,25 +8,53 @@
 	border-width: 0px thin 0px thin;
 	background-color: layout.$scheme-1;
 }
-#item {
+#wrapper {
+	border-width: 0px;
+	&.active {
+		border-width: 0px 0px thin 0px;
+		#instance {
+			border-width: 0px 0px thin 0px;
+		}
+		#collapse {
+			display: block;
+		}
+	}
+}
+#instance {
 	height: 40px;
 	border-width: 0px 0px thin 0px;
+	#favicon {
+		float: left;
+		margin: 5px;
+		width: 30px;
+		height: 30px;
+		border-radius: 5px;
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center;
+	}
+	#hostname {
+		float: left;
+		height: 40px;
+		display: flex;
+		align-items: center;
+		margin-left: 10px;
+	}
 }
-#favicon {
-	position: absolute;
-	margin: 5px;
-	width: 30px;
-	height: 30px;
-	border-radius: 5px;
-	background-size: contain;
-	background-repeat: no-repeat;
-	background-position: center;
-}
-#hostname {
-	position: absolute;
-	align-items: center;
-	display: flex;
-	left: 40px;
-	height: 40px;
-	padding-left: 10px;
+#collapse {
+	margin: 10px;
+	display: none;
+	will-change: display;
+	button {
+		width: 130px;
+		margin: 2.5px auto 2.5px auto;
+		padding: 5px;
+		color: layout.$scheme-5;
+		background-color: layout.$scheme-2;
+		transition: border-color 250ms ease-in-out;
+		will-change: border-color;
+		&:hover {
+			border-color: layout.$scheme-5;
+		}
+	}
 }

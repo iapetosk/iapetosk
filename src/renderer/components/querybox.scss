@@ -18,7 +18,8 @@
 	background-color: layout.$scheme-3;
 	transition: color 250ms ease-in-out, border-color 250ms ease-in-out;
 	will-change: color, border-color;
-	&:hover, &:focus {
+	&:hover,
+	&:focus {
 		color: layout.$scheme-8;
 		border-color: layout.$scheme-5;
 	}

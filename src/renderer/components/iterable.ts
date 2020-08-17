@@ -9,9 +9,9 @@ export default class Iterable extends Vue {
 		// this.$store.commit("querybox/query", { value: "https://hitomi.la/galleries/1097524.html" });
 	}
 	private wheel(event: WheelEvent): void | boolean {
-		if (event.deltaY > 0 && this.$store.getters["thread/list"].length - 1 > this.scroll_index) {
+		if (event.deltaY > 0 && this.scroll_index < this.$store.getters["thread/list"].length - 1) {
 			this.scroll_index++;
-		} else if (this.scroll_index > 0) {
+		} if (event.deltaY < 0 && this.scroll_index > 0) {
 			this.scroll_index--;
 		}
 	}

@@ -24,7 +24,7 @@
     "file-loader": "^6.0.0",
     "html-loader": "^1.1.0",
     "html-webpack-plugin": "^4.3.0",
-    "nw": "0.47.2-sdk",
+    "nw": "0.47.3-sdk",
     "nw-builder": "^3.5.7",
     "sass": "^1.26.10",
     "sass-loader": "^9.0.3",
