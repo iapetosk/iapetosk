@@ -5,7 +5,7 @@
 				<section id="process" class="contrast" v-for="(thread, index) in $store.getters[`thread/list`]" :key="index" :class="{ highlight: scroll_index === index, [status_colour(thread.status)]: true }">
 					<legend id="title" class="contrast center">{{ thread.title }} - ({{ thread.finished }} / {{ thread.files.length }})</legend>
 					<figure id="wrapper" class="contrast" @click="scroll_index = index">
-						<canvas id="thumbnail" class="contrast" :style="{ 'background-image': thread.files[0].written ? `url(${thread.files[0].path.replace(/\\/g, `/`)})` : true }"></canvas>
+						<canvas id="thumbnail" class="contrast" :style="{ 'background-image': thread.files[0].written === thread.files[0].size ? `url(${thread.files[0].path.replace(/\\/g, `/`)})` : undefined }"></canvas>
 					</figure>
 				</section>
 			</section>

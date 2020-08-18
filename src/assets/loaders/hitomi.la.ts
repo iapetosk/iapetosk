@@ -15,10 +15,10 @@ export type GalleryBlock = {
 	}[];
 };
 class Hitomi_La {
-	private _number_of_frontends: number = NaN;
+	private number_of_frontends: number = NaN;
 	constructor() {
 		request.get("https://ltn.hitomi.la/common.js").then((callback) => {
-			this._number_of_frontends = utility.extract(callback.body, "number_of_frontends", "number");
+			this.number_of_frontends = utility.extract(callback.content.encode, "number_of_frontends", "number");
 		});
 	}
 	public start(url: string): Promise<Loaded> {
@@ -37,17 +37,17 @@ class Hitomi_La {
 		};
 		return new Promise<Loaded>(async (resolve, rejects) => {
 			function format(regex: RegExp, url: string, base: number): string {
-				const channel = parseInt(regex.exec(url)![1], base);
-				return url.replace("[@]", String.fromCharCode(97 + (channel < 0x09 ? 1 : channel) % (channel < 0x30 ? 2 : I._number_of_frontends)).toString());
+				const chapter: number = parseInt(regex.exec(url)![1], base);
+				return url.replace(/@/g, String.fromCharCode(97 + (chapter < 0x09 ? 1 : chapter) % (chapter < 0x30 ? 2 : I.number_of_frontends)).toString());
 			}
 			async function recursive(galleryblock?: GalleryBlock) {
 				galleryblock = galleryblock || await request.get(`https://ltn.hitomi.la/galleries/${I.ID(url)}.js`).then((callback) => {
-					return callback.response.statusCode === 404 ? undefined : utility.extract(`${callback.body};`, "galleryinfo", "object") as GalleryBlock;
+					return callback.status.code === 404 ? undefined : utility.extract(`${callback.content.encode};`, "galleryinfo", "object") as GalleryBlock;
 				});
 				if (!galleryblock) {
 					return rejects();
 				}
-				if (isNaN(I._number_of_frontends)) {
+				if (isNaN(I.number_of_frontends)) {
 					setTimeout(() => {
 						return recursive(galleryblock);
 					}, 1000);
@@ -58,16 +58,16 @@ class Hitomi_La {
 							const hash: string = file.hash.length < 3 ? file.hash : file.hash.replace(/^.*(..)(.)$/, "$2/$1/" + file.hash);
 							// condition
 							if (file.haswebp) {
-								links[index] = format(/webp\/[0-9a-f]\/([0-9a-f]{2})/, `https://[@]a.hitomi.la/webp/${hash}.webp`, 16);
+								links[index] = format(/webp\/[0-9a-f]\/([0-9a-f]{2})/, `https://@a.hitomi.la/webp/${hash}.webp`, 16);
 							} else {
-								links[index] = format(/images\/[0-9a-f]\/([0-9a-f]{2})/, `https://[@]a.hitomi.la/images/${hash}.${file.name.split(/\./).pop()}`, 16);
+								links[index] = format(/images\/[0-9a-f]\/([0-9a-f]{2})/, `https://@a.hitomi.la/images/${hash}.${file.name.split(/\./).pop()}`, 16);
 							}
 						} else {
-							links[index] = format(/galleries\/\[0-9]*(0-9)/, `https://[@]a.hitomi.la/galleries/${I.ID(url)}/${file.name}`, 10);
+							links[index] = format(/galleries\/\[0-9]*(0-9)/, `https://@a.hitomi.la/galleries/${I.ID(url)}/${file.name}`, 10);
 						}
 					});
 					request.get(`https://ltn.hitomi.la/galleryblock/${I.ID(url)}.html`).then((callback) => {
-						(utility.parser(callback.body, "td") as string[]).forEach((value, index) => {
+						(utility.parse(callback.content.encode, "td") as string[]).forEach((value, index) => {
 							if (index % 2) {
 								placeholders[Object.keys(placeholders).pop()!] = utility.unwrap(value.split(/\s\s+/g).filter((value) => { return value.length; }));
 							} else {
@@ -75,7 +75,7 @@ class Hitomi_La {
 							}
 						});
 						return resolve({
-							title: utility.parser(callback.body, ".lillie a") as string,
+							title: utility.parse(callback.content.encode, ".lillie a") as string,
 							links: links,
 							options: options,
 							placeholders: placeholders

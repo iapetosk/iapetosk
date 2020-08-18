@@ -32,10 +32,12 @@ export type PlaceHolders = {
 export class File {
 	public link: string;
 	public path: string;
-	public written: boolean;
-	constructor(link: string, path: string, written: boolean = false) {
+	public size: number;
+	public written: number;
+	constructor(link: string, path: string, size: number = NaN, written: number = 0) {
 		this.link = link;
 		this.path = path;
+		this.size = size;
 		this.written = written;
 	}
 }
@@ -46,7 +48,7 @@ export class Thread {
 	public files: File[];
 	public status: Status = Status.NONE;
 	public options: PartialOptions;
-	public yields: number = 0;
+	public working: number = 0;
 	public finished: number = 0;
 	constructor(from: string, title: string, files: File[], options: PartialOptions = {}, id: number = Date.now()) {
 		this.id = id;
@@ -60,10 +62,10 @@ export class Download {
 	public threads: Thread[];
 	public queued: Thread[];
 	public max_threads: number;
-	public max_yields: number;
-	constructor(max_threads: number, max_yields: number) {
+	public max_working: number;
+	constructor(max_threads: number, max_working: number) {
 		this.max_threads = max_threads;
-		this.max_yields = max_yields;
+		this.max_working = max_working;
 		// limit max threads
 		this.threads = new Array(max_threads);
 		this.queued = new Array();
@@ -119,7 +121,7 @@ export class Download {
 			const valid: number[] = [];
 
 			for (let index: number = 0; index < thread.files.length; index++) {
-				if (!thread.files[index].written) {
+				if (thread.files[index].written !== thread.files[index].size) {
 					valid.push(index);
 				}
 			}
@@ -132,20 +134,30 @@ export class Download {
 			}
 			const I: Download = this;
 			function condition(): boolean {
-				return !!valid[thread.yields] && thread.yields - thread.finished < I.max_yields;
+				return !!valid[thread.working] && thread.working - thread.finished < I.max_working;
 			}
 			function recursive(index: number): void {
 				if (!thread) {
 					return resolve();
 				}
-				thread.yields++;
-				request.get(thread.files[valid[index]].link, thread.options, thread.files[valid[index]].path).then((): void => {
+				thread.working++;
+				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
+				request.get(
+					thread.files[valid[index]].link,
+					{
+						...thread.options,
+						headers: {
+							...thread.options.headers,
+							// resume from partitally downloaded chunk
+							"content-range": `bytes=${thread.files[valid[index]].written}-`
+						}
+					},
+					thread.files[valid[index]]
+				).then((): void => {
 					if (!thread) {
 						return resolve();
 					}
 					thread.finished++;
-					thread.files[valid[index]].written = true;
-					thread.status = I.status(thread.files);
 
 					storage.set_data(thread.id.toString(), thread);
 
@@ -153,7 +165,6 @@ export class Download {
 						value: thread,
 						id: thread.id
 					});
-					// (files.length - valid.length + thread.finished) / files.length
 
 					if (valid.length === thread.finished) {
 
@@ -167,11 +178,11 @@ export class Download {
 						return resolve();
 					}
 					if (condition()) {
-						return recursive(thread.yields);
+						return recursive(thread.working);
 					}
 				});
 				if (condition()) {
-					return recursive(thread.yields);
+					return recursive(thread.working);
 				}
 			}
 			return recursive(0);
@@ -186,11 +197,11 @@ export class Download {
 						const files: File[] = [];
 						const folder: string = Date.now().toString();
 						callback.links.forEach((link, index) => {
-							files[index] = new File(link, path.join(".", Folder.DOWNLOADS, LOADER.loader, folder, `${index}${path.extname(link)}`), false);
+							files[index] = new File(link, path.join(Folder.DOWNLOADS, LOADER.loader, folder, `${index}${path.extname(link)}`));
 						});
 						return resolve(new Thread(link, callback.title, files, callback.options));
 					}).catch((error: Error): void => {
-						fs.writeFile(path.join(".", Folder.DEBUGS, `${Date.now()}.log`), error.message, () => {
+						fs.writeFile(path.join(Folder.DEBUGS, `${Date.now()}.log`), error.message, () => {
 							return rejects(error);
 						});
 					});
@@ -200,7 +211,7 @@ export class Download {
 	}
 	public status(files: File[]): Status {
 		for (const file of files) {
-			if (!file.written) {
+			if (file.written !== file.size) {
 				return Status.PROGRESS;
 			}
 		}

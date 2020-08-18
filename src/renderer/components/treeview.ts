@@ -33,7 +33,7 @@ export default class TreeView extends Vue {
 				};
 			} else {
 				treeview[hostname] = {
-					favicon: await request.get(`https://${hostname}`).then((callback) => { return favicon(hostname, utility.parser(callback.body, "link[rel=\"icon\"]", "href")); }),
+					favicon: await request.get(`https://${hostname}`).then((callback) => { return favicon(hostname, utility.parse(callback.content.encode, "link[rel=\"icon\"]", "href")); }),
 					active: false,
 					list: [thread.id]
 				};

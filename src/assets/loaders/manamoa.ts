@@ -15,26 +15,26 @@ class Manamoa {
 		return new Promise<Loaded>(async (resolve, rejects) => {
 			request.get(url).then((callback) => {
 				const list: string[][] = [
-					utility.extract(callback.body, "img_list", "array"),
-					utility.extract(callback.body, "img_list1", "array")
+					utility.extract(callback.content.encode, "img_list", "array"),
+					utility.extract(callback.content.encode, "img_list1", "array")
 				];
-				const domains: string[] = utility.extract(callback.body, "cdn_domains", "array");
-				const chapter: number = utility.extract(callback.body, "chapter", "number");
+				const domains: string[] = utility.extract(callback.content.encode, "cdn_domains", "array");
+				const chapter: number = utility.extract(callback.content.encode, "chapter", "number");
 
 				for (let x: number = 0; x < list.length; x++) {
 					for (let y: number = 0; y < list[x].length; y++) {
 						if (!list[x][y]) {
 							continue;
 						}
-						links[y] = list[x][y];
+						links[y] = list[x][y].replace(/\\/g, "");
 
 						for (const charset of ["cdntigermask.xyz", "cdnmadmax.xyz", "filecdn.xyz"]) {
-							links[y] = links[y].replace(charset, domains[(chapter + 4 * y) % domains.length]).replace(/\\/g, "");
+							links[y] = links[y].replace(charset, domains[(chapter + 4 * y) % domains.length]);
 						}
 					}
 				}
 				return resolve({
-					title: utility.parser(callback.body, "meta[name=\"title\"]", "content") as string,
+					title: utility.parse(callback.content.encode, "meta[name=\"title\"]", "content") as string,
 					links: links,
 					options: options,
 					placeholders: placeholders

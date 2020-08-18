@@ -19,7 +19,7 @@ class Utility {
 	public unwrap<type>(value: type[]): type[] | type {
 		return value.length - 1.0 ? value : value[0];
 	}
-	public parser(value: string, path: string, attribute?: string): string[] | string {
+	public parse(value: string, path: string, attribute?: string): string[] | string {
 		const array: string[] = [];
 		new DOMParser().parseFromString(value, "text/html").querySelectorAll(path).forEach((element, index) => {
 			array[index] = attribute ? element.getAttribute(attribute)! : (element as HTMLElement).innerText;

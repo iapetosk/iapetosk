@@ -25,7 +25,7 @@ WIP
 
 ## download.ts
 
-> features downloader favoured by *storage.ts*, *request.ts*.<br>
+> features downloader favoured by *storage.ts*, and *request.ts*.<br>
 
 ```ts
 /**
@@ -54,7 +54,7 @@ WIP
 /**
  * send and retrive data.
  */
-public async send(options: RequestOptions, directory?: string): Promise<{ response: http.IncomingMessage, body: string }>
+public async send(options: RequestOptions, file?: File): Promise<{ content: { buffer: Buffer, encode: string; }, status: { code?: number, message?: string; }; }>
 ```
 
 ## storage.ts
