@@ -1,6 +1,9 @@
-/dist
+# node.js
 /node_modules
 /package-lock.json
+# program
 /debugs
 /bundles
 /downloads
+# nw.js
+/build

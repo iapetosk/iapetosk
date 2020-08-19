@@ -35,7 +35,7 @@ module.exports = {
 	},
 	output: {
 		filename: "[name].bundle.js",
-		path: resolve_path("dist")
+		path: resolve_path("build")
 	},
 	resolve: {
 		alias: {

@@ -3,7 +3,7 @@
 		"module": "commonjs",
 		"target": "ES2019",
 		"baseUrl": "./",
-		"outDir": "./dist",
+		"outDir": "./build",
 		"paths": {
 			"@/*": [
 				"src/*"

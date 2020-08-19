@@ -1,44 +1,59 @@
 {
-  "name": "blossom",
-  "version": "1.0.0",
-  "description": "WIP",
-  "main": "http://localhost:8080",
-  "node-remote": "*://localhost/*",
-  "scripts": {
-    "serve": "node webpack/serve.js",
-    "build": "node webpack/build.js",
-    "update": "npm install & npm update"
-  },
-  "window": {
-    "frame": false,
-    "min_width": 900,
-    "min_height": 600,
-    "position": "center",
-    "icon": "./src/assets/icons/icon.png"
-  },
-  "devDependencies": {
-    "@types/node": "^14.6.0",
-    "@types/nw.js": "^0.13.9",
-    "css-loader": "^4.2.1",
-    "file-loader": "^6.0.0",
-    "html-loader": "^1.2.0",
-    "html-webpack-plugin": "^4.3.0",
-    "nw": "0.47.3-sdk",
-    "nw-builder": "^3.5.7",
-    "sass": "^1.26.10",
-    "sass-loader": "^9.0.3",
-    "style-loader": "^1.2.1",
-    "ts-loader": "^8.0.2",
-    "typescript": "^3.9.7",
-    "vue": "^2.6.11",
-    "vue-class-component": "^7.2.5",
-    "vue-loader": "^15.9.3",
-    "vue-property-decorator": "^9.0.0",
-    "vue-template-compiler": "^2.6.11",
-    "vuex": "^3.5.1",
-    "webpack": "^4.44.1",
-    "webpack-dev-server": "^3.11.0"
-  },
-  "author": "Sombian",
-  "license": "ISC"
+	"name": "blossom",
+	"version": "1.0.0",
+	"description": "WIP",
+	"main": "http://localhost:8080",
+	"node-remote": "*://localhost/*",
+	"scripts": {
+		"serve": "node webpack/serve.js",
+		"build": "node webpack/build.js",
+		"update": "npm install & npm update"
+	},
+	"window": {
+		"frame": false,
+		"min_width": 900,
+		"min_height": 600,
+		"position": "center",
+		"icon": "./src/assets/icons/icon.png"
+	},
+	"build": {
+		"win": {
+			"copyright": "© 2020 Sombian All Rights Reserved",
+			"icon": "./src/assets/icons/icon.ico"
+		},
+		"mac": {
+			"copyright": "© 2020 Sombian All Rights Reserved",
+			"icon": "./src/assets/icons/icon.icns"
+		},
+		"files": [
+			"node_modules/**/*",
+			"dist/**/*"
+		],
+		"output": "./build"
+	},
+	"devDependencies": {
+		"@types/node": "^14.6.0",
+		"@types/nw.js": "^0.13.9",
+		"css-loader": "^4.2.1",
+		"file-loader": "^6.0.0",
+		"html-loader": "^1.2.0",
+		"html-webpack-plugin": "^4.3.0",
+		"nw": "0.47.3-sdk",
+		"nwjs-builder-phoenix": "^1.15.0",
+		"sass": "^1.26.10",
+		"sass-loader": "^9.0.3",
+		"style-loader": "^1.2.1",
+		"ts-loader": "^8.0.2",
+		"typescript": "^3.9.7",
+		"vue": "^2.6.11",
+		"vue-class-component": "^7.2.5",
+		"vue-loader": "^15.9.3",
+		"vue-property-decorator": "^9.0.0",
+		"vue-template-compiler": "^2.6.11",
+		"vuex": "^3.5.1",
+		"webpack": "^4.44.1",
+		"webpack-dev-server": "^3.11.0"
+	},
+	"author": "Sombian",
+	"license": "ISC"
 }
