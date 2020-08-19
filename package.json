@@ -4,11 +4,10 @@
   "description": "WIP",
   "main": "http://localhost:8080",
   "node-remote": "*://localhost/*",
-  "chromium-args": "--mixed-context",
   "scripts": {
-    "build": "node webpack/build.js",
     "serve": "node webpack/serve.js",
-    "update": "npm install & npm ci"
+    "build": "node webpack/build.js",
+    "update": "npm install & npm update"
   },
   "window": {
     "frame": false,
@@ -22,7 +21,7 @@
     "@types/nw.js": "^0.13.9",
     "css-loader": "^4.2.1",
     "file-loader": "^6.0.0",
-    "html-loader": "^1.1.0",
+    "html-loader": "^1.2.0",
     "html-webpack-plugin": "^4.3.0",
     "nw": "0.47.3-sdk",
     "nw-builder": "^3.5.7",

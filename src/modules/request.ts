@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as tls from "tls";
 import * as path from "path";
 import * as http from "http";
 import * as https from "https";
@@ -14,7 +15,7 @@ export type PartialOptions = {
 class Request {
 	public async send(options: RequestOptions, file?: File) {
 		const $: Buffer[] = [];
-		const SSL: boolean = /^https/.test(options.url);
+		const SSL: boolean = options.url.startsWith("https");
 		const URI: string[] = options.url.replace(/https?:\/\/(www.)?/, "").split("/");
 		return new Promise<{ content: { buffer: Buffer, encode: string; }, status: { code?: number, message?: string; }; }>((resolve, rejects) => {
 			(SSL ? https : http).get({
@@ -22,7 +23,8 @@ class Request {
 				path: ["", ...URI.slice(1)].join("/"),
 				method: options.method,
 				headers: options.headers,
-				protocol: SSL ? "https:" : "http:"
+				protocol: SSL ? "https:" : "http:",
+				rejectUnauthorized: false
 			}, (response) => {
 				// redirects
 				if (response.headers.location) {

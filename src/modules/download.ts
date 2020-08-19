@@ -69,8 +69,10 @@ export class Download {
 		// limit max threads
 		this.threads = new Array(max_threads);
 		this.queued = new Array();
-		// loop all within folder
 		try {
+			// prevent threads duplication
+			$store.commit("thread/list", { value: [] });
+			// loop bundles
 			for (const bundle of fs.readdirSync(Folder.BUNDLES)) {
 				if (fs.statSync(path.join(Folder.BUNDLES, bundle)).isFile() && path.extname(bundle) === ".json") {
 					const ID: string = bundle.split(/\./)[0];
