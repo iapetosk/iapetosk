@@ -1,6 +1,5 @@
 const path = require("path");
-const vue_loader_plugin = require("vue-loader/lib/plugin");
-const html_webpack_plugin = require("html-webpack-plugin");
+const { dependencies } = require("../package");
 
 function resolve_path() {
 	return path.resolve(__dirname, "..", ...arguments);
@@ -13,6 +12,15 @@ module.exports = {
 	entry: {
 		renderer: resolve_path("src", "renderer", "index.ts")
 	},
+	externals: [
+		(context, request, callback) => {
+			if (dependencies && dependencies[request]) {
+				return callback(null, `commonjs ${request}`);
+			} else {
+				callback();
+			}
+		}
+	],
 	module: {
 		rules: [
 			{
@@ -34,7 +42,7 @@ module.exports = {
 		]
 	},
 	output: {
-		filename: "[name].bundle.js",
+		filename: "bundle.js",
 		path: resolve_path("build")
 	},
 	resolve: {
@@ -43,9 +51,27 @@ module.exports = {
 		},
 		extensions: [".js", ".ts", ".vue", ".scss", ".json"]
 	},
+	optimization: {
+		minimize: true,
+		minimizer: [
+			new (require("terser-webpack-plugin"))({
+				parallel: true,
+				terserOptions: {
+					output: {
+						beautify: false,
+						comments: false,
+						semicolons: true
+					},
+					compress: {
+						drop_console: true
+					}
+				}
+			})
+		]
+	},
 	plugins: [
-		new vue_loader_plugin(),
-		new html_webpack_plugin({
+		new (require("vue-loader/lib/plugin")),
+		new (require("html-webpack-plugin"))({
 			filename: "index.html",
 			template: resolve_path("src", "index.html")
 		})

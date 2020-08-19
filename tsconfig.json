@@ -2,8 +2,8 @@
 	"compilerOptions": {
 		"module": "commonjs",
 		"target": "ES2019",
-		"baseUrl": "./",
-		"outDir": "./build",
+		"baseUrl": ".",
+		"outDir": "build",
 		"paths": {
 			"@/*": [
 				"src/*"
