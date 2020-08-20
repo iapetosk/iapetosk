@@ -16,25 +16,6 @@
 		"position": "center",
 		"icon": "src/assets/icons/icon.png"
 	},
-	"build": {
-		"win": {
-			"copyright": "© 2020 Sombian All Rights Reserved",
-			"icon": "src/assets/icons/icon.ico"
-		},
-		"mac": {
-			"copyright": "© 2020 Sombian All Rights Reserved",
-			"icon": "src/assets/icons/icon.icns"
-		},
-		"files": [
-			"node_modules/**/*",
-			"dist/**/*"
-		],
-		"overriddenProperties": {
-			"main": "index.html"
-		},
-		"output": "build",
-		"nwVersion": "0.47.3"
-	},
 	"devDependencies": {
 		"@types/node": "^14.6.0",
 		"@types/nw.js": "^0.13.9",
@@ -42,8 +23,9 @@
 		"file-loader": "^6.0.0",
 		"html-loader": "^1.2.1",
 		"html-webpack-plugin": "^4.3.0",
+		"node-stream-zip": "^1.11.3",
 		"nw": "0.47.3-sdk",
-		"nwjs-builder-phoenix": "^1.15.0",
+		"rcedit": "^2.2.0",
 		"sass": "^1.26.10",
 		"sass-loader": "^9.0.3",
 		"style-loader": "^1.2.1",

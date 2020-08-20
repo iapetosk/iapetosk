@@ -14,13 +14,11 @@ export type PartialOptions = {
 };
 class Request {
 	public async send(options: RequestOptions, file?: File) {
-		const $: Buffer[] = [];
 		const SSL: boolean = options.url.startsWith("https");
-		const URI: string[] = options.url.replace(/https?:\/\/(www.)?/, "").split("/");
+		const chunks: Buffer[] = [];
 		return new Promise<{ content: { buffer: Buffer, encode: string; }, status: { code?: number, message?: string; }; }>((resolve, rejects) => {
 			(SSL ? https : http).get({
-				hostname: URI[0],
-				path: ["", ...URI.slice(1)].join("/"),
+				...this.parse(options.url),
 				method: options.method,
 				headers: options.headers,
 				protocol: SSL ? "https:" : "http:",
@@ -45,7 +43,7 @@ class Request {
 					var writable: fs.WriteStream = fs.createWriteStream(file.path);
 				}
 				response.on("data", (chunk) => {
-					$.push(Buffer.from(chunk, "binary"));
+					chunks.push(Buffer.from(chunk, "binary"));
 					// file
 					if (file) {
 						file.written += chunk.length;
@@ -60,8 +58,8 @@ class Request {
 					}
 					return resolve({
 						content: {
-							buffer: Buffer.concat($),
-							encode: Buffer.concat($).toString(options.encoding)
+							buffer: Buffer.concat(chunks),
+							encode: Buffer.concat(chunks).toString(options.encoding)
 						},
 						status: {
 							code: response.statusCode,
@@ -86,6 +84,13 @@ class Request {
 	}
 	public async delete(url: string, options: PartialOptions = {}, file?: File) {
 		return this.send({ url: url, method: "DELETE", ...options }, file);
+	}
+	public parse(url: string): { hostname: string, path: string } {
+		const component: string[] = url.replace(/https?:\/\//, "").split(/\//);
+		return {
+			hostname: component[0],
+			path: ["", ...component.slice(1)].join("/")
+		};
 	}
 }
 export default (new Request());

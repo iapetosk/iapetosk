@@ -69,7 +69,7 @@ class Hitomi_La {
 					request.get(`https://ltn.hitomi.la/galleryblock/${I.ID(url)}.html`).then((callback) => {
 						(utility.parse(callback.content.encode, "td") as string[]).forEach((value, index) => {
 							if (index % 2) {
-								placeholders[Object.keys(placeholders).pop()!] = utility.unwrap(value.split(/\s\s+/g).filter((value) => { return value.length; }));
+								placeholders[Object.keys(placeholders).pop()!] = utility.unwrap(value.split(/\s\s+/).filter((value) => { return value.length; }));
 							} else {
 								placeholders[value.toLowerCase()] = undefined;
 							}
