@@ -10,5 +10,9 @@
 	{
 		"loader": "manamoa",
 		"test": "^https:\\\/\\\/manamoa.net\\\/bbs\\\/board.php\\?bo_table=manga&wr_id=([\\d]+)$"
+	},
+	{
+		"loader": "jmana",
+		"test": "^https:\\\/\\\/jmana\\.net\\\/bookdetail\\?bookname=([\\D\\d]+)&bookdetail=([\\d]+)$"
 	}
 ]

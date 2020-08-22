@@ -34,7 +34,11 @@ export default class TreeView extends Vue {
 			} else {
 				treeview[hostname] = {
 					favicon: await request.get(`https://${hostname}`).then((callback) => {
-						return favicon(hostname, utility.parse(callback.content.encode, "link[rel=\"icon\"]", "href"));
+						const icon = {
+							default: utility.parse(callback.content.encode, "link[rel=\"icon\"]", "href"),
+							shortcut: utility.parse(callback.content.encode, "link[rel=\"shortcut icon\"]", "href")
+						};
+						return favicon(hostname, icon.default.length ? icon.default : icon.shortcut);
 					}),
 					active: false,
 					list: [thread.id]
@@ -51,8 +55,10 @@ export default class TreeView extends Vue {
 function favicon(hostname: string, value: string | string[]): string {
 	let url: string = value instanceof Array ? value[0] : value;
 
-	url = url.startsWith("//") ? url : hostname + url;
-	url = url.startsWith("http") || url.startsWith("https") ? url : `https://${url}`;
-	
+	if (url) {
+		url = url.startsWith("//") ? url : [hostname, url].join("/");
+		url = url.startsWith("http") || url.startsWith("https") ? url : `https://${url}`;
+	}
+
 	return url;
 }
