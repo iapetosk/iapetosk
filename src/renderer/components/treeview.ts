@@ -1,7 +1,7 @@
 import { Component, Vue, Watch } from "vue-property-decorator";
-import { Thread } from "@/modules/download";
 import request from "@/modules/request";
 import utility from "@/modules/utility";
+import { Thread } from "@/modules/download";
 
 @Component({})
 export default class TreeView extends Vue {

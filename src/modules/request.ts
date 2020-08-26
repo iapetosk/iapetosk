@@ -1,5 +1,4 @@
 import * as fs from "fs";
-import * as tls from "tls";
 import * as path from "path";
 import * as http from "http";
 import * as https from "https";

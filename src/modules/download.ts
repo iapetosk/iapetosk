@@ -1,9 +1,10 @@
 import * as fs from "fs";
 import * as path from "path";
-import storage from "@/modules/storage";
-import request, { PartialOptions } from "@/modules/request";
 import * as API from "@/assets/modules.json";
+import storage from "@/modules/storage";
+import request from "@/modules/request";
 import $store from "@/renderer/store/index";
+import { PartialOptions } from "@/modules/request";
 export enum Folder {
 	DEBUGS = "debugs",
 	BUNDLES = "bundles",
@@ -11,9 +12,9 @@ export enum Folder {
 };
 export enum Status {
 	NONE,
-	PROGRESS,
 	FINISHED,
-	REMOVED,
+	WORKING,
+	PAUSED,
 	QUEUED,
 	ERROR
 }
@@ -82,7 +83,7 @@ export class Download {
 					const thread: Thread = storage.get_data(ID);
 
 					switch (thread.status) {
-						case Status.PROGRESS: {
+						case Status.WORKING: {
 							this.start(thread);
 							break;
 						}
@@ -99,48 +100,43 @@ export class Download {
 	}
 	public start(thread: Thread): Promise<void> {
 		return new Promise<void>((resolve, rejects): void => {
-			let slot: number = NaN;
-
+			// print thread
 			console.table(thread);
 
-			for (let index: number = 0; index < this.max_threads; index++) {
-				if (!this.threads[index]) {
-					slot = index;
-					break;
-				}
-			}
-			if (isNaN(slot)) {
-				this.queued.push(thread);
-				return resolve();
-			}
-
-			$store.dispatch("thread/append", {
-				value: thread
-			});
-
-			this.threads[slot] = thread;
-
-			const valid: number[] = [];
-
-			for (let index: number = 0; index < thread.files.length; index++) {
-				if (thread.files[index].written !== thread.files[index].size) {
-					valid.push(index);
-				}
-			}
-			if (!valid.length) {
-				delete this.threads[slot];
-				return resolve();
-			}
-			if (!storage.exist(thread.id.toString())) {
-				storage.register(thread.id.toString(), path.join(Folder.BUNDLES, thread.id.toString() + ".json"), thread);
-			}
 			const I: Download = this;
+			
+			let slot: number = NaN;
+			let valid: number[] = [];
+			function stop(): void {
+				// remove from thread list
+				delete I.threads[slot];
+				// check if queued threads are exist
+				if (I.queued.length) {
+					// get the oldest queued thread
+					const queue = I.queued[0];
+					// shorten the queued list
+					I.queued.splice(0, 1);
+					// run the oldest thread
+					I.start(queue);
+				}
+				// return
+				return resolve();
+			}
+			function pause(): void {
+				// append current thread to queued list
+				I.queued.push(thread);
+				// stop the worker thread
+				return stop();
+			}
 			function condition(): boolean {
 				return !!valid[thread.working] && thread.working - thread.finished < I.max_working;
 			}
 			function recursive(index: number): void {
 				if (!thread) {
-					return resolve();
+					return stop();
+				}
+				if (thread.status === Status.PAUSED) {
+					return pause();
 				}
 				thread.working++;
 				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
@@ -156,9 +152,6 @@ export class Download {
 					},
 					thread.files[valid[index]]
 				).then((): void => {
-					if (!thread) {
-						return resolve();
-					}
 					thread.finished++;
 
 					storage.set_data(thread.id.toString(), thread);
@@ -167,17 +160,14 @@ export class Download {
 						value: thread,
 						id: thread.id
 					});
-
+					if (!thread) {
+						return stop();
+					}
+					if (thread.status === Status.PAUSED) {
+						return pause();
+					}
 					if (valid.length === thread.finished) {
-
-						delete I.threads[slot];
-
-						if (I.queued.length) {
-							const queue = I.queued[0];
-							I.queued.splice(0, 1);
-							I.start(queue);
-						}
-						return resolve();
+						return stop();
 					}
 					if (condition()) {
 						return recursive(thread.working);
@@ -187,8 +177,53 @@ export class Download {
 					return recursive(thread.working);
 				}
 			}
+			for (let index: number = 0; index < this.max_threads; index++) {
+				if (!this.threads[index]) {
+					slot = index;
+					break;
+				}
+			}
+			if (isNaN(slot)) {
+				this.queued.push(thread);
+				return resolve();
+			}
+
+			$store.dispatch("thread/append", {
+				value: thread
+			});
+			// set thread slot
+			this.threads[slot] = thread;
+			// check for unfinished files
+			for (let index: number = 0; index < thread.files.length; index++) {
+				if (thread.files[index].written !== thread.files[index].size) {
+					valid.push(index);
+				}
+			}
+			if (!valid.length) {
+				delete this.threads[slot];
+				return resolve();
+			}
+			if (!storage.exist(thread.id.toString())) {
+				storage.register(thread.id.toString(), path.join(Folder.BUNDLES, thread.id.toString() + ".json"), thread);
+			}
 			return recursive(0);
 		});
+	}
+	public pause(id: number): void {
+		for (let index: number = 0; index < this.threads.length; index++) {
+			if (this.threads[index].id === id) {
+				this.threads[index].status === Status.PAUSED;
+				return;
+			}
+		}
+	}
+	public remove(id: number): void {
+		for (let index: number = 0; index < this.threads.length; index++) {
+			if (this.threads[index].id === id) {
+				delete this.threads[index];
+				return;
+			}
+		}
 	}
 	public modulator(link: string): Promise<Thread> {
 		return new Promise<Thread>((resolve, rejects): void => {
@@ -204,6 +239,7 @@ export class Download {
 						return resolve(new Thread(link, callback.title, files, callback.options));
 					}).catch((error: Error): void => {
 						fs.writeFile(path.join(Folder.DEBUGS, `${Date.now()}.log`), error.message, () => {
+							console.log(error);
 							return rejects(error);
 						});
 					});
@@ -214,7 +250,7 @@ export class Download {
 	public status(files: File[]): Status {
 		for (const file of files) {
 			if (file.written !== file.size) {
-				return Status.PROGRESS;
+				return Status.WORKING;
 			}
 		}
 		return Status.FINISHED;

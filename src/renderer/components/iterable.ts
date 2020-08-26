@@ -1,6 +1,7 @@
 import { Component, Vue, Watch } from "vue-property-decorator";
-import download, { Status, Thread } from "@/modules/download";
+import download from "@/modules/download";
 import utility from "@/modules/utility";
+import { Status, Thread } from "@/modules/download";
 
 @Component({})
 export default class Iterable extends Vue {
@@ -18,8 +19,7 @@ export default class Iterable extends Vue {
 	private status_colour(status: Status): undefined | "success" | "warning" | "error" {
 		switch (status) {
 			case Status.NONE:
-			case Status.REMOVED:
-			case Status.PROGRESS: {
+			case Status.WORKING: {
 				return undefined;
 			}
 			case Status.FINISHED: {

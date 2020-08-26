@@ -1,7 +1,8 @@
-import request, { PartialOptions } from "@/modules/request";
-import { Loaded, PlaceHolders } from "@/modules/download";
+import request from "@/modules/request";
 import utility from "@/modules/utility";
-class Manamoa {
+import { PartialOptions } from "@/modules/request";
+import { PlaceHolders, Loaded } from "@/modules/download";
+class JMana {
 	public start(url: string): Promise<Loaded> {
 		const links: string[] = [
 			// TODO: none
@@ -37,4 +38,4 @@ class Manamoa {
 	}
 }
 
-export default (new Manamoa());
+export default (new JMana());

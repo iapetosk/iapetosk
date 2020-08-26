@@ -13,6 +13,6 @@
 	},
 	{
 		"loader": "jmana",
-		"test": "^https:\\\/\\\/jmana\\.net\\\/bookdetail\\?bookname=([\\D\\d]+)&bookdetail=([\\d]+)$"
+		"test": "^https:\\\/\\\/jmana.net\\\/bookdetail\\?bookname=([\\D\\d]+)&bookdetail=([\\d]+)$"
 	}
 ]
