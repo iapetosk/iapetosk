@@ -2,6 +2,7 @@ import request from "@/modules/request";
 import utility from "@/modules/utility";
 import { PartialOptions } from "@/modules/request";
 import { PlaceHolders, Loaded } from "@/modules/download";
+
 class Manamoa {
 	public start(url: string): Promise<Loaded> {
 		const links: string[] = [

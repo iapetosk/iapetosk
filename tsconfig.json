@@ -2,8 +2,9 @@
 	"compilerOptions": {
 		"module": "commonjs",
 		"target": "ES2019",
-		"baseUrl": ".",
 		"outDir": "build",
+		"baseUrl": ".",
+		"jsx": "react",
 		"paths": {
 			"@/*": [
 				"src/*"
@@ -22,12 +23,11 @@
 		"esnext"
 	],
 	"files": [
-		"src/typings/vue.ts",
-		"src/typings/vue_node.ts"
+		"src/typings/jsx.ts"
 	],
 	"include": [
 		"**/*.ts",
-		"**/*.vue",
+		"**/*.tsx",
 		"**/*.json"
 	],
 	"exclude": [

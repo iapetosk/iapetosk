@@ -31,5 +31,15 @@ class Utility {
 		
 		return type === "string" ? capture : type === "number" ? parseInt(capture) : type === "array" ? capture.replace(/[\[\]\"]/g, "").split(/,/) : JSON.parse(capture);
 	}
+	public inline(value: { [key: string]: boolean }): string {
+		const array: string[] = [];
+		
+		for (const key in value) {
+			if (value[key]) {
+				array.push(key);
+			}
+		}
+		return array.join("\u0020");
+	}
 }
 export default (new Utility());

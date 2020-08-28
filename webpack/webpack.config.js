@@ -10,7 +10,7 @@ module.exports = {
 	target: "node-webkit",
 	stats: "errors-only",
 	entry: {
-		renderer: resolve_path("src", "renderer", "index.ts")
+		renderer: resolve_path("src", "renderer", "index.tsx")
 	},
 	externals: [
 		(context, request, callback) => {
@@ -24,12 +24,8 @@ module.exports = {
 	module: {
 		rules: [
 			{
-				test: /\.(ts)$/,
+				test: /\.(ts|tsx)$/,
 				loader: "ts-loader"
-			},
-			{
-				test: /\.(vue)$/,
-				loader: "vue-loader"
 			},
 			{
 				test: /\.(scss)$/,
@@ -49,7 +45,7 @@ module.exports = {
 		alias: {
 			"@": resolve_path("src")
 		},
-		extensions: [".js", ".ts", ".vue", ".scss", ".json"]
+		extensions: [".js", ".jsx", ".ts", ".tsx", ".scss", ".json"]
 	},
 	optimization: {
 		minimize: true,
@@ -70,7 +66,6 @@ module.exports = {
 		]
 	},
 	plugins: [
-		new (require("vue-loader/lib/plugin")),
 		new (require("html-webpack-plugin"))({
 			filename: "index.html",
 			template: resolve_path("src", "index.html")

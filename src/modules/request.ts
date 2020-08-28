@@ -3,6 +3,7 @@ import * as path from "path";
 import * as http from "http";
 import * as https from "https";
 import { File } from "@/modules/download";
+
 export type RequestOptions = PartialOptions & {
 	url: string,
 	method: "GET" | "POST" | "PUT" | "DELETE";

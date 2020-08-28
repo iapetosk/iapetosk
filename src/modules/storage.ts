@@ -1,72 +1,74 @@
 import * as fs from "fs";
 import * as path from "path";
+
 export enum StoragePreset {
 	SETTINGS = "settings"
-}
+};
+type StorageState = {
+	path: string,
+	data: any;
+};
 class Storage {
-	private store: {
-		[key: string]: {
-			path: string,
-			data: any
-		}
+	private storage: {
+		[key: string]: StorageState;
 	} = {};
-	constructor(store: Storage["store"]) {
-		this.store = store;
+	constructor(storage: Storage["storage"]) {
+		this.storage = storage;
 	}
 	public $define(object: { [key: string]: any; }, field: string, data: any): any {
-        const array: string[] = field.split(/\./);
+		const array: string[] = field.split(/\./);
 
-        for (const [index, value] of array.entries()) {
-            if (index === array.length - 1) {
+		for (const [index, value] of array.entries()) {
+			if (index === array.length - 1) {
 				object[value] = data;
 				return;
 			} else if (typeof object[value] === "undefined") {
 				object[value] = {};
 			}
 			object = object[value];
-        }
+		}
 	}
 	public $delete(object: { [key: string]: any; }, field: string): any {
-        const array: string[] = field.split(/\./);
+		const array: string[] = field.split(/\./);
 
-        for (const [index, value] of array.entries()) {
-            if (index === array.length - 1) {
+		for (const [index, value] of array.entries()) {
+			if (index === array.length - 1) {
 				delete object[value];
 				return;
 			} else if (typeof object[value] === "undefined") {
 				return;
 			}
 			object = object[value];
-        }
+		}
 	}
 	public $return(object: { [key: string]: any; }, field: string): any {
-        const array: string[] = field.split(/\./);
+		const array: string[] = field.split(/\./);
 
-        for (const [index, value] of array.entries()) {
-            if (index === array.length - 1) {
+		for (const [index, value] of array.entries()) {
+			if (index === array.length - 1) {
 				return object[value];
 			} else if (typeof object[value] === "undefined") {
 				return;
 			}
 			object = object[value];
-        }
+		}
 	}
-	public get_path(key: string): string {
-		return this.$return(this.store, key + ".path");
+	public get_path(key: string): StorageState["path"] {
+		return this.$return(this.storage, key + ".path");
 	}
 	public set_path(key: string, path: any): void {
-		this.$define(this.store, key + ".path", path);
+		this.$define(this.storage, key + ".path", path);
 		this.export(key);
 	}
-	public get_data(key: string): any {
-		return this.$return(this.store, key + ".data");
+	public get_data(key: string): StorageState["data"] {
+		return this.$return(this.storage, key + ".data");
 	}
 	public set_data(key: string, data: any): void {
-		this.$define(this.store, key + ".data", data);
+		this.$define(this.storage, key + ".data", data);
 		this.export(key);
 	}
 	public register(key: string, path: string, data: any): void {
-		this.$define(this.store, key, {
+		this.$define(this.storage, key, {
 			path: path,
 			data: data === "@import" ? this.import(path) : {}
 		});
@@ -74,7 +76,7 @@ class Storage {
 	}
 	public un_register(key: string): void {
 		fs.rmdirSync(path.dirname(this.get_path(key)), { recursive: true });
-		this.$delete(this.store, key);
+		this.$delete(this.storage, key);
 	}
 	public import(key: string): any {
 		try {
@@ -88,7 +90,7 @@ class Storage {
 		fs.writeFileSync(this.get_path(key), JSON.stringify(this.get_data(key)));
 	}
 	public exist(key: string): boolean {
-		return !!this.$return(this.store, key);
+		return !!this.$return(this.storage, key);
 	}
 }
 export default (new Storage({

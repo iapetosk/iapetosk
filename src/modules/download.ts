@@ -3,8 +3,9 @@ import * as path from "path";
 import * as API from "@/assets/modules.json";
 import storage from "@/modules/storage";
 import request from "@/modules/request";
-import $store from "@/renderer/store/index";
+import worker from "@/scheme/worker";
 import { PartialOptions } from "@/modules/request";
+
 export enum Folder {
 	DEBUGS = "debugs",
 	BUNDLES = "bundles",
@@ -71,9 +72,6 @@ export class Download {
 		this.threads = new Array(max_threads);
 		this.queued = new Array();
 		try {
-			// prevent threads duplication
-			$store.commit("thread/list", { value: [] });
-			// loop bundles
 			for (const bundle of fs.readdirSync(Folder.BUNDLES)) {
 				if (fs.statSync(path.join(Folder.BUNDLES, bundle)).isFile() && path.extname(bundle) === ".json") {
 					const ID: string = bundle.split(/\./)[0];
@@ -88,9 +86,7 @@ export class Download {
 							break;
 						}
 						default: {
-							$store.dispatch("thread/append", {
-								value: thread
-							});
+							worker.append(thread);
 							break;
 						}
 					}
@@ -155,11 +151,8 @@ export class Download {
 					thread.finished++;
 
 					storage.set_data(thread.id.toString(), thread);
+					worker.replace(thread, thread.id);
 
-					$store.dispatch("thread/update", {
-						value: thread,
-						id: thread.id
-					});
 					if (!thread) {
 						return stop();
 					}
@@ -187,10 +180,7 @@ export class Download {
 				this.queued.push(thread);
 				return resolve();
 			}
-
-			$store.dispatch("thread/append", {
-				value: thread
-			});
+			worker.append(thread);
 			// set thread slot
 			this.threads[slot] = thread;
 			// check for unfinished files

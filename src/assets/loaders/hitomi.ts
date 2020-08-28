@@ -2,6 +2,7 @@ import request from "@/modules/request";
 import utility from "@/modules/utility";
 import { PartialOptions } from "@/modules/request";
 import { PlaceHolders, Loaded } from "@/modules/download";
+
 export type GalleryBlock = {
 	language_localname: string,
 	language: string,
@@ -15,6 +16,7 @@ export type GalleryBlock = {
 		hash: string;
 	}[];
 };
+
 class Hitomi_La {
 	private number_of_frontends: number = NaN;
 	constructor() {
