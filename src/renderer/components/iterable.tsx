@@ -3,10 +3,8 @@ import * as React from "react";
 import "./iterable.scss";
 
 import listener from "@/modules/listener";
-import download from "@/modules/download";
 import utility from "@/modules/utility";
 import worker from "@/scheme/worker";
-import query from "@/scheme/query";
 import { Thread } from "@/modules/download";
 
 export type IterableState = {
@@ -21,18 +19,6 @@ class Iterable extends React.Component<IterableState, any> {
 
 		listener.on("worker_threads", ($new: Thread[]) => {
 			this.setState({ scroll_index: utility.clamp(this.state.scroll_index, 0, $new.length - 1) });
-		});
-		listener.on("query_text", ($new: string) => {
-			if ($new && $new.length) {
-				$new.split(/\s+/).forEach((link) => {
-					download.modulator(link).then((callback) => {
-						download.start(callback).then(() => {
-							// TODO: none
-						});
-					});
-				});
-				query.set("text", "");
-			}
 		});
 	}
 	public componentDidUpdate(): void {
@@ -69,9 +55,9 @@ class Iterable extends React.Component<IterableState, any> {
 					})}
 				</section>
 				<section id="scroll_track" className="contrast">
-					{[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((value, index) => {
+					{[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((value, index) => {
 						return (
-							<button id="scroll_metre" key={index} className={utility.inline({ highlight: worker.get("threads").length < 10 ? (this.state.scroll_index) * (1.0 / worker.get("threads").length) < (index / 10) && (index / 10) <= (this.state.scroll_index + 1.0) * (1.0 / worker.get("threads").length) : (index - 1.0) * (worker.get("threads").length / 10) <= this.state.scroll_index && this.state.scroll_index < index * (worker.get("threads").length / 10) })}>
+							<button id="scroll_metre" key={index} className={utility.inline({ highlight: worker.get("threads").length < 10 ? (this.state.scroll_index) * (1.0 / worker.get("threads").length) < (index + 1.0) / 10 && (index + 1.0) / 10 <= (this.state.scroll_index + 1.0) * (1.0 / worker.get("threads").length) : (index) * (worker.get("threads").length / 10) <= this.state.scroll_index && this.state.scroll_index < (index + 1.0) * (worker.get("threads").length / 10) })}>
 							</button>
 						);
 					})}

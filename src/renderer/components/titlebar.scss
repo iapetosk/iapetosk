@@ -5,28 +5,28 @@
 	height: layout.$titlebar-height;
 	top: 0px;
 	background-color: layout.$scheme-1;
-}
-button {
-	position: absolute;
-	width: 45px;
-	height: 100%;
-	transition: background-color layout.$transition;
-	will-change: background-color;
-	&:hover {
-		background-color: layout.$scheme-2;
+	button {
+		position: absolute;
+		width: 45px;
+		height: 100%;
+		transition: background-color layout.$transition;
+		will-change: background-color;
+		&:hover {
+			background-color: layout.$scheme-2;
+		}
 	}
-}
-svg {
-	position: absolute;
-	width: 12.5px;
-	height: 12.5px;
-	top: 0px;
-	right: 0px;
-	bottom: 0px;
-	left: 0px;
-	margin: auto;
-	pointer-events: none;
-	fill: layout.$scheme-9;
+	svg {
+		position: absolute;
+		width: 12.5px;
+		height: 12.5px;
+		top: 0px;
+		right: 0px;
+		bottom: 0px;
+		left: 0px;
+		margin: auto;
+		pointer-events: none;
+		fill: layout.$scheme-9;
+	}
 }
 #focus {
 	right: 90px;
