@@ -12,7 +12,7 @@ export type TreeViewState = {
 	[key: string]: {
 		favicon: string,
 		active: boolean,
-		list: number[];
+		count: number;
 	};
 };
 
@@ -38,12 +38,12 @@ class TreeView extends React.Component<TreeViewState, any> {
 			if (genesis[hostname]) {
 				genesis[hostname] = {
 					...genesis[hostname],
-					list: [...genesis[hostname].list, thread.id]
-				};
+					count: genesis[hostname].count + 1
+				}
 			} else if (this.state[hostname]) {
 				genesis[hostname] = {
 					...this.state[hostname],
-					list: [thread.id]
+					count: 1
 				};
 			} else {
 				genesis[hostname] = {
@@ -56,7 +56,7 @@ class TreeView extends React.Component<TreeViewState, any> {
 						return this.favicon(hostname, icon.default.length ? icon.default : icon.shortcut);
 					}),
 					active: false,
-					list: [thread.id]
+					count: 1
 				};
 			}
 		}
@@ -78,7 +78,7 @@ class TreeView extends React.Component<TreeViewState, any> {
 					return (
 						<section id="wrapper" className="contrast" key={index}>
 							<canvas id="favicon" className="contrast" style={{ backgroundImage: `url(${this.state[value].favicon})` }}></canvas>
-							<legend id="hostname">{ value } [{ this.state[value].list.length }]</legend>
+							<legend id="hostname">{ value } [{ this.state[value].count }]</legend>
 						</section>
 					);
 				})}

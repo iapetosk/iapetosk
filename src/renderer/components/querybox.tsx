@@ -23,9 +23,11 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 						});
 					});
 				});
+				// clear QUERY data
 				query.set("text", "");
+				// clear HTML input
+				(document.getElementById("input")! as HTMLInputElement).value = "";
 			}
-			(document.getElementById("input")! as HTMLInputElement).value = "";
 		});
 	}
 	public render(): JSX.Element {
