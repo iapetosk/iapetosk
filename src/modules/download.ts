@@ -221,12 +221,15 @@ export class Download {
 				if (new RegExp(LOADER.test).test(link)) {
 					// require("module")._load(LOADER.loader, this, false) | https://nearsoft.com/blog/nodejs-how-to-load-a-module-with-require/
 					(require(`@/assets/loaders/${LOADER.loader}`).default as Loader).start(link).then((callback): void => {
-						const files: File[] = [];
-						const folder: string = Date.now().toString();
-						callback.links.forEach((link, index) => {
-							files[index] = new File(link, path.join(Folder.DOWNLOADS, LOADER.loader, folder, `${index}${path.extname(link)}`));
-						});
-						return resolve(new Thread(link, callback.title, files, callback.options));
+						if (callback.links.length) {
+							const files: File[] = [];
+							const folder: string = Date.now().toString();
+							callback.links.forEach((link, index) => {
+								files[index] = new File(link, path.join(Folder.DOWNLOADS, LOADER.loader, folder, `${index}${path.extname(link)}`));
+							});
+							return resolve(new Thread(link, callback.title, files, callback.options));
+						}
+						throw new Error();
 					}).catch((error: Error): void => {
 						fs.writeFile(path.join(Folder.DEBUGS, `${Date.now()}.log`), error.message, () => {
 							console.log(error);

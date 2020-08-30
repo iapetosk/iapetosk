@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as http from "http";
 import * as https from "https";
 import { File } from "@/modules/download";
 
@@ -17,12 +16,12 @@ class Request {
 		const SSL: boolean = options.url.startsWith("https");
 		const chunks: Buffer[] = [];
 		return new Promise<{ content: { buffer: Buffer, encode: string; }, status: { code?: number, message?: string; }; }>((resolve, rejects) => {
-			(SSL ? https : http).get({
-				...this.parse(options.url),
+			https.request({
+				agent: false,
 				method: options.method,
 				headers: options.headers,
 				protocol: SSL ? "https:" : "http:",
-				rejectUnauthorized: false
+				...this.parse(options.url)
 			}, (response) => {
 				// redirects
 				if (response.headers.location) {
@@ -70,7 +69,7 @@ class Request {
 				response.on("error", (error) => {
 					return rejects(error);
 				});
-			});
+			}).end();
 		});
 	};
 	public async get(url: string, options: PartialOptions = {}, file?: File) {
