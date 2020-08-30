@@ -8,24 +8,24 @@
 	left: layout.$treeview-width;
 	#scroll_area {
 		position: absolute;
-		overflow: hidden;
-		height: 100%;
 		right: 10px;
 		left: 0px;
 		background-color: layout.$scheme-2;
+		height: 100%;
+		overflow: hidden;
 		#process {
 			position: relative;
-			overflow: hidden;
-			height: 150px;
 			margin: 10px;
+			height: 150px;
+			overflow: hidden;
 			&, * {
 				transition: color 250ms ease-in-out, background-color 250ms ease-in-out, border-color 250ms ease-in-out;
 				will-change: color, border-color;
 			}
 			&:hover,
 			&:hover * {
-				color: layout.$scheme-9;
 				border-color: layout.$scheme-5;
+				color: layout.$scheme-9;
 			}
 			&.error {
 				background-color: layout.$error;
@@ -41,41 +41,40 @@
 			}
 		}
 		#title {
-			height: 20px;
 			margin: 0px 0px 0px 10px;
 			border-width: 0px 0px 0px thin;
 			background-color: layout.$scheme-2;
+			height: 20px;
 		}
 		#wrapper {
-			height: 130px;
 			margin: 0px 0px 0px 10px;
 			border-width: thin 0px 0px thin;
 			background-color: layout.$scheme-3;
+			height: 130px;
 		}
 		#thumbnail {
-			width: 200px;
-			height: 110px;
 			margin: 8.5px;
 			border-radius: 5px;
-			background-size: cover;
-			background-repeat: no-repeat;
-			background-position: center;
 			background-color: layout.$scheme-2;
+			background-position: center;
+			background-repeat: no-repeat;
+			background-size: cover;
+			width: 200px;
+			height: 110px;
 		}
 	}
 	#scroll_track {
 		position: fixed;
-		width: layout.$scrollbar-width;
 		top: layout.$titlebar-height;
 		right: 0px;
 		bottom: layout.$taskbar-height;
 		border-width: 0px thin 0px thin;
+		width: layout.$scrollbar-width;
 		#scroll_metre {
 			display: block;
-			width: 100%;
-			height: 10%;
-			background-color: layout.$scheme-2;
 			transition: background-color layout.$transition;
+			background-color: layout.$scheme-2;
+			width: 100%;
 			will-change: background-color;
 			&:nth-child(2n) {
 				background-color: layout.$scheme-3;
@@ -84,7 +83,5 @@
 				background-color: layout.$success;
 			}
 		}
-		
 	}
-	
 }

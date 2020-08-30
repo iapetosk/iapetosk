@@ -8,6 +8,7 @@ import worker from "@/scheme/worker";
 import { Thread } from "@/modules/download";
 
 export type IterableState = {
+	scroll_length: number,
 	scroll_index: number;
 };
 
@@ -18,7 +19,7 @@ class Iterable extends React.Component<IterableState, any> {
 		this.state = { ...properties };
 
 		listener.on("worker_threads", ($new: Thread[]) => {
-			this.setState({ scroll_index: utility.clamp(this.state.scroll_index, 0, $new.length - 1) });
+			this.setState({ ...this.state, scroll_index: utility.clamp(this.state.scroll_index, 0, $new.length - 1) });
 		});
 	}
 	public componentDidUpdate(): void {
@@ -36,9 +37,9 @@ class Iterable extends React.Component<IterableState, any> {
 		return (
 			<main id="iterable" onWheel={(event) => {
 				if (event.deltaY > 0 && this.state.scroll_index < worker.get("threads").length - 1) {
-					this.setState({ scroll_index: this.state.scroll_index + 1 });
+					this.setState({ ...this.state, scroll_index: this.state.scroll_index + 1 });
 				} if (event.deltaY < 0 && this.state.scroll_index > 0) {
-					this.setState({ scroll_index: this.state.scroll_index - 1 });
+					this.setState({ ...this.state, scroll_index: this.state.scroll_index - 1 });
 				}
 			}}>
 				<section id="scroll_area">
@@ -46,7 +47,7 @@ class Iterable extends React.Component<IterableState, any> {
 						return (
 							<section id="process" className={utility.inline({ contrast: true, highlight: this.state.scroll_index === index })} key={index}>
 								<legend id="title" className="contrast center">{ value.title } - ({ value.finished } / { value.files.length })</legend>
-								<figure id="wrapper" className="contrast" onClick={() => { this.setState({ scroll_index: index }); }}>
+								<figure id="wrapper" className="contrast" onClick={() => { this.setState({ ...this.state, scroll_index: index }); }}>
 									<canvas id="thumbnail" className="contrast" style={{ backgroundImage: value.files[0].written === value.files[0].size ? `url(${value.files[0].path.replace(/\\/g, `/`)})` : undefined }}>
 									</canvas>
 								</figure>
@@ -55,9 +56,9 @@ class Iterable extends React.Component<IterableState, any> {
 					})}
 				</section>
 				<section id="scroll_track" className="contrast">
-					{[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((value, index) => {
+					{[...Array(this.state.scroll_length)].map((value, index) => {
 						return (
-							<button id="scroll_metre" className={utility.inline({ highlight: worker.get("threads").length < 10 ? (this.state.scroll_index) * (1.0 / worker.get("threads").length) < (index + 1.0) / 10 && (index + 1.0) / 10 <= (this.state.scroll_index + 1.0) * (1.0 / worker.get("threads").length) : (index) * (worker.get("threads").length / 10) <= this.state.scroll_index && this.state.scroll_index < (index + 1.0) * (worker.get("threads").length / 10) })} key={index}>
+							<button id="scroll_metre" className={utility.inline({ highlight: worker.get("threads").length < 10 ? (this.state.scroll_index) * (1.0 / worker.get("threads").length) < (index + 1.0) / 10 && (index + 1.0) / 10 <= (this.state.scroll_index + 1.0) * (1.0 / worker.get("threads").length) : (index) * (worker.get("threads").length / 10) <= this.state.scroll_index && this.state.scroll_index < (index + 1.0) * (worker.get("threads").length / 10) })} style={{ height: `${this.state.scroll_length}%` }} key={index}>
 							</button>
 						);
 					})}

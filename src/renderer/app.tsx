@@ -33,7 +33,7 @@ class App extends React.Component<AppState, any> {
 				<article id="content">
 					<QueryBox></QueryBox>
 					<TreeView></TreeView>
-					<Iterable scroll_index={0}></Iterable>
+					<Iterable scroll_length={10} scroll_index={0}></Iterable>
 				</article>
 				<TaskBar></TaskBar>
 			</main>

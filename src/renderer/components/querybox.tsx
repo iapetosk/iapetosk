@@ -4,6 +4,7 @@ import "./querybox.scss";
 
 import listener from "@/modules/listener";
 import download from "@/modules/download";
+import utility from "@/modules/utility";
 import query from "@/scheme/query";
 
 export type QueryBoxState = {};
@@ -33,9 +34,12 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 	public render(): JSX.Element {
 		return (
 			<section id="querybox">
-				<input id="input" className="contrast" placeholder="type url in here" autoComplete="off" onKeyDown={(event) => {
-					if (event.key === "Enter") {
-						query.set("text", (event.target as HTMLInputElement).value);
+				<input id="input" className="contrast" placeholder={["strongly typed :O", "paste links in here :P", "press enter to start download :D"][utility.random(0, 2)]} autoComplete="off" onKeyDown={(event) => {
+					switch (event.key.toLowerCase()) {
+						case "enter": {
+							query.set("text", (event.target as HTMLInputElement).value);
+							break;
+						}
 					}
 				}}>
 				</input>
