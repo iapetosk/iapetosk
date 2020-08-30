@@ -29,7 +29,7 @@ class Utility {
 	public extract(value: string, path: string, type: "string" | "number" | "array" | "object"): any {
 		const capture: string = new RegExp(`var ${path} = (.+?)(?=;)`).exec(value)![1];
 		
-		return type === "string" ? capture : type === "number" ? parseInt(capture) : type === "array" ? capture.replace(/[\[\]\"]/g, "").split(/,/) : JSON.parse(capture);
+		return type === "string" ? capture : type === "number" ? Number(capture) : type === "array" ? capture.replace(/[\[\]\"]/g, "").split(/,/) : JSON.parse(capture);
 	}
 	public inline(value: { [key: string]: boolean }): string {
 		const array: string[] = [];

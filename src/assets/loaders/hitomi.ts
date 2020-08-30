@@ -90,7 +90,7 @@ class Hitomi_La {
 		});
 	}
 	public ID(url: string): number {
-		return parseInt(/([0-9]+).html$/.exec(url)![1]);
+		return Number(/([0-9]+).html$/.exec(url)![1]);
 	}
 }
 
