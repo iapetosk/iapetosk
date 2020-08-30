@@ -44,7 +44,7 @@ class Iterable extends React.Component<IterableState, any> {
 				<section id="scroll_area">
 					{worker.get("threads").map((value, index) => {
 						return (
-							<section id="process" key={index} className={utility.inline({ contrast: true, highlight: this.state.scroll_index === index })}>
+							<section id="process" className={utility.inline({ contrast: true, highlight: this.state.scroll_index === index })} key={index}>
 								<legend id="title" className="contrast center">{ value.title } - ({ value.finished } / { value.files.length })</legend>
 								<figure id="wrapper" className="contrast" onClick={() => { this.setState({ scroll_index: index }); }}>
 									<canvas id="thumbnail" className="contrast" style={{ backgroundImage: value.files[0].written === value.files[0].size ? `url(${value.files[0].path.replace(/\\/g, `/`)})` : undefined }}>
@@ -57,7 +57,7 @@ class Iterable extends React.Component<IterableState, any> {
 				<section id="scroll_track" className="contrast">
 					{[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((value, index) => {
 						return (
-							<button id="scroll_metre" key={index} className={utility.inline({ highlight: worker.get("threads").length < 10 ? (this.state.scroll_index) * (1.0 / worker.get("threads").length) < (index + 1.0) / 10 && (index + 1.0) / 10 <= (this.state.scroll_index + 1.0) * (1.0 / worker.get("threads").length) : (index) * (worker.get("threads").length / 10) <= this.state.scroll_index && this.state.scroll_index < (index + 1.0) * (worker.get("threads").length / 10) })}>
+							<button id="scroll_metre" className={utility.inline({ highlight: worker.get("threads").length < 10 ? (this.state.scroll_index) * (1.0 / worker.get("threads").length) < (index + 1.0) / 10 && (index + 1.0) / 10 <= (this.state.scroll_index + 1.0) * (1.0 / worker.get("threads").length) : (index) * (worker.get("threads").length / 10) <= this.state.scroll_index && this.state.scroll_index < (index + 1.0) * (worker.get("threads").length / 10) })} key={index}>
 							</button>
 						);
 					})}

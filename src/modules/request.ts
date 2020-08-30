@@ -86,7 +86,7 @@ class Request {
 		return this.send({ url: url, method: "DELETE", ...options }, file);
 	}
 	public parse(url: string): { hostname: string, path: string } {
-		const component: string[] = url.replace(/https?:\/\//, "").split(/\//);
+		const component: string[] = (url === decodeURI(url) ? encodeURI(url) : url).replace(/https?:\/\//, "").split(/\//);
 		return {
 			hostname: component[0],
 			path: ["", ...component.slice(1)].join("/")

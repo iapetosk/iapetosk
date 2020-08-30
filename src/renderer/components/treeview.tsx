@@ -25,7 +25,8 @@ class TreeView extends React.Component<TreeViewState, any> {
 		listener.on("worker_threads", ($new: Thread[]) => {
 			this.update($new);
 		});
-
+	}
+	public componentDidMount(): void {
 		this.update(worker.get("threads"));
 	}
 	public async update(worker: Thread[]) {
@@ -59,34 +60,25 @@ class TreeView extends React.Component<TreeViewState, any> {
 				};
 			}
 		}
-
+		this.setState(genesis);
 	}
 	private favicon(hostname: string, path: string | string[]): string {
 		path = path instanceof Array ? path[0] : path;
 		// for unknown reason, sometimes path is undefined
 		if (path) {
 			path = path.startsWith("//") ? path : [hostname, path].join("/");
-			path = path.startsWith("http") || path.startsWith("https") ? path : `https://${path}`;
+			path = path.startsWith("http") || path.startsWith("https") ? path : `https:${path}`;
 		}
 		return path;
 	}
 	public render(): JSX.Element {
 		return (
 			<main id="treeview" className="contrast">
-				{Object.values(this.state).map((value, index) => {
+				{Object.keys(this.state).map((value, index) => {
 					return (
-						<section id="wrapper" className="contrast">
-							<figure id="instance" className="contrast">
-								<canvas id="favicon" className="contrast" style={{ backgroundColor: `url(${value.favicon})` }}></canvas>
-								<legend id="hostname">{{ index }}</legend>
-							</figure>
-							{value.list.map((value, index) => {
-								return (
-									<figure id="collapse">
-										<button className="contrast">{{ value }}</button>
-									</figure>
-								);
-							})}
+						<section id="wrapper" className="contrast" key={index}>
+							<canvas id="favicon" className="contrast" style={{ backgroundImage: `url(${this.state[value].favicon})` }}></canvas>
+							<legend id="hostname">{ value } [{ this.state[value].list.length }]</legend>
 						</section>
 					);
 				})}

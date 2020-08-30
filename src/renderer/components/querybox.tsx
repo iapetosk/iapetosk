@@ -25,13 +25,13 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 				});
 				query.set("text", "");
 			}
-			(document.getElementById("query")! as HTMLInputElement).value = "";
+			(document.getElementById("input")! as HTMLInputElement).value = "";
 		});
 	}
 	public render(): JSX.Element {
 		return (
 			<section id="querybox">
-				<input id="query" className="contrast" autoComplete="off" onKeyDown={(event) => {
+				<input id="input" className="contrast" placeholder="type url in here" autoComplete="off" onKeyDown={(event) => {
 					if (event.key === "Enter") {
 						query.set("text", (event.target as HTMLInputElement).value);
 					}
