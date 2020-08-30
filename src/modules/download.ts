@@ -229,10 +229,12 @@ export class Download {
 							});
 							return resolve(new Thread(link, callback.title, files, callback.options));
 						}
-						throw new Error();
+						throw new Error("EMPTY");
 					}).catch((error: Error): void => {
-						fs.writeFile(path.join(Folder.DEBUGS, `${Date.now()}.log`), error.message, () => {
+						fs.writeFile(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: LOADER, error: error }), () => {
+							// print ERROR
 							console.log(error);
+							// reject ERROR
 							return rejects(error);
 						});
 					});
