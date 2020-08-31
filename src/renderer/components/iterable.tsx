@@ -46,7 +46,7 @@ class Iterable extends React.Component<IterableState, any> {
 					{worker.get("threads").map((value, index) => {
 						return (
 							<section id="process" className={utility.inline({ contrast: true, highlight: this.state.scroll_index === index })} key={index}>
-								<legend id="title" className="contrast center">{ value.title } - ({ value.finished } / { value.files.length })</legend>
+								<legend id="title" className="contrast center">{value.title} - ({value.finished} / {value.files.length})</legend>
 								<figure id="wrapper" className="contrast" onClick={() => { this.setState({ ...this.state, scroll_index: index }); }}>
 									<canvas id="thumbnail" className="contrast" style={{ backgroundImage: value.files[0].written === value.files[0].size ? `url(${value.files[0].path.replace(/\\/g, `/`)})` : undefined }}>
 									</canvas>
@@ -56,9 +56,9 @@ class Iterable extends React.Component<IterableState, any> {
 					})}
 				</section>
 				<section id="scroll_track" className="contrast">
-					{[...Array(this.state.scroll_length)].map((value, index) => {
+					{[...new Array(this.state.scroll_length)].map((value, index) => {
 						return (
-							<button id="scroll_metre" className={utility.inline({ highlight: worker.get("threads").length < 10 ? (this.state.scroll_index) * (1.0 / worker.get("threads").length) < (index + 1.0) / 10 && (index + 1.0) / 10 <= (this.state.scroll_index + 1.0) * (1.0 / worker.get("threads").length) : (index) * (worker.get("threads").length / 10) <= this.state.scroll_index && this.state.scroll_index < (index + 1.0) * (worker.get("threads").length / 10) })} style={{ height: `${this.state.scroll_length}%` }} key={index}>
+							<button id="scroll_metre" className={utility.inline({ highlight: worker.get("threads").length < 10 ? (this.state.scroll_index) * (1.0 / worker.get("threads").length) < (index + 1.0) / 10 && (index + 1.0) / 10 <= (this.state.scroll_index + 1.0) * (1.0 / worker.get("threads").length) : (index) * (worker.get("threads").length / 10) <= this.state.scroll_index && this.state.scroll_index < (index + 1.0) * (worker.get("threads").length / 10) })} style={{ height: `${100 / this.state.scroll_length}%` }} key={index}>
 							</button>
 						);
 					})}

@@ -12,7 +12,7 @@ class TaskBar extends React.Component<Object, TaskBarState> {
 	}
 	public render(): JSX.Element {
 		return (
-			<footer id="taskbar" className="contrast center">Copyright (c) { new Date().getFullYear()} Sombian</footer>
+			<footer id="taskbar" className="contrast center">Copyright (c) {new Date().getFullYear()} Sombian</footer>
 		);
 	}
 }

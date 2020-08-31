@@ -39,7 +39,7 @@ class TreeView extends React.Component<TreeViewState, any> {
 				genesis[hostname] = {
 					...genesis[hostname],
 					count: genesis[hostname].count + 1
-				}
+				};
 			} else if (this.state[hostname]) {
 				genesis[hostname] = {
 					...this.state[hostname],
@@ -78,7 +78,7 @@ class TreeView extends React.Component<TreeViewState, any> {
 					return (
 						<section id="wrapper" className="contrast" key={index}>
 							<canvas id="favicon" className="contrast" style={{ backgroundImage: `url(${this.state[value].favicon})` }}></canvas>
-							<legend id="hostname">{ value } [{ this.state[value].count }]</legend>
+							<legend id="hostname">{value} [{this.state[value].count}]</legend>
 						</section>
 					);
 				})}
