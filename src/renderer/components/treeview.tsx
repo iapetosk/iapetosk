@@ -67,7 +67,7 @@ class TreeView extends React.Component<TreeViewState, any> {
 		// for unknown reason, sometimes path is undefined
 		if (path) {
 			path = path.startsWith("//") ? path : [hostname, path].join("/");
-			path = path.startsWith("http") || path.startsWith("https") ? path : `https:${path}`;
+			path = path.startsWith("http") || path.startsWith("https") ? path : `https://${path}`;
 		}
 		return path;
 	}

@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import * as http from "http";
 import * as https from "https";
 import { File } from "@/modules/download";
 
@@ -15,8 +16,9 @@ class Request {
 	public async send(options: RequestOptions, file?: File) {
 		const SSL: boolean = options.url.startsWith("https");
 		const chunks: Buffer[] = [];
+		/* DNS over HTTPS */
 		return new Promise<{ content: { buffer: Buffer, encode: string; }, status: { code?: number, message?: string; }; }>((resolve, rejects) => {
-			https.request({
+			(SSL ? https : http).request({
 				agent: false,
 				method: options.method,
 				headers: options.headers,
@@ -46,7 +48,6 @@ class Request {
 					// file
 					if (file) {
 						file.written += chunk.length;
-						// stream
 						writable.write(chunk);
 					}
 				});
@@ -67,6 +68,9 @@ class Request {
 					});
 				});
 				response.on("error", (error) => {
+					// print ERROR
+					console.log(error);
+					// rejects ERROR
 					return rejects(error);
 				});
 			}).end();
@@ -84,7 +88,7 @@ class Request {
 	public async delete(url: string, options: PartialOptions = {}, file?: File) {
 		return this.send({ url: url, method: "DELETE", ...options }, file);
 	}
-	public parse(url: string): { hostname: string, path: string } {
+	public parse(url: string): { hostname: string, path: string; } {
 		const component: string[] = (url === decodeURI(url) ? encodeURI(url) : url).replace(/https?:\/\//, "").split(/\//);
 		return {
 			hostname: component[0],

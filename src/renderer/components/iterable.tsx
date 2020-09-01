@@ -58,7 +58,7 @@ class Iterable extends React.Component<IterableState, any> {
 				<section id="scroll_track" className="contrast">
 					{[...new Array(this.state.scroll_length)].map((value, index) => {
 						return (
-							<button id="scroll_metre" className={utility.inline({ highlight: worker.get("threads").length < 10 ? (this.state.scroll_index) * (1.0 / worker.get("threads").length) < (index + 1.0) / 10 && (index + 1.0) / 10 <= (this.state.scroll_index + 1.0) * (1.0 / worker.get("threads").length) : (index) * (worker.get("threads").length / 10) <= this.state.scroll_index && this.state.scroll_index < (index + 1.0) * (worker.get("threads").length / 10) })} style={{ height: `${100 / this.state.scroll_length}%` }} key={index}>
+							<button id="scroll_metre" className={utility.inline({ highlight: worker.get("threads").length < this.state.scroll_length ? (this.state.scroll_index) * (1.0 / worker.get("threads").length) < (index + 1.0) / this.state.scroll_length && (index + 1.0) / this.state.scroll_length <= (this.state.scroll_index + 1.0) * (1.0 / worker.get("threads").length) : (index) * (worker.get("threads").length / this.state.scroll_length) <= this.state.scroll_index && this.state.scroll_index < (index + 1.0) * (worker.get("threads").length / this.state.scroll_length) })} style={{ height: `${100 / this.state.scroll_length}%` }} key={index}>
 							</button>
 						);
 					})}

@@ -71,6 +71,7 @@ export class Download {
 		// limit max threads
 		this.threads = new Array(max_threads);
 		this.queued = new Array();
+		// error thrown if bundles folder not found
 		try {
 			for (const bundle of fs.readdirSync(Folder.BUNDLES)) {
 				if (fs.statSync(path.join(Folder.BUNDLES, bundle)).isFile() && path.extname(bundle) === ".json") {
@@ -110,7 +111,7 @@ export class Download {
 				if (I.queued.length) {
 					// get the oldest queued thread
 					const queue = I.queued[0];
-					// shorten the queued list
+					// modify the queued list
 					I.queued.splice(0, 1);
 					// run the oldest thread
 					I.start(queue);
@@ -229,7 +230,7 @@ export class Download {
 							});
 							return resolve(new Thread(link, callback.title, files, callback.options));
 						}
-						throw new Error("EMPTY");
+						throw new Error("empty");
 					}).catch((error: Error): void => {
 						fs.writeFile(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: LOADER, error: error }), () => {
 							// print ERROR

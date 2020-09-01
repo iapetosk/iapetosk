@@ -28,8 +28,24 @@ class Utility {
 	}
 	public extract(value: string, path: string, type: "string" | "number" | "array" | "object"): any {
 		const capture: string = new RegExp(`var ${path} = (.+?)(?=;)`).exec(value)![1];
-		
-		return type === "string" ? capture : type === "number" ? Number(capture) : type === "array" ? capture.replace(/[\[\]\"]/g, "").split(/,/) : JSON.parse(capture);
+
+		switch (type) {
+			case "string": {
+				return String(capture);
+			}
+			case "number": {
+				return Number(capture);
+			}
+			case "array": {
+				return JSON.parse(`{"capture":${capture}}`).capture;
+			}
+			case "object": {
+				return JSON.parse(capture);
+			}
+			default: {
+				throw new Error();
+			}
+		}
 	}
 	public inline(value: { [key: string]: boolean }): string {
 		const array: string[] = [];
