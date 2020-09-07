@@ -27,7 +27,7 @@ class TreeView extends React.Component<TreeViewState, any> {
 		});
 	}
 	public componentDidMount(): void {
-		this.update(worker.get("threads"));
+		this.update(worker.index("threads").get());
 	}
 	public async update(worker: Thread[]) {
 		const genesis: TreeViewState = {};

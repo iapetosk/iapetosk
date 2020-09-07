@@ -25,7 +25,7 @@ class Iterable extends React.Component<IterableState, any> {
 	public componentDidUpdate(): void {
 		const target: HTMLElement = document.getElementById("scroll_area")!;
 
-		const height: number = utility.truncate(target.scrollHeight / worker.get("threads").length);
+		const height: number = utility.truncate(target.scrollHeight / worker.index("threads").get().length);
 
 		let start: number = (target.scrollTop) / height;
 		let finish: number = (target.scrollTop + target.clientHeight) / height;
@@ -36,14 +36,14 @@ class Iterable extends React.Component<IterableState, any> {
 	public render(): JSX.Element {
 		return (
 			<main id="iterable" onWheel={(event) => {
-				if (event.deltaY > 0 && this.state.scroll_index < worker.get("threads").length - 1) {
+				if (event.deltaY > 0 && this.state.scroll_index < worker.index("threads").get().length - 1) {
 					this.setState({ ...this.state, scroll_index: this.state.scroll_index + 1 });
 				} if (event.deltaY < 0 && this.state.scroll_index > 0) {
 					this.setState({ ...this.state, scroll_index: this.state.scroll_index - 1 });
 				}
 			}}>
 				<section id="scroll_area">
-					{worker.get("threads").map((value, index) => {
+					{worker.index("threads").get().map((value, index) => {
 						return (
 							<section id="process" className={utility.inline({ contrast: true, highlight: this.state.scroll_index === index })} key={index}>
 								<legend id="title" className="contrast center">{value.title} - ({value.finished} / {value.files.length})</legend>
@@ -58,7 +58,7 @@ class Iterable extends React.Component<IterableState, any> {
 				<section id="scroll_track" className="contrast">
 					{[...new Array(this.state.scroll_length)].map((value, index) => {
 						return (
-							<button id="scroll_metre" className={utility.inline({ highlight: worker.get("threads").length < this.state.scroll_length ? (this.state.scroll_index) * (1.0 / worker.get("threads").length) < (index + 1.0) / this.state.scroll_length && (index + 1.0) / this.state.scroll_length <= (this.state.scroll_index + 1.0) * (1.0 / worker.get("threads").length) : (index) * (worker.get("threads").length / this.state.scroll_length) <= this.state.scroll_index && this.state.scroll_index < (index + 1.0) * (worker.get("threads").length / this.state.scroll_length) })} style={{ height: `${100 / this.state.scroll_length}%` }} key={index}>
+							<button id="scroll_metre" className={utility.inline({ highlight: worker.index("threads").get().length < this.state.scroll_length ? (this.state.scroll_index) * (1.0 / worker.index("threads").get().length) < (index + 1.0) / this.state.scroll_length && (index + 1.0) / this.state.scroll_length <= (this.state.scroll_index + 1.0) * (1.0 / worker.index("threads").get().length) : (index) * (worker.index("threads").get().length / this.state.scroll_length) <= this.state.scroll_index && this.state.scroll_index < (index + 1.0) * (worker.index("threads").get().length / this.state.scroll_length) })} style={{ height: `${100 / this.state.scroll_length}%` }} key={index}>
 							</button>
 						);
 					})}

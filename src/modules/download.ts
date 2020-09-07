@@ -87,7 +87,7 @@ export class Download {
 							break;
 						}
 						default: {
-							worker.append(thread);
+							worker.index("threads").append(thread);
 							break;
 						}
 					}
@@ -152,7 +152,7 @@ export class Download {
 					thread.finished++;
 
 					storage.set_data(thread.id.toString(), thread);
-					worker.replace(thread, thread.id);
+					worker.index("threads").replace(thread.id, thread);
 
 					if (!thread) {
 						return stop();
@@ -181,7 +181,7 @@ export class Download {
 				this.queued.push(thread);
 				return resolve();
 			}
-			worker.append(thread);
+			worker.index("threads").append(thread);
 			// set thread slot
 			this.threads[slot] = thread;
 			// check for unfinished files
@@ -204,6 +204,7 @@ export class Download {
 		for (let index: number = 0; index < this.threads.length; index++) {
 			if (this.threads[index].id === id) {
 				this.threads[index].status === Status.PAUSED;
+				worker.index("threads").replace(id, this.threads[index]);
 				return;
 			}
 		}
@@ -212,6 +213,7 @@ export class Download {
 		for (let index: number = 0; index < this.threads.length; index++) {
 			if (this.threads[index].id === id) {
 				delete this.threads[index];
+				worker.index("threads").replace(id, undefined);
 				return;
 			}
 		}
