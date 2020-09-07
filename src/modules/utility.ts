@@ -57,5 +57,8 @@ class Utility {
 		}
 		return array.join("\u0020");
 	}
+	public split(text: string, index: number): string[] {
+		return [text.substring(0, index), text.substring(index)];
+	}
 }
 export default (new Utility());

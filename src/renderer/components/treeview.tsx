@@ -22,7 +22,7 @@ class TreeView extends React.Component<TreeViewState, any> {
 		super(properties);
 		this.state = { ...properties };
 
-		listener.on("worker_threads", ($new: Thread[]) => {
+		listener.on("worker.threads", ($new: Thread[]) => {
 			this.update($new);
 		});
 	}
