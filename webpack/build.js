@@ -17,8 +17,11 @@ request("nwjs.io", "/versions.json").then((callback) => {
 		},
 		output: {
 			path: "build/",
-			name: "blossom.exe",
-			icon: "src/assets/icons/icon.ico"
+			name: `${pakcage.name}.exe`,
+			icon: {
+				file: "src/assets/icons/icon.ico",
+				task: "src/assets/icons/icon.png"
+			}
 		}
 	};
 	fs.rmdirSync(options.output.path, { recursive: true });
@@ -51,22 +54,29 @@ async function request(hostname, path) {
 async function build(options) {
 	return new Promise((resolve, rejects) => {
 		request("dl.nwjs.io", `/${options.archive.version}/${options.archive.flavor}-${options.archive.version}-${options.archive.platform}-${options.archive.architecture}.zip`).then((callback) => {
-			// write archive
-			fs.writeFileSync(path.resolve(options.output.path, "archive.zip"), callback);
-			// write package.json
-			fs.writeFileSync(path.resolve(options.output.path, "package.json"), JSON.stringify({
-				name: "blossom",
-				main: "index.html",
-				window: package.window
-			}));
+			// write files
+			for (const file of [
+				{
+					name: "archive.zip",
+					data: callback
+				},
+				{
+					name: "package.json",
+					data: JSON.stringify({ name: package.name, main: "system/index.html", window: { ...package.window, icon: "system/icon.png" }})
+				},
+				{
+					name: "system/icon.png",
+					data: fs.readFileSync(options.output.icon.task)
+				}
+			]) {
+				fs.writeFileSync(path.resolve(options.output.path, file.name), file.data);
+			}
 			// extract archive
 			const archive = new (require("node-stream-zip"))({ file: path.resolve(options.output.path, "archive.zip") });
 			archive.on("ready", () => {
 				archive.extract(`nwjs-${options.archive.version}-${options.archive.platform}-${options.archive.architecture}/`, options.output.path, (error, count) => {
 					// close archive
 					archive.close();
-					// remove archive
-					fs.unlinkSync(path.resolve(options.output.path, "archive.zip"));
 					// rename executable
 					fs.renameSync(path.resolve(options.output.path, "nw.exe"), path.resolve(options.output.path, options.output.name));
 					// update executable
@@ -78,8 +88,13 @@ async function build(options) {
 							"FileDescription": package.description,
 							"LegalCopyright": `Copyright (c) ${new Date().getFullYear()} ${package.author}`,
 						},
-						"icon": options.output.icon
+						"icon": options.output.icon.file
 					}).then(() => {
+						// remove unnecessary files
+						for (const file of ["archive.zip", "notification_helper.exe", "credits.html"]) {
+							fs.unlinkSync(path.resolve(options.output.path, file));
+						}
+						// <END>
 						return resolve();
 					});
 				});
