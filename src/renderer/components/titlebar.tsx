@@ -41,13 +41,22 @@ class TitleBar extends React.Component<TitleBarState, any> {
 	public render(): JSX.Element {
 		return (
 			<header id="titlebar" className="contrast draggable">
-				<button id="focus" className="none-draggable" onClick={() => { this.app.minimize(); }}
+				<button id="focus" className="none-draggable"
+					onClick={() => {
+						this.app.minimize();
+					}}
 					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/focus.svg`) }}>
 				</button >
-				<button id="restore" className="none-draggable" onClick={() => { this.setState({ ...this.state, restore: !this.state.restore }); }}
+				<button id="restore" className="none-draggable"
+					onClick={() => {
+						this.setState({ ...this.state, restore: !this.state.restore });
+					}}
 					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/${this.state.restore ? `minimize` : `maximize`}.svg`) }}>
 				</button >
-				<button id="close" className="none-draggable" onClick={() => { this.app.close(); }}
+				<button id="close" className="none-draggable"
+					onClick={() => {
+						this.app.close();
+					}}
 					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/close.svg`) }}>
 				</button >
 			</header >

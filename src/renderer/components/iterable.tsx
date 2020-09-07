@@ -18,7 +18,7 @@ class Iterable extends React.Component<IterableState, any> {
 		super(properties);
 		this.state = { ...properties };
 
-		listener.on("worker_threads", ($new: Thread[]) => {
+		listener.on("worker.threads", ($new: Thread[]) => {
 			this.setState({ ...this.state, scroll_index: utility.clamp(this.state.scroll_index, 0, $new.length - 1) });
 		});
 	}
@@ -35,19 +35,23 @@ class Iterable extends React.Component<IterableState, any> {
 	}
 	public render(): JSX.Element {
 		return (
-			<main id="iterable" onWheel={(event) => {
-				if (event.deltaY > 0 && this.state.scroll_index < worker.index("threads").get().length - 1) {
-					this.setState({ ...this.state, scroll_index: this.state.scroll_index + 1 });
-				} if (event.deltaY < 0 && this.state.scroll_index > 0) {
-					this.setState({ ...this.state, scroll_index: this.state.scroll_index - 1 });
-				}
-			}}>
+			<main id="iterable"
+				onWheel={(event) => {
+					if (event.deltaY > 0 && this.state.scroll_index < worker.index("threads").get().length - 1) {
+						this.setState({ ...this.state, scroll_index: this.state.scroll_index + 1 });
+					} if (event.deltaY < 0 && this.state.scroll_index > 0) {
+						this.setState({ ...this.state, scroll_index: this.state.scroll_index - 1 });
+					}
+				}}>
 				<section id="scroll_area">
 					{worker.index("threads").get().map((value, index) => {
 						return (
-							<section id="process" className={utility.inline({ contrast: true, highlight: this.state.scroll_index === index })} key={index}>
+							<section id="process" className={utility.inline({ contrast: true, highlight: this.state.scroll_index === index })} key={index}
+								onClick={() => {
+									this.setState({ ...this.state, scroll_index: index });
+								}}>
 								<legend id="title" className="contrast center">{value.title} - ({value.finished} / {value.files.length})</legend>
-								<figure id="wrapper" className="contrast" onClick={() => { this.setState({ ...this.state, scroll_index: index }); }}>
+								<figure id="wrapper" className="contrast">
 									<canvas id="thumbnail" className="contrast" style={{ backgroundImage: value.files[0].written === value.files[0].size ? `url(${value.files[0].path.replace(/\\/g, `/`)})` : undefined }}>
 									</canvas>
 								</figure>

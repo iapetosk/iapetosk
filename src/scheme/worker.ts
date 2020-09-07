@@ -5,7 +5,7 @@ class Worker {
 	private threads: {
 		value: Thread[],
 		readonly get: () => Worker["threads"]["value"],
-		readonly set: (threads: Thread[]) => void,		
+		readonly set: (threads: Worker["threads"]["value"]) => void,		
 		readonly append: (thread: Thread) => void,
 		readonly prepend: (thread: Thread) => void,
 		readonly replace: (id: number, thread?: Thread) => void;
@@ -16,9 +16,9 @@ class Worker {
 		get: (): Worker["threads"]["value"] => {
 			return this.threads.value;
 		},
-		set: (threads: Thread[]): void => {
+		set: (threads: Worker["threads"]["value"]): void => {
 			this.threads.value = threads;
-			listener.emit("worker_threads", threads);
+			listener.emit("worker.threads", threads);
 		},
 		append: (thread: Thread): void => {
 			this.threads.set([...this.threads.get(), thread]);

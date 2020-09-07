@@ -66,9 +66,10 @@ export class Download {
 	public max_threads: number;
 	public max_working: number;
 	constructor(max_threads: number, max_working: number) {
+		// <START>
 		this.max_threads = max_threads;
 		this.max_working = max_working;
-		// limit max threads
+		// <END>
 		this.threads = new Array(max_threads);
 		this.queued = new Array();
 		// error thrown if bundles folder not found
@@ -104,6 +105,7 @@ export class Download {
 			
 			let slot: number = NaN;
 			let valid: number[] = [];
+
 			function stop(): void {
 				// remove from thread list
 				delete I.threads[slot];
@@ -166,6 +168,8 @@ export class Download {
 					if (condition()) {
 						return recursive(thread.working);
 					}
+				}).catch((error) => {
+					// TODO: handle error
 				});
 				if (condition()) {
 					return recursive(thread.working);
@@ -227,6 +231,7 @@ export class Download {
 						if (callback.links.length) {
 							const files: File[] = [];
 							const folder: string = Date.now().toString();
+
 							callback.links.forEach((link, index) => {
 								files[index] = new File(link, path.join(Folder.DOWNLOADS, LOADER.loader, folder, `${index}${path.extname(link)}`));
 							});

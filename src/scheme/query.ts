@@ -4,7 +4,7 @@ class Query {
 	private text: {
 		value: string,
 		readonly get: () => Query["text"]["value"],
-		readonly set: (text: string) => void,
+		readonly set: (text: Query["text"]["value"]) => void,
 		readonly clear: () => void;
 	} = {
 		// initial value
@@ -13,9 +13,9 @@ class Query {
 		get: (): Query["text"]["value"] => {
 			return this.text.value;
 		},
-		set: (text: string): void => {
+		set: (text: Query["text"]["value"]): void => {
 			this.text.value = text;
-			listener.emit("query_text", text);
+			listener.emit("query.text", text);
 		},
 		clear: (): void => {
 			this.text.set("");
