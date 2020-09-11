@@ -18,7 +18,7 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 		listener.on("query.text", ($new: string) => {
 			if ($new && $new.length) {
 				$new.split(/\s+/).forEach((link) => {
-					download.modulator(link).then((callback) => {
+					download.evaluate(link).then((callback) => {
 						download.start(callback).then(() => {
 							// TODO: none
 						});
@@ -34,7 +34,7 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 	public render(): JSX.Element {
 		return (
 			<section id="querybox">
-				<input id="input" className="contrast" placeholder={["strongly typed :O", "paste links in here :P", "press enter to start download :D"][utility.random(0, 2)]} autoComplete="off"
+				<input id="input" className="contrast" placeholder={["strongly typed 👧🏻", "paste links in here 👧🏻", "press enter to start download 👧🏻"][utility.random(0, 2)]} autoComplete="off"
 					onKeyDown={(event) => {
 						switch (event.key.toLowerCase()) {
 							case "enter": {

@@ -5,7 +5,7 @@ import "./iterable.scss";
 import listener from "@/modules/listener";
 import utility from "@/modules/utility";
 import worker from "@/scheme/worker";
-import { Thread } from "@/modules/download";
+import { Status, Thread } from "@/modules/download";
 
 export type IterableState = {
 	scroll_length: number,
@@ -46,7 +46,7 @@ class Iterable extends React.Component<IterableState, any> {
 				<section id="scroll_area">
 					{worker.index("threads").get().map((value, index) => {
 						return (
-							<section id="process" className={utility.inline({ contrast: true, highlight: this.state.scroll_index === index })} key={index}
+							<section id="process" className={utility.inline({ contrast: true, highlight: this.state.scroll_index === index, [Status[value.status].toLowerCase()]: true })} key={index}
 								onClick={() => {
 									this.setState({ ...this.state, scroll_index: index });
 								}}>
