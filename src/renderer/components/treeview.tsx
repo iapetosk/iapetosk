@@ -11,7 +11,6 @@ import { Thread } from "@/modules/download";
 export type TreeViewState = {
 	[key: string]: {
 		favicon: string,
-		active: boolean,
 		count: number;
 	};
 };
@@ -23,44 +22,43 @@ class TreeView extends React.Component<TreeViewState, any> {
 		this.state = { ...properties };
 
 		listener.on("worker.threads", ($new: Thread[]) => {
-			this.update($new);
+			this.update();
 		});
 	}
 	public componentDidMount(): void {
-		this.update(worker.index("threads").get());
+		this.update();
 	}
-	public async update(worker: Thread[]) {
-		const genesis: TreeViewState = {};
+	public async update() {
+		const treeview: TreeViewState = {};
 
-		for (const thread of worker) {
-			const hostname = thread.from.replace(/https?:\/\/(www.)?/, "").split(/\//)[0];
+		for (const thread of worker.index("threads").get()) {
+			const host: string = request.parse(thread.from).host;
 
-			if (genesis[hostname]) {
-				genesis[hostname] = {
-					...genesis[hostname],
-					count: genesis[hostname].count + 1
+			if (treeview[host]) {
+				treeview[host] = {
+					...treeview[host],
+					count: treeview[host].count + 1
 				};
-			} else if (this.state[hostname]) {
-				genesis[hostname] = {
-					...this.state[hostname],
+			} else if (this.state[host]) {
+				treeview[host] = {
+					...this.state[host],
 					count: 1
 				};
 			} else {
-				genesis[hostname] = {
-					favicon: await request.get(`https://${hostname}`).then((callback) => {
+				treeview[host] = {
+					favicon: await request.get(`https://${host}`).then((callback) => {
 						const icon = {
 							// https://en.wikipedia.org/wiki/Favicon
 							default: utility.parse(callback.content.encode, "link[rel=\"icon\"]", "href"),
 							shortcut: utility.parse(callback.content.encode, "link[rel=\"shortcut icon\"]", "href")
 						};
-						return this.favicon(hostname, icon.default.length ? icon.default : icon.shortcut);
+						return this.favicon(host, icon.default.length ? icon.default : icon.shortcut);
 					}),
-					active: false,
 					count: 1
 				};
 			}
 		}
-		this.setState(genesis);
+		this.setState(treeview);
 	}
 	private favicon(hostname: string, path: string | string[]): string {
 		path = path instanceof Array ? path[0] : path;

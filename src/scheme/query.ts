@@ -7,15 +7,17 @@ class Query {
 		readonly set: (text: Query["text"]["value"]) => void,
 		readonly clear: () => void;
 	} = {
-		// initial value
+		// initial
 		value: "",
 		// functions
 		get: (): Query["text"]["value"] => {
 			return this.text.value;
 		},
 		set: (text: Query["text"]["value"]): void => {
+			// listener [new, old]
+			listener.emit("query.text", text, this.text.get());
+			// override
 			this.text.value = text;
-			listener.emit("query.text", text);
 		},
 		clear: (): void => {
 			this.text.set("");
