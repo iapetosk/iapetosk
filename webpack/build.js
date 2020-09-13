@@ -33,11 +33,11 @@ request("nwjs.io", "/versions.json").then((callback) => {
 		Promise.all([build(options)]);
 	});
 });
-async function request(hostname, path) {
+async function request(host, path) {
 	const chunks = [];
 	return new Promise((resolve, rejects) => {
 		require("https").get({
-			hostname: hostname,
+			host: host,
 			path: path,
 			method: "GET",
 			protocol: "https:"

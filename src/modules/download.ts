@@ -70,13 +70,13 @@ export class Download {
 		this.max_working = max_working;
 		// <END>
 		try {
-			for (const bundle of fs.readdirSync(Folder.BUNDLES)) {
-				if (fs.statSync(path.join(Folder.BUNDLES, bundle)).isFile() && path.extname(bundle) === ".json") {
-					const ID: string = bundle.split(/\./)[0];
+			for (const file of fs.readdirSync(Folder.BUNDLES)) {
+				// check if file is .json
+				if (fs.statSync(path.join(Folder.BUNDLES, file)).isFile() && path.extname(file) === ".json") {
+					// read thread from .json
+					storage.register(file.split(/\./)[0], path.join(Folder.BUNDLES, file), "@import");
 
-					storage.register(ID, path.join(Folder.BUNDLES, bundle), "@import");
-
-					const thread: Thread = storage.get_data(ID);
+					const thread: Thread = storage.get_data(file.split(/\./)[0]);
 
 					switch (thread.status) {
 						case Status.NONE:
@@ -131,7 +131,7 @@ export class Download {
 					{
 						...thread.options,
 						headers: {
-							...thread.options?.headers,
+							...thread.options.headers,
 							// resume from partitally downloaded chunk
 							"content-range": `bytes=${thread.files[valid[index]].written}-`
 						}
@@ -202,28 +202,33 @@ export class Download {
 	}
 	public evaluate(link: string): Promise<Thread> {
 		return new Promise<Thread>((resolve, rejects): void => {
-			for (const LOADER of API) {
-				if (new RegExp(LOADER.test).test(link)) {
-					// require("module")._load(LOADER.loader, this, false) | https://nearsoft.com/blog/nodejs-how-to-load-a-module-with-require/
-					(require(`@/assets/loaders/${LOADER.loader}`).default as Loader).start(link).then((callback): void => {
-						if (callback.links.length) {
-							const files: File[] = [];
-							const folder: string = Date.now().toString();
-
-							callback.links.forEach((link, index) => {
-								files[index] = new File(link, path.join(Folder.DOWNLOADS, LOADER.loader, folder, `${index}${path.extname(link)}`));
+			for (let index: number = 0; index < API.length; index++) {
+				switch (new RegExp(API[index].test).test(link)) {
+					case true: {
+						(require(`@/assets/loaders/${API[index].loader}`).default as Loader).start(link).then((callback): void => {
+							if (callback.links.length) {
+								const files: File[] = [];
+								const folder: string = Date.now().toString();
+	
+								callback.links.forEach((link, index) => {
+									files[index] = new File(link, path.join(Folder.DOWNLOADS, API[index].loader, folder, `${index}${path.extname(link)}`));
+								});
+								return resolve(new Thread(link, callback.title, files, callback.options));
+							}
+							throw new Error("empty");
+						}).catch((error: Error): void => {
+							fs.writeFile(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: API[index], error: error }), () => {
+								// print ERROR
+								console.log(error);
+								// reject ERROR
+								return rejects(error);
 							});
-							return resolve(new Thread(link, callback.title, files, callback.options));
-						}
-						throw new Error("empty");
-					}).catch((error: Error): void => {
-						fs.writeFile(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: LOADER, error: error }), () => {
-							// print ERROR
-							console.log(error);
-							// reject ERROR
-							return rejects(error);
 						});
-					});
+						break;
+					}
+					case false: {
+						break;
+					}
 				}
 			}
 		});
