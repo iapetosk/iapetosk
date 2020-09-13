@@ -11,7 +11,7 @@ class Worker {
 		// initial
 		value: [],
 		// functions
-		get: (status?: Status): Thread[] => {
+		get: (status?: Status): Worker["threads"]["value"] => {
 			return status ? this.threads.value.filter((value) => { return value.status === status; }) : this.threads.value;
 		},
 		set: (threads: Worker["threads"]["value"]): void => {
@@ -21,15 +21,20 @@ class Worker {
 			this.threads.value = threads;
 		},
 		declare: (id: number, thread?: Thread): void => {
-			let slot: number = this.threads.get().length;
+			let $index: number = this.threads.get().length;
 
-			for (let index: number = 0; index < this.threads.get().length; index++) {
-				if (this.threads.get()[index].id === id) {
-					slot = index;
-					break;
+			for (const [index, value] of this.threads.get().entries()) {
+				switch (value.id) {
+					case id: {
+						$index = index;
+						break;
+					}
+					default: {
+						break;
+					}
 				}
 			}
-			this.threads.set([...this.threads.get().slice(0, slot), ...(thread ? [thread] : []), ...this.threads.get().slice(slot + 1)]);
+			this.threads.set([...this.threads.get().slice(0, $index), ...(thread ? [thread] : []), ...this.threads.get().slice($index + 1)]);
 		}
 	};
 	constructor() {

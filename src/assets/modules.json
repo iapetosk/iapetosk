@@ -1,18 +1,18 @@
 [
 	{
 		"loader": "hitomi",
-		"test": "^https?:\\\/\\\/hitomi.la\\\/(manga|doujinshi|gamecg|cg|reader)\\\/([\\D\\d]+)-([\\D\\d]+)-([0-9]+).html$"
+		"test": "^https?:\\\/\\\/hitomi.la\\\/(manga|doujinshi|gamecg|cg|reader)\\\/([\\D\\d]+)-([\\D\\d]+)-([\\d]+).html$"
 	},
 	{
 		"loader": "hitomi",
-		"test": "^https?:\\\/\\\/hitomi.la\\\/galleries\\\/([0-9]+).html$"
+		"test": "^https?:\\\/\\\/hitomi.la\\\/galleries\\\/([\\d]+).html$"
 	},
 	{
 		"loader": "manamoa",
-		"test": "^https:\\\/\\\/manamoa.net\\\/bbs\\\/board.php\\?bo_table=manga&wr_id=([\\d]+)$"
+		"test": "^https?:\\\/\\\/manamoa.net\\\/bbs\\\/board.php\\?bo_table=manga&wr_id=([\\d]+)$"
 	},
 	{
 		"loader": "jmana",
-		"test": "^https:\\\/\\\/jmana.net\\\/bookdetail\\?bookname=([\\D\\d]+)&bookdetail=([\\d]+)$"
+		"test": "^https?:\\\/\\\/jmana.net\\\/bookdetail\\?bookname=([\\D\\d]+)&bookdetail=([\\d]+)$"
 	}
 ]

@@ -17,15 +17,14 @@ npm run serve
 
 ## configure.ts
 
-> features confugrations favoured by *storage.ts*.<br>
+> provides confugrations favoured by *storage.ts*.<br>
 
 ```ts
 WIP
 ```
-
 ## download.ts
 
-> features downloader favoured by *storage.ts*, and *request.ts*.<br>
+> provides downloader favoured by *storage.ts*, and *request.ts*.<br>
 
 ```ts
 /**
@@ -35,12 +34,12 @@ public start(thread: Thread): Promise<void>
 /**
  * evaluate link and form it into thread.
  */
-public modulator(link: string): Promise<Thread> 
+public evaluate(link: string): Promise<Thread> 
 ```
 
 ## listener.js
 
-> features event-listener across the modules.<br>
+> provides event-listener across the modules.<br>
 
 ```ts
 WIP
@@ -48,7 +47,7 @@ WIP
 
 ## request.ts
 
-> features *http* / *https* request and file write.<br>
+> provides *http* / *https* request and file write.<br>
 
 ```ts
 /**
@@ -59,7 +58,7 @@ public async send(options: RequestOptions, file?: File): Promise<{ content: { bu
 
 ## storage.ts
 
-> features storage system in *json* format.<br>
+> provides storage system in *json* format.<br>
 
 ```ts
 WIP
@@ -67,7 +66,7 @@ WIP
 
 ## utility.ts
 
-> features useful functions in many cases.<br>
+> provides useful functions in many cases.<br>
 
 ```ts
 WIP

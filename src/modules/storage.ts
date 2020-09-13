@@ -4,7 +4,7 @@ import * as path from "path";
 export enum StoragePreset {
 	SETTINGS = "settings"
 };
-type StorageState = {
+export type StorageState = {
 	path: string,
 	data: any;
 };
