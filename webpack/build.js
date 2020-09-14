@@ -17,7 +17,7 @@ request("nwjs.io", "/versions.json").then((callback) => {
 		},
 		output: {
 			path: "build/",
-			name: `${pakcage.name}.exe`,
+			name: `${package.name}.exe`,
 			icon: {
 				file: "src/assets/icons/icon.ico",
 				task: "src/assets/icons/icon.png"
