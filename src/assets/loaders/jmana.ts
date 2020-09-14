@@ -17,8 +17,8 @@ class JMana {
 		return new Promise<Loaded>(async (resolve, rejects) => {
 			request.get(url).then((callback) => {
 				const list: string[][] = [
-					utility.parse(callback.content.encode, ".view > li > img:nth-child(1)", "data-src") as string[],
-					utility.parse(callback.content.encode, ".view > li > img:nth-child(1)", "src") as string[]
+					utility.parse(callback.content.encode, ".view > li > img:nth-child(1)", "src") as string[],
+					utility.parse(callback.content.encode, ".view > li > img:nth-child(1)", "data-src") as string[]
 				];
 				for (let x: number = 0; x < list.length; x++) {
 					for (let y: number = 0; y < list[x].length; y++) {

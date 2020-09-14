@@ -27,14 +27,23 @@
 				border-color: layout.$scheme-5;
 				color: layout.$scheme-9;
 			}
-			&.error {
-				background-color: layout.$error;
+			&.none {
+				// TODO: none
 			}
-			&.success {
+			&.finished {
 				background-color: layout.$success;
 			}
-			&.warning {
+			&.working {
+				// TODO: none
+			}
+			&.queued {
 				background-color: layout.$warning;
+			}
+			&.paused {
+				background-color: layout.$warning;
+			}
+			&.error {
+				background-color: layout.$error;
 			}
 			&.highlight {
 				border-color: layout.$scheme-6;
