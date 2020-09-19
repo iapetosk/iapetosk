@@ -21,12 +21,12 @@ class Worker {
 			this.threads.value = threads;
 		},
 		declare: (id: number, thread?: Thread): void => {
-			let $index: number = this.threads.get().length;
+			let index: number = this.threads.get().length;
 
-			for (const [index, value] of this.threads.get().entries()) {
+			for (const [$index, value] of this.threads.get().entries()) {
 				switch (value.id) {
 					case id: {
-						$index = index;
+						index = $index;
 						break;
 					}
 					default: {
@@ -34,7 +34,7 @@ class Worker {
 					}
 				}
 			}
-			this.threads.set([...this.threads.get().slice(0, $index), ...(thread ? [thread] : []), ...this.threads.get().slice($index + 1)]);
+			this.threads.set([...this.threads.get().slice(0, index), ...(thread ? [thread] : []), ...this.threads.get().slice(index + 1)]);
 		}
 	};
 	constructor() {

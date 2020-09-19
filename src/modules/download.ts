@@ -210,8 +210,8 @@ export class Download {
 								const files: File[] = [];
 								const folder: string = Date.now().toString();
 
-								callback.links.forEach((link, index) => {
-									files[index] = new File(link, path.join(Folder.DOWNLOADS, API[index].loader, folder, `${index}${path.extname(link)}`));
+								callback.links.forEach((link, $index) => {
+									files[$index] = new File(link, path.join(Folder.DOWNLOADS, API[index].loader, folder, `${$index}${path.extname(link)}`));
 								});
 								return resolve(new Thread(link, callback.title, files, callback.options));
 							}
