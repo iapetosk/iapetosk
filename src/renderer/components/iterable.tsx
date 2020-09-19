@@ -54,6 +54,22 @@ class Iterable extends React.Component<IterableState, any> {
 								<figure id="wrapper" className="contrast">
 									<canvas id="thumbnail" className="contrast" style={{ backgroundImage: value.files[0].written === value.files[0].size ? `url(${value.files[0].path.replace(/\\/g, `/`)})` : undefined }}>
 									</canvas>
+									<button id="read"
+										dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/read.svg`) }}
+									>
+									</button>
+									<button id="open"
+										dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/open.svg`) }}
+									>
+									</button>
+									<button id="copy"
+										dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/copy.svg`) }}
+									>
+									</button>
+									<button id="delete"
+										dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/delete.svg`) }}
+									>
+									</button>
 								</figure>
 							</section>
 						);

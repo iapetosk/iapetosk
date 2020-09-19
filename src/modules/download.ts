@@ -12,12 +12,12 @@ export enum Folder {
 	DOWNLOADS = "downloads"
 };
 export enum Status {
-	NONE = 1,
-	FINISHED = 2,
-	WORKING = 3,
-	QUEUED = 4,
-	PAUSED = 5,
-	ERROR = 6
+	NONE,
+	FINISHED,
+	WORKING,
+	QUEUED,
+	PAUSED,
+	ERROR
 }
 export type Loader = {
 	start(url: string): Promise<Loaded>;
@@ -48,7 +48,7 @@ export class Thread {
 	public from: string;
 	public title: string;
 	public files: File[];
-	public status: Status;
+	public status: Status = Status.NONE;
 	public options: PartialOptions;
 	public working: number = 0;
 	public finished: number = 0;
@@ -57,7 +57,6 @@ export class Thread {
 		this.from = from;
 		this.title = title;
 		this.files = files;
-		this.status = Status.NONE;
 		this.options = options;
 	}
 }
@@ -113,6 +112,7 @@ export class Download {
 					}
 					I.start(value);
 				});
+				return resolve();
 			}
 			function condition(): boolean {
 				return !!valid[thread.working] && thread.working - thread.finished < I.max_working;
@@ -209,14 +209,14 @@ export class Download {
 							if (callback.links.length) {
 								const files: File[] = [];
 								const folder: string = Date.now().toString();
-	
+
 								callback.links.forEach((link, index) => {
 									files[index] = new File(link, path.join(Folder.DOWNLOADS, API[index].loader, folder, `${index}${path.extname(link)}`));
 								});
 								return resolve(new Thread(link, callback.title, files, callback.options));
 							}
 							throw new Error("empty");
-						}).catch((error: Error): void => {
+						}).catch((error): void => {
 							fs.writeFile(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: API[index], error: error }), () => {
 								// print ERROR
 								console.log(error);
