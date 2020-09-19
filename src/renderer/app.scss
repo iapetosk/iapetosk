@@ -3,10 +3,10 @@
 html,
 body {
 	overflow: hidden;
-	font-family: sans-serif;
-	caret-color: layout.$scheme-5;
 	color: layout.$scheme-6;
 	font-size: small;
+	font-family: sans-serif;
+	caret-color: layout.$scheme-5;
 	user-select: none;
 }
 * {
@@ -16,6 +16,14 @@ body {
 	outline: none;
 	background: none;
 	box-sizing: border-box;
+}
+svg {
+	top: 0px;
+	right: 0px;
+	bottom: 0px;
+	left: 0px;
+	margin: auto;
+	pointer-events: none;
 }
 ::selection {
 	background: layout.$scheme-6;
@@ -39,19 +47,19 @@ body {
 #container > * {
 	position: fixed;
 }
-#titlebar {
-	z-index: 1;
-}
 #content {
 	width: 100%;
 	top: layout.$titlebar-height;
 	bottom: layout.$taskbar-height;
-	#treeview {
-		z-index: 0;
-	}
-	#iterable {
-		z-index: -1;
-	}
+}
+#titlebar {
+	z-index: 1;
+}
+#treeview {
+	z-index: 0;
+}
+#iterable {
+	z-index: -1;
 }
 #taskbar {
 	z-index: 1;

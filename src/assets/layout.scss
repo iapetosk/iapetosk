@@ -1,4 +1,4 @@
-// colours
+/* COLOURS*/
 $scheme-0: #080808;
 $scheme-1: #111111;
 $scheme-2: #222222;
@@ -9,15 +9,18 @@ $scheme-6: #9e9e9e;
 $scheme-7: #b6b6b6;
 $scheme-8: #cecece;
 $scheme-9: #e6e6e6;
-// status
 $error: #ff505050;
 $success: #99ff9950;
 $warning: #ff990050;
-// common
+/* COMMON */
 $transition: 250ms ease-in-out;
-// components
+/* scrollbar */
 $scrollbar-width: 10px;
+/* QUERYBOX */
 $querybox-height: 50px;
+/* TITLEBAR */
 $titlebar-height: 30px;
+/* TREEVIEW */
 $treeview-width: 150px;
+/* TASKBAR */
 $taskbar-height: 30px;
