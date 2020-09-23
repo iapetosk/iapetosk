@@ -1,12 +1,40 @@
-@use "@/assets/layout.scss";
-
+:root {
+	/* COLOURS */
+	--scheme-0: #080808;
+	--scheme-1: #111111;
+	--scheme-2: #222222;
+	--scheme-3: #333333;
+	--scheme-4: #444444;
+	--scheme-5: #555555;
+	--scheme-6: #9e9e9e;
+	--scheme-7: #b6b6b6;
+	--scheme-8: #cecece;
+	--scheme-9: #e6e6e6;
+	/* COLORS */
+	--error: #ff505050;
+	--success: #99ff9950;
+	--warning: #ff990050;
+	/* COMMON */
+	--contrast: thin;
+	--transition: 250ms ease-in-out;
+	/* scrollbar */
+	--scrollbar-width: 10px;
+	/* QUERYBOX */
+	--querybox-height: 50px;
+	/* TITLEBAR */
+	--titlebar-height: 30px;
+	/* TREEVIEW */
+	--treeview-width: 150px;
+	/* TASKBAR */
+	--taskbar-height: 30px;
+}
 html,
 body {
 	overflow: hidden;
-	color: layout.$scheme-6;
+	color: var(--scheme-6);
 	font-size: small;
 	font-family: sans-serif;
-	caret-color: layout.$scheme-5;
+	caret-color: var(--scheme-5);
 	user-select: none;
 }
 * {
@@ -26,7 +54,7 @@ svg {
 	pointer-events: none;
 }
 ::selection {
-	background: layout.$scheme-6;
+	background: var(--scheme-6);
 }
 .draggable {
 	-webkit-app-region: drag;
@@ -36,21 +64,26 @@ svg {
 }
 .contrast {
 	border-style: solid;
-	border-width: thin;
-	border-color: layout.$scheme-0;
+	border-width: var(--contrast);
+	border-color: var(--scheme-0);
 }
 .center {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
+.flowless {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
 #container > * {
 	position: fixed;
 }
 #content {
 	width: 100%;
-	top: layout.$titlebar-height;
-	bottom: layout.$taskbar-height;
+	top: var(--titlebar-height);
+	bottom: var(--taskbar-height);
 }
 #titlebar {
 	z-index: 1;

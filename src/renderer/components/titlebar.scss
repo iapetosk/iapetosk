@@ -1,26 +1,23 @@
-@use "@/assets/layout.scss";
-
 #titlebar {
 	width: 100%;
-	height: layout.$titlebar-height;
-	top: 0px;
-	background-color: layout.$scheme-1;
+	height: var(--titlebar-height);
+	background-color: var(--scheme-1);
 	#focus,
 	#restore,
 	#close {
 		position: absolute;
 		width: 45px;
 		height: 100%;
-		transition: background-color layout.$transition;
+		transition: background-color var(--transition);
 		will-change: background-color;
 		&:hover {
-			background-color: layout.$scheme-2;
+			background-color: var(--scheme-2);
 		}
 		> svg {
 			position: absolute;
 			width: 12.5px;
 			height: 12.5px;
-			fill: layout.$scheme-9;
+			fill: var(--scheme-9);
 		}
 	}
 	#focus {
@@ -32,7 +29,7 @@
 	#close {
 		right: 0px;
 		&:hover {
-			background-color: layout.$error;
+			background-color: var(--error);
 		}
 	}
 }

@@ -2,10 +2,12 @@ import * as React from "react";
 
 import "./iterable.scss";
 
+import * as path from "path";
+import * as process from "child_process";
 import listener from "@/modules/listener";
 import utility from "@/modules/utility";
 import worker from "@/scheme/worker";
-import { Status, Thread } from "@/modules/download";
+import download, { Status, Thread } from "@/modules/download";
 
 export type IterableState = {
 	scroll_length: number,
@@ -50,24 +52,36 @@ class Iterable extends React.Component<IterableState, any> {
 								onClick={() => {
 									this.setState({ ...this.state, scroll_index: index });
 								}}>
-								<legend id="title" className="contrast center">{value.title} - ({value.finished} / {value.files.length})</legend>
+								<legend id="title" className="contrast flowless">{value.title} - ({value.finished} / {value.files.length})</legend>
 								<figure id="wrapper" className="contrast">
 									<canvas id="thumbnail" className="contrast" style={{ backgroundImage: value.files[0].written === value.files[0].size ? `url(${value.files[0].path.replace(/\\/g, `/`)})` : undefined }}>
 									</canvas>
-									<button id="read"
-										dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/read.svg`) }}
-									>
-									</button>
-									<button id="open"
-										dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/open.svg`) }}
+									<button id="delete"
+										onClick={() => {
+											return download.remove(value.id);
+										}}
+										dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/delete.svg`) }}
 									>
 									</button>
 									<button id="copy"
+										onClick={() => {
+											return navigator.clipboard.writeText(value.from);
+										}}
 										dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/copy.svg`) }}
 									>
 									</button>
-									<button id="delete"
-										dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/delete.svg`) }}
+									<button id="open"
+										onClick={() => {
+											return process.exec(`start "" "${path.dirname(value.files[0].path)}"`);
+										}}
+										dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/open.svg`) }}
+									>
+									</button>
+									<button id="read"
+										onClick={() => {
+											// TODO: READ
+										}}
+										dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/read.svg`) }}
 									>
 									</button>
 								</figure>

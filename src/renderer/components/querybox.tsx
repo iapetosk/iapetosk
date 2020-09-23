@@ -19,7 +19,7 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 			if ($new && $new.length) {
 				$new.split(/\s+/).forEach((link) => {
 					download.evaluate(link).then((callback) => {
-						download.start(callback).then(() => {
+						download.create(callback).then(() => {
 							// TODO: none
 						});
 					});
@@ -50,7 +50,7 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 							// before selection
 							utility.split(target.value, target.selectionStart!)[0],
 							// clipboard
-							decodeURI(event.clipboardData!.getData("text")),
+							event.clipboardData!.getData("text"),
 							// after selection
 							utility.split(target.value, target.selectionEnd!).pop()
 						].join("");

@@ -80,7 +80,7 @@ export class Download {
 					switch (thread.status) {
 						case Status.NONE:
 						case Status.WORKING: {
-							this.start(thread);
+							this.create(thread);
 							break;
 						}
 						default: {
@@ -94,7 +94,7 @@ export class Download {
 			// TODO: none
 		}
 	}
-	public start(thread: Thread): Promise<void> {
+	public create(thread: Thread): Promise<void> {
 		return new Promise<void>((resolve, rejects): void => {
 
 			console.table(thread);
@@ -110,7 +110,7 @@ export class Download {
 					if (index) {
 						return resolve();
 					}
-					I.start(value);
+					I.create(value);
 				});
 				return resolve();
 			}
@@ -200,6 +200,26 @@ export class Download {
 			return recursive(0);
 		});
 	}
+	public remove(id: number): Promise<void> {
+		return new Promise<void>((resolve, rejects): void => {
+			for (const file of worker.index("threads").get(id)[0]?.files) {
+				fs.unlink(file.path, (error) => {
+					if (error) {
+						// print ERROR
+						console.log(error);
+						// reject ERROR
+						return rejects(error);
+					}
+				});
+			}
+			// update worker
+			worker.index("threads").declare(id, undefined);
+			// update storage
+			storage.un_register(id.toString());
+
+			return resolve();
+		});
+	}
 	public evaluate(link: string): Promise<Thread> {
 		return new Promise<Thread>((resolve, rejects): void => {
 			for (let index: number = 0; index < API.length; index++) {
@@ -217,11 +237,13 @@ export class Download {
 							}
 							throw new Error("empty");
 						}).catch((error): void => {
-							fs.writeFile(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: API[index], error: error }), () => {
-								// print ERROR
-								console.log(error);
-								// reject ERROR
-								return rejects(error);
+							fs.writeFile(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: API[index], error: error }), (error) => {
+								if (error) {
+									// print ERROR
+									console.log(error);
+									// reject ERROR
+									return rejects(error);
+								}
 							});
 						});
 						break;

@@ -30,7 +30,11 @@ WIP
 /**
  * start download. if max_thread is exceeded, given thread will be queued. 
  */
-public start(thread: Thread): Promise<void>
+public create(thread: Thread): Promise<void>
+/**
+ * remove downloaded files and thread data.
+ */
+public remove(id: number): Promise<void>
 /**
  * evaluate link and form it into thread.
  */

@@ -4,15 +4,15 @@ import { Status, Thread } from "@/modules/download";
 class Worker {
 	private threads: {
 		value: Thread[],
-		readonly get: (status?: Status) => Worker["threads"]["value"],
+		readonly get: (filter?: number | Status) => Worker["threads"]["value"],
 		readonly set: (threads: Worker["threads"]["value"]) => void,
 		readonly declare: (id: number, thread?: Thread) => void;
 	} = {
 		// initial
 		value: [],
 		// functions
-		get: (status?: Status): Worker["threads"]["value"] => {
-			return status ? this.threads.value.filter((value) => { return value.status === status; }) : this.threads.value;
+		get: (filter?: number | Status): Worker["threads"]["value"] => {
+			return filter ? this.threads.value.filter((value) => { return typeof filter === typeof Status ? value.status === filter : value.id === filter; }) : this.threads.value;
 		},
 		set: (threads: Worker["threads"]["value"]): void => {
 			// listener [new, old]

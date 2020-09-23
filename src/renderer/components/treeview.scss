@@ -1,15 +1,14 @@
-@use "@/assets/layout.scss";
-
 #treeview {
 	position: fixed;
-	width: layout.$treeview-width;
-	top: layout.$titlebar-height;
-	bottom: layout.$taskbar-height;
-	border-width: 0px thin 0px thin;
-	background-color: layout.$scheme-1;
+	width: var(--treeview-width);
+	top: var(--titlebar-height);
+	bottom: var(--taskbar-height);
+	border-width: 0px var(--contrast);
+	background-color: var(--scheme-1);
 	#wrapper {
 		height: 40px;
-		border-width: 0px 0px thin 0px;
+		border-width: 0px;
+		border-bottom-width: var(--contrast);
 	}
 	#favicon {
 		width: 30px;
