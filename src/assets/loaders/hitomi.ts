@@ -57,7 +57,7 @@ class Hitomi_La {
 				} else {
 					galleryblock.files.forEach((file, index) => {
 						if (file.hash) {
-							// server logic
+							// hash
 							const hash: string = file.hash.length < 3 ? file.hash : file.hash.replace(/^.*(..)(.)$/, "$2/$1/" + file.hash);
 							// condition
 							if (file.haswebp) {

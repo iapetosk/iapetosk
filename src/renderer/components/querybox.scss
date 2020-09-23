@@ -1,26 +1,24 @@
-@use "@/assets/layout.scss";
-
 #querybox {
 	position: fixed;
-	height: layout.$querybox-height;
-	right: layout.$scrollbar-width;
-	left: layout.$treeview-width;
-	background-color: layout.$scheme-2;
+	height: var(--querybox-height);
+	right: var(--scrollbar-width);
+	left: var(--treeview-width);
+	background-color: var(--scheme-2);
 	#input {
 		display: block;
-		width: calc(100% - 20px);
-		height: calc(100% - 20px);
-		color: layout.$scheme-6;
+		width: calc(100% - 10px * 2);
+		height: calc(100% - 10px * 2);
+		color: var(--scheme-6);
 		font-size: medium;
 		margin: 10px;
 		padding: 10px;
-		background-color: layout.$scheme-3;
-		transition: color layout.$transition, border-color layout.$transition;
+		background-color: var(--scheme-3);
+		transition: color var(--transition), border-color var(--transition);
 		will-change: color, border-color;
 		&:hover,
 		&:focus {
-			color: layout.$scheme-8;
-			border-color: layout.$scheme-5;
+			color: var(--scheme-8);
+			border-color: var(--scheme-5);
 		}
 	}
 }

@@ -1,18 +1,16 @@
-@use "@/assets/layout.scss";
-
 #iterable {
 	position: fixed;
-	top: layout.$querybox-height + layout.$titlebar-height;
+	top: calc(var(--querybox-height) + var(--titlebar-height));
 	right: 0px;
-	bottom: layout.$taskbar-height;
-	left: layout.$treeview-width;
+	bottom: var(--taskbar-height);
+	left: var(--treeview-width);
 	#scroll_area {
 		position: absolute;
 		overflow: hidden;
 		height: 100%;
 		right: 10px;
 		left: 0px;
-		background-color: layout.$scheme-2;
+		background-color: var(--scheme-2);
 	}
 	#process {
 		position: relative;
@@ -20,48 +18,51 @@
 		height: 150px;
 		margin: 10px;
 		&, * {
-			transition: color layout.$transition, background-color layout.$transition, border-color layout.$transition;
+			transition: color var(--transition), background-color var(--transition), border-color var(--transition);
 			will-change: color, background-color, border-color;
 		}
 		&:hover,
 		&:hover * {
-			color: layout.$scheme-9;
-			border-color: layout.$scheme-5;
+			color: var(--scheme-9);
+			border-color: var(--scheme-5);
 		}
 		&.none {
 			// TODO: none
 		}
 		&.finished {
-			background-color: layout.$success;
+			background-color: var(--success);
 		}
 		&.working {
 			// TODO: none
 		}
 		&.queued {
-			background-color: layout.$warning;
+			background-color: var(--warning);
 		}
 		&.paused {
-			background-color: layout.$warning;
+			background-color: var(--warning);
 		}
 		&.error {
-			background-color: layout.$error;
+			background-color: var(--error);
 		}
 		&.highlight {
-			border-color: layout.$scheme-6;
+			border-color: var(--scheme-6);
 		}
 	}
 	#title {
 		height: 20px;
-		margin: 0px 0px 0px 10px;
-		border-width: 0px 0px 0px thin;
-		background-color: layout.$scheme-2;
+		margin-left: 10px;
+		padding-left: 10px;
+		border-width: 0px;
+		background-color: var(--scheme-2);
+		border-left-width: var(--contrast);
 	}
 	#wrapper {
 		position: relative;
 		height: 130px;
-		margin: 0px 0px 0px 10px;
-		border-width: thin 0px 0px thin;
-		background-color: layout.$scheme-3;
+		margin-left: 10px;
+		background-color: var(--scheme-3);
+		border-right-width: 0px;
+		border-bottom-width: 0px;
 	}
 	#thumbnail {
 		width: 200px;
@@ -71,7 +72,7 @@
 		background-size: cover;
 		background-repeat: no-repeat;
 		background-position: center;
-		background-color: layout.$scheme-2;
+		background-color: var(--scheme-2);
 	}
 	#read, #open, #copy, #delete {
 		width: 50px;
@@ -81,35 +82,36 @@
 		> svg {
 			width: 50px;
 			height: 50px;
-			fill: layout.$scheme-2;
-			transition: fill layout.$transition;
+			fill: var(--scheme-2);
+			transition: fill var(--transition);
 			will-change: fill;
 		}
 		&:hover {
 			> svg {
-				fill: layout.$scheme-1;
+				fill: var(--scheme-1);
 			}
 		}
 	}
 	#scroll_track {
 		position: fixed;
-		width: layout.$scrollbar-width;
-		top: layout.$titlebar-height;
+		width: var(--scrollbar-width);
+		top: var(--titlebar-height);
 		right: 0px;
-		bottom: layout.$taskbar-height;
-		border-width: 0px thin 0px thin;
+		bottom: var(--taskbar-height);
+		border-top-width: 0px;
+		border-bottom-width: 0px;
 	}
 	#scroll_metre {
 		display: block;
 		width: 100%;
-		background-color: layout.$scheme-2;
-		transition: background-color layout.$transition;
+		background-color: var(--scheme-2);
+		transition: background-color var(--transition);
 		will-change: background-color;
 		&:nth-child(2n) {
-			background-color: layout.$scheme-3;
+			background-color: var(--scheme-3);
 		}
 		&.highlight {
-			background-color: layout.$success;
+			background-color: var(--success);
 		}
 	}
 }

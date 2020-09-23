@@ -1,8 +1,6 @@
-@use "@/assets/layout.scss";
-
 #taskbar {
 	width: 100%;
-	height: layout.$taskbar-height;
+	height: var(--taskbar-height);
 	bottom: 0px;
-	background-color: layout.$scheme-1;
+	background-color: var(--scheme-1);
 }
