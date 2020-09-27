@@ -222,22 +222,22 @@ export class Download {
 	}
 	public evaluate(link: string): Promise<Thread> {
 		return new Promise<Thread>((resolve, rejects): void => {
-			for (let index: number = 0; index < API.length; index++) {
-				switch (new RegExp(API[index].test).test(link)) {
-					case true: {
-						(require(`@/assets/loaders/${API[index].loader}`).default as Loader).start(link).then((callback): void => {
+			for (const LOADER of Object.keys(API)) {
+				for (const TEST of API[LOADER as never]["regular-expression"] as string[]) {
+					if (new RegExp(TEST).test(link)) {
+						(require(`@/assets/loaders/${LOADER}`).default as Loader).start(link).then((callback): void => {
 							if (callback.links.length) {
 								const files: File[] = [];
 								const folder: string = Date.now().toString();
 
 								callback.links.forEach((link, $index) => {
-									files[$index] = new File(link, path.join(Folder.DOWNLOADS, API[index].loader, folder, `${$index}${path.extname(link)}`));
+									files[$index] = new File(link, path.join(Folder.DOWNLOADS, LOADER, folder, `${$index}${path.extname(link)}`));
 								});
 								return resolve(new Thread(link, callback.title, files, callback.options));
 							}
 							throw new Error("empty");
 						}).catch((error): void => {
-							fs.writeFile(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: API[index], error: error }), (error) => {
+							fs.writeFile(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: LOADER, error: error }), (error) => {
 								if (error) {
 									// print ERROR
 									console.log(error);
@@ -246,10 +246,6 @@ export class Download {
 								}
 							});
 						});
-						break;
-					}
-					case false: {
-						break;
 					}
 				}
 			}

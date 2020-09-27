@@ -1,18 +1,18 @@
-[
-	{
-		"loader": "hitomi",
-		"test": "^https?:\\\/\\\/hitomi.la\\\/(manga|doujinshi|gamecg|cg|reader)\\\/([\\D\\d]+)-([\\D\\d]+)-([\\d]+).html$"
+{
+	"hitomi": {
+		"regular-expression": [
+			"^https?:\\\/\\\/hitomi.la\\\/galleries\\\/([\\d]+).html$",
+			"^https?:\\\/\\\/hitomi.la\\\/(manga|doujinshi|gamecg|cg|reader)\\\/([\\D\\d]+)-([\\D\\d]+)-([\\d]+).html$"
+		]
 	},
-	{
-		"loader": "hitomi",
-		"test": "^https?:\\\/\\\/hitomi.la\\\/galleries\\\/([\\d]+).html$"
+	"manamoa": {
+		"regular-expression": [
+			"^https?:\\\/\\\/manamoa.net\\\/bbs\\\/board.php\\?bo_table=manga&wr_id=([\\d]+)$"
+		]
 	},
-	{
-		"loader": "manamoa",
-		"test": "^https?:\\\/\\\/manamoa.net\\\/bbs\\\/board.php\\?bo_table=manga&wr_id=([\\d]+)$"
-	},
-	{
-		"loader": "jmana",
-		"test": "^https?:\\\/\\\/jmana.net\\\/bookdetail\\?bookname=([\\D\\d]+)&bookdetail=([\\d]+)$"
+	"jmana": {
+		"regular-expression": [
+			"^https?:\\\/\\\/jmana.net\\\/bookdetail\\?bookname=([\\D\\d]+)&bookdetail=([\\d]+)$"
+		]
 	}
-]
+}

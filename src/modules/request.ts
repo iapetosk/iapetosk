@@ -10,6 +10,7 @@ export type RequestOptions = PartialOptions & {
 	method: "GET" | "POST" | "PUT" | "DELETE";
 };
 export type PartialOptions = {
+	agent?: boolean,
 	headers?: { [key: string]: any; },
 	encoding?: "binary" | "ascii" | "utf8" | "base64" | "hex";
 };
@@ -24,10 +25,9 @@ class Request {
 	public async send(options: RequestOptions, file?: File) {
 		const SSL: boolean = options.url.startsWith("https");
 		const chunks: Buffer[] = [];
-		/* DNS over HTTPS */
 		return new Promise<{ content: { buffer: Buffer, encode: string; }, status: { code?: number, message?: string; }; }>((resolve, rejects) => {
 			(SSL ? https : http).request({
-				agent: this.agent,
+				agent: options.agent ? undefined : this.agent,
 				method: options.method,
 				headers: options.headers,
 				protocol: SSL ? "https:" : "http:",

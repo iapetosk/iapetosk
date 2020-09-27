@@ -58,7 +58,7 @@ class TreeView extends React.Component<TreeViewState, any> {
 				};
 			}
 		}
-		this.setState(treeview);
+		this.setState({ ...treeview });
 	}
 	private favicon(hostname: string, path: string | string[]): string {
 		path = path instanceof Array ? path[0] : path;
