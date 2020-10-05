@@ -9,7 +9,10 @@ class JMana {
 			// TODO: none
 		];
 		const options: PartialOptions = {
-			// TODO: none
+			agent: true,
+			headers: {
+				"referer": "https://jmana.net"
+			}
 		};
 		const placeholders: PlaceHolders = {
 			// TODO: none

@@ -13,8 +13,15 @@ class Utility {
 	public truncate(value: number): number {
 		return value - value % 10;
 	}
-	public random(minimum: number, maximum: number): number {
-		return Math.floor(Math.random() * (maximum - minimum + 1.0)) + minimum;
+	public random(minimum: number, maximum: number, type: "integer" | "double" = "integer"): number {
+		switch (type) {
+			case "integer": {
+				return Math.floor(Math.random() * (maximum - minimum + 1.0)) + minimum;
+			}
+			case "double": {
+				return Math.random() * (maximum - minimum) + minimum;
+			}
+		}
 	}
 	public unwrap<type>(value: type[]): type[] | type {
 		return value.length - 1.0 ? value : value[0];
@@ -24,6 +31,7 @@ class Utility {
 		new DOMParser().parseFromString(value, "text/html").querySelectorAll(path).forEach((element, index) => {
 			array[index] = attribute ? element.getAttribute(attribute)! : (element as HTMLElement).innerText;
 		});
+
 		return this.unwrap(array);
 	}
 	public extract(value: string, path: string, type: "string" | "number" | "array" | "object"): any {
@@ -47,9 +55,16 @@ class Utility {
 			}
 		}
 	}
-	public inline(value: { [key: string]: boolean }): string {
+	public cookie(value: string): Record<string, any> {
+		const cookie: Record<string, any> = {};
+		value.split(/;\s/g).forEach((property) => {
+			cookie[property.split(/=/)[0]] = property.split(/=/)[1] || true;
+		});
+		return cookie;
+	}
+	public inline(value: Record<string, boolean>): string {
 		const array: string[] = [];
-		
+
 		for (const key in value) {
 			if (value[key]) {
 				array.push(key);
