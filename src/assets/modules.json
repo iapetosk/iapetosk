@@ -12,6 +12,7 @@
 	},
 	"jmana": {
 		"regular-expression": [
+			"^https?:\\\/\\\/jmana.net\\\/bookid\\\/([\\d]+)$",
 			"^https?:\\\/\\\/jmana.net\\\/bookdetail\\?bookname=([\\D\\d]+)&bookdetail=([\\d]+)$"
 		]
 	}

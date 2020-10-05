@@ -28,9 +28,9 @@ export type Loaded = {
 	readonly options?: PartialOptions,
 	readonly placeholders?: PlaceHolders;
 };
-export type PlaceHolders = {
-	[key: string]: any;
-};
+export type PlaceHolders = (
+	Record<string, any>
+);
 export class File {
 	public link: string;
 	public path: string;

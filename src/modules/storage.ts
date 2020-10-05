@@ -9,13 +9,13 @@ export type StorageState = {
 	data: any;
 };
 class Storage {
-	private storage: {
-		[key: string]: StorageState;
-	} = {};
+	private storage: (
+		Record<string, StorageState>
+	) = {};
 	constructor(storage: Storage["storage"]) {
 		this.storage = storage;
 	}
-	public $define(object: { [key: string]: any; }, field: string, data: any): any {
+	public $define(object: Record<string, any>, field: string, data: any): any {
 		const array: string[] = field.split(/\./);
 
 		for (const [index, value] of array.entries()) {
@@ -28,7 +28,7 @@ class Storage {
 			object = object[value];
 		}
 	}
-	public $delete(object: { [key: string]: any; }, field: string): any {
+	public $delete(object: Record<string, any>, field: string): any {
 		const array: string[] = field.split(/\./);
 
 		for (const [index, value] of array.entries()) {
@@ -41,7 +41,7 @@ class Storage {
 			object = object[value];
 		}
 	}
-	public $return(object: { [key: string]: any; }, field: string): any {
+	public $return(object: Record<string, any>, field: string): any {
 		const array: string[] = field.split(/\./);
 
 		for (const [index, value] of array.entries()) {
@@ -56,18 +56,18 @@ class Storage {
 	public get_path(key: string): StorageState["path"] {
 		return this.$return(this.storage, key + ".path");
 	}
-	public set_path(key: string, path: any): void {
+	public set_path(key: string, path: StorageState["path"]): void {
 		this.$define(this.storage, key + ".path", path);
 		this.export(key);
 	}
 	public get_data(key: string): StorageState["data"] {
 		return this.$return(this.storage, key + ".data");
 	}
-	public set_data(key: string, data: any): void {
+	public set_data(key: string, data: StorageState["data"]): void {
 		this.$define(this.storage, key + ".data", data);
 		this.export(key);
 	}
-	public register(key: string, path: string, data: any): void {
+	public register(key: string, path: StorageState["path"], data: StorageState["data"]): void {
 		this.$define(this.storage, key, {
 			path: path,
 			data: data === "@import" ? this.import(path) : {}
