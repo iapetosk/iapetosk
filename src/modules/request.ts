@@ -3,7 +3,7 @@ import * as tls from "tls";
 import * as path from "path";
 import * as http from "http";
 import * as https from "https";
-import utility from "./utility";
+import utility from "@/modules/utility";
 import { File } from "@/modules/download";
 
 export type RequestOptions = PartialOptions & PrivateOptions & {
@@ -26,14 +26,9 @@ class Request {
 		this.agent.createConnection = (options, callback): tls.TLSSocket => {
 			return tls.connect({ ...options, servername: undefined }, callback);
 		};
-		/*
-		this.get("https://wecloudimage.net/comics/jdrive01/202008/%EC%B8%A0%EB%AC%B4%EC%A7%80%EB%A7%88%EA%B0%80%EB%A6%AC%C3%97%EC%8A%A4%ED%94%84%EB%A7%81/%EC%B8%A0%EB%AC%B4%EC%A7%80%EB%A7%88%EA%B0%80%EB%A6%AC%C3%97%EC%8A%A4%ED%94%84%EB%A7%81%201%ED%99%94/ec2536f7-675b-41df-8645-cb0cedbfe1e8.jpg", { agent: true, max_redirects: 10 }).then((callback) => {
-			console.log(callback);
-		});
-		*/
 	}
 	public async send(options: RequestOptions, file?: File) {
-		const SSL: boolean = options.url.startsWith("https");
+		const SSL: boolean = /^https/.test(options.url);
 		const chunks: Buffer[] = [];
 		return new Promise<{ content: { buffer: Buffer, encode: string; }, status: { code?: number, message?: string; }; }>((resolve, rejects) => {
 			(SSL ? https : http).request({
@@ -44,11 +39,45 @@ class Request {
 				...this.parse(options.url)
 			}, (response) => {
 				// redirects
-				if ((options.max_redirects || 1) > (options.redirects || 0) && (response.headers.location || response.headers["set-cookie"])) {
-					// subtract by one
-					options.redirects = options.redirects ? options.redirects + 1 : 1;
-					// return new instance
-					return this.send({ ...options, url: response.headers.location || options.url, headers: { ...options.headers, cookie: response.headers["set-cookie"]?.join(";\u0020") } }, file);
+				if ((options.max_redirects || 1) > (options.redirects || 0)) {
+					// clone original options
+					const override: {
+						changed: boolean,
+						options: RequestOptions;
+					} = {
+						changed: false,
+						options: new Proxy({ ...options }, {
+							set(target: RequestOptions, key: never, value: never): boolean {
+								// is changed!
+								override.changed = true;
+								// update property
+								target[key] = value;
+								// approve
+								return true;
+							}
+						})
+					};
+					// new location
+					if (response.headers.location) {
+						override.options.url = response.headers.location || options.url;
+					}
+					// DDOS protection services
+					if (response.headers.server) {
+						switch (response.headers.server) {
+							case "cloudflare": {
+								override.options.headers = {
+									"cookie": utility.cookie_encode({ "__cfduid": utility.cookie_decode([...(response.headers["set-cookie"] || []), ...([options.headers?.cookie] || [])].join(";\u0020"))["__cfduid"] })
+								};
+								break;
+							}
+						}
+					}
+					if (override.changed) {
+						// subtract by one
+						override.options.redirects = override.options.redirects ? override.options.redirects + 1 : 1;
+						// return new instance
+						return this.send(override.options, file);
+					}
 				}
 				// encoding
 				if (options.encoding) {
