@@ -28,104 +28,123 @@ class Request {
 		};
 	}
 	public async send(options: RequestOptions, file?: File) {
-		const SSL: boolean = /^https/.test(options.url);
-		const chunks: Buffer[] = [];
+		const I: Request = this;
 		return new Promise<{ content: { buffer: Buffer, encode: string; }, status: { code?: number, message?: string; }; }>((resolve, rejects) => {
-			(SSL ? https : http).request({
-				agent: options.agent ? undefined : this.agent,
-				method: options.method,
-				headers: options.headers,
-				protocol: SSL ? "https:" : "http:",
-				...this.parse(options.url)
-			}, (response) => {
-				// redirects
-				if ((options.max_redirects || 1) > (options.redirects || 0)) {
-					// clone original options
-					const override: {
-						changed: boolean,
-						options: RequestOptions;
-					} = {
-						changed: false,
-						options: new Proxy({ ...options }, {
-							set(target: RequestOptions, key: never, value: never): boolean {
-								// is changed!
-								override.changed = true;
-								// update property
-								target[key] = value;
-								// approve
-								return true;
-							}
-						})
-					};
-					// new location
-					if (response.headers.location) {
-						override.options.url = response.headers.location || options.url;
-					}
-					// DDOS protection services
-					if (response.headers.server) {
-						switch (response.headers.server) {
-							case "cloudflare": {
-								override.options.headers = {
-									"cookie": utility.cookie_encode({ "__cfduid": utility.cookie_decode([...(response.headers["set-cookie"] || []), ...([options.headers?.cookie] || [])].join(";\u0020"))["__cfduid"] })
-								};
-								break;
+			function recursive(options: RequestOptions, file?: File): void {
+				// content
+				const chunks: Buffer[] = [];
+				// send request
+				(I.SSL(options.url) ? https : http).request({
+					agent: options.agent ? undefined : I.agent,
+					method: options.method,
+					headers: options.headers,
+					protocol: I.SSL(options.url) ? "https:" : "http:",
+					...I.parse(options.url)
+				}, (response) => {
+					// debug
+					console.log(options);
+					// redirects
+					if ((options.max_redirects || 1) > (options.redirects || 0)) {
+						// clone original options
+						const override: {
+							changed: boolean,
+							options: RequestOptions;
+						} = {
+							changed: false,
+							options: new Proxy({ ...options }, {
+								set(target: RequestOptions, key: never, value: never): boolean {
+									// is changed!
+									override.changed = true;
+									// update property
+									target[key] = value;
+									// approve
+									return true;
+								}
+							})
+						};
+						// new location
+						if (response.headers.location) {
+							override.options.url = response.headers.location || options.url;
+						}
+						// DDOS protection services
+						if (response.headers.server) {
+							switch (response.headers.server) {
+								case "cloudflare": {
+									override.options.headers = {
+										"referer": options.url,
+										"cookie": utility.cookie_encode({ "__cfduid": utility.cookie_decode([...(response.headers["set-cookie"] || []), ...([options.headers?.cookie] || [])].join(";\u0020"))["__cfduid"] })
+									};
+									break;
+								}
 							}
 						}
+						if (override.changed) {
+							// subtract by one
+							override.options.redirects = override.options.redirects ? override.options.redirects + 1 : 1;
+							// return new instance
+							return recursive({ ...override.options }, file);
+						}
 					}
-					if (override.changed) {
-						// subtract by one
-						override.options.redirects = override.options.redirects ? override.options.redirects + 1 : 1;
-						// return new instance
-						return this.send(override.options, file);
+					// encoding
+					if (options.encoding) {
+						response.setEncoding(options.encoding);
 					}
-				}
-				// encoding
-				if (options.encoding) {
-					response.setEncoding(options.encoding);
-				}
-				// file
-				if (file) {
-					// generates directory recursively
-					fs.mkdirSync(path.dirname(file.path), { recursive: true });
-					// content-length should be defined
-					if (response.headers["content-length"]) {
-						file.size = Number(response.headers["content-length"]);
-					}
-					var writable: fs.WriteStream = fs.createWriteStream(file.path);
-				}
-				response.on("data", (chunk) => {
-					chunks.push(Buffer.from(chunk, "binary"));
 					// file
 					if (file) {
-						file.written += chunk.length;
-						writable.write(chunk);
+						// generates directory recursively
+						fs.mkdirSync(path.dirname(file.path), { recursive: true });
+						// content-length should be defined
+						if (response.headers["content-length"]) {
+							file.size = Number(response.headers["content-length"]);
+						}
+						var writable: fs.WriteStream = fs.createWriteStream(file.path);
 					}
-				});
-				response.on("end", () => {
-					// file
-					if (file) {
-						writable.end();
-					}
-					const buffer: Buffer = Buffer.concat(chunks);
-
-					return resolve({
-						content: {
-							buffer: buffer,
-							encode: buffer.toString(options.encoding)
-						},
-						status: {
-							code: response.statusCode,
-							message: response.statusMessage
+					response.on("data", (chunk) => {
+						// content
+						chunks.push(Buffer.from(chunk, "binary"));
+						// file
+						if (file) {
+							file.written += chunk.length;
+							writable.write(chunk);
 						}
 					});
-				});
-				response.on("error", (error) => {
-					// print ERROR
-					console.log(error);
-					// rejects ERROR
-					return rejects(error);
-				});
-			}).end();
+					response.on("end", () => {
+						// file
+						if (file) {
+							writable.end();
+						}
+						const buffer: Buffer = Buffer.concat(chunks);
+						// debug
+						console.log({
+							content: {
+								buffer: buffer,
+								encode: buffer.toString(options.encoding)
+							},
+							status: {
+								code: response.statusCode,
+								message: response.statusMessage
+							}
+						});
+						return resolve({
+							content: {
+								buffer: buffer,
+								encode: buffer.toString(options.encoding)
+							},
+							status: {
+								code: response.statusCode,
+								message: response.statusMessage
+							}
+						});
+					});
+					response.on("error", (error) => {
+						// print ERROR
+						console.log(error);
+						// rejects ERROR
+						return rejects(error);
+					});
+				}).end();
+			}
+			return recursive(options, file);
 		});
 	};
 	public async get(url: string, options: PartialOptions = {}, file?: File) {
@@ -146,6 +165,9 @@ class Request {
 			host: component[0],
 			path: ["", ...component.slice(1)].join("/")
 		};
+	}
+	public SSL(url: string): boolean {
+		return new RegExp(/^https/).test(url);
 	}
 }
 export default (new Request());
