@@ -16,7 +16,7 @@ class Storage {
 		this.storage = storage;
 	}
 	public $define(object: Record<string, any>, field: string, data: any): any {
-		const array: string[] = field.split(/\./);
+		const array: string[] = field.split(/\./g);
 
 		for (const [index, value] of array.entries()) {
 			if (index === array.length - 1) {
@@ -29,7 +29,7 @@ class Storage {
 		}
 	}
 	public $delete(object: Record<string, any>, field: string): any {
-		const array: string[] = field.split(/\./);
+		const array: string[] = field.split(/\./g);
 
 		for (const [index, value] of array.entries()) {
 			if (index === array.length - 1) {
@@ -42,7 +42,7 @@ class Storage {
 		}
 	}
 	public $return(object: Record<string, any>, field: string): any {
-		const array: string[] = field.split(/\./);
+		const array: string[] = field.split(/\./g);
 
 		for (const [index, value] of array.entries()) {
 			if (index === array.length - 1) {

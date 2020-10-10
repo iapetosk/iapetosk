@@ -28,6 +28,7 @@ class Utility {
 	}
 	public parse(value: string, path: string, attribute?: string): string[] | string {
 		const array: string[] = [];
+
 		new DOMParser().parseFromString(value, "text/html").querySelectorAll(path).forEach((element, index) => {
 			array[index] = attribute ? element.getAttribute(attribute)! : (element as HTMLElement).innerText;
 		});
@@ -55,12 +56,21 @@ class Utility {
 			}
 		}
 	}
-	public cookie(value: string): Record<string, any> {
+	public cookie_decode(value: string): Record<string, any> {
 		const cookie: Record<string, any> = {};
+
 		value.split(/;\s/g).forEach((property) => {
-			cookie[property.split(/=/)[0]] = property.split(/=/)[1] || true;
+			cookie[property.split(/=/)[0]] = property.split(/=/)[1];
 		});
 		return cookie;
+	}
+	public cookie_encode(value: Record<string, any>): string {
+		const cookie: string[] = [];
+
+		Object.keys(value).forEach((key) => {
+			cookie.push(value[key] ? `${key}=${value[key]}` : key);
+		});
+		return cookie.join(";\u0020");
 	}
 	public inline(value: Record<string, boolean>): string {
 		const array: string[] = [];
