@@ -96,8 +96,8 @@ export class Download {
 	}
 	public create(thread: Thread): Promise<void> {
 		return new Promise<void>((resolve, rejects): void => {
-
-			console.table(thread);
+			// debug
+			console.log(thread);
 
 			const I: Download = this;
 			const valid: number[] = [];
@@ -133,7 +133,7 @@ export class Download {
 						headers: {
 							...thread.options.headers,
 							// resume from partitally downloaded chunk
-							"content-range": `bytes=${thread.files[valid[index]].written}-`
+							...thread.files[valid[index]].written ? { "content-range": `bytes=${thread.files[valid[index]].written}-` } : {}
 						}
 					},
 					thread.files[valid[index]]

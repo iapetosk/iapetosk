@@ -32,7 +32,7 @@ class Hitomi_La {
 		];
 		const options: PartialOptions = {
 			headers: {
-				"referer": "https://hitomi.la/search.html"
+				"referer": url
 			}
 		};
 		const placeholders: PlaceHolders = {
@@ -90,7 +90,7 @@ class Hitomi_La {
 		});
 	}
 	public ID(url: string): number {
-		return Number(/([0-9]+).html$/.exec(url)![1]);
+		return Number(new RegExp(/([0-9]+).html$/).exec(url)![1]);
 	}
 }
 
