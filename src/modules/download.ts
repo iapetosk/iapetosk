@@ -1,9 +1,11 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as API from "@/assets/modules.json";
+
 import storage from "@/modules/storage";
 import request from "@/modules/request";
 import worker from "@/scheme/worker";
+
 import { PartialOptions } from "@/modules/request";
 
 export enum Folder {
@@ -64,10 +66,10 @@ export class Download {
 	public max_threads: number;
 	public max_working: number;
 	constructor(max_threads: number, max_working: number) {
-		// <START>
+		// <define default properties>
 		this.max_threads = max_threads;
 		this.max_working = max_working;
-		// <END>
+		// <exception occured if folder isn't exist>
 		try {
 			for (const file of fs.readdirSync(Folder.BUNDLES)) {
 				// check if file is .json
@@ -84,7 +86,7 @@ export class Download {
 							break;
 						}
 						default: {
-							worker.index("threads").declare(thread.id, thread);
+							worker.declare(thread.id, thread);
 							break;
 						}
 					}
@@ -103,10 +105,10 @@ export class Download {
 			const valid: number[] = [];
 
 			// declare thread
-			worker.index("threads").declare(thread.id, thread);
+			worker.declare(thread.id, thread);
 
 			function next(): void {
-				worker.index("threads").get(Status.QUEUED).every((value, index) => {
+				worker.get(Status.QUEUED).every((value, index) => {
 					if (index) {
 						return resolve();
 					}
@@ -161,7 +163,7 @@ export class Download {
 				}
 			}
 			// maximum thread exceeded
-			if (this.max_threads <= worker.index("threads").get(Status.WORKING).length) {
+			if (this.max_threads <= worker.get(Status.WORKING).length) {
 				thread.status = Status.QUEUED;
 				return resolve();
 			}
@@ -189,7 +191,7 @@ export class Download {
 					// update storage
 					storage.set_data(target.id.toString(), target);
 					// update worker
-					worker.index("threads").declare(target.id, target);
+					worker.declare(target.id, target);
 					// approve
 					return true;
 				}
@@ -202,7 +204,7 @@ export class Download {
 	}
 	public remove(id: number): Promise<void> {
 		return new Promise<void>((resolve, rejects): void => {
-			for (const file of worker.index("threads").get(id)[0]?.files) {
+			for (const file of worker.get(id)[0]?.files) {
 				fs.unlink(file.path, (error) => {
 					if (error) {
 						// print ERROR
@@ -213,7 +215,7 @@ export class Download {
 				});
 			}
 			// update worker
-			worker.index("threads").declare(id, undefined);
+			worker.declare(id, undefined);
 			// update storage
 			storage.un_register(id.toString());
 

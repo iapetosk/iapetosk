@@ -1,5 +1,3 @@
-class Listener extends require("events").EventEmitter { };
-
 module.exports = {
-	default: new Listener()
+	default: new class Listener extends require("events").EventEmitter { }
 };

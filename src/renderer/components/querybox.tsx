@@ -25,7 +25,7 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 					});
 				});
 				// clear QUERY data
-				query.index("text").clear();
+				query.clear();
 				// clear HTML input
 				(document.getElementById("input")! as HTMLInputElement).value = "";
 			}
@@ -38,7 +38,7 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 					onKeyDown={(event) => {
 						switch (event.key.toLowerCase()) {
 							case "enter": {
-								query.index("text").set((event.target as HTMLInputElement).value);
+								query.set((event.target as HTMLInputElement).value);
 								break;
 							}
 						}

@@ -1,16 +1,14 @@
 #iterable {
 	position: fixed;
 	top: calc(var(--querybox-height) + var(--titlebar-height));
-	right: 0px;
+	right: var(--scrollbar-width);
 	bottom: var(--taskbar-height);
 	left: var(--treeview-width);
-	#scroll_area {
+	background-color: var(--scheme-2);
+	#scrollable {
 		position: absolute;
 		overflow: hidden;
 		height: 100%;
-		right: 10px;
-		left: 0px;
-		background-color: var(--scheme-2);
 	}
 	#process {
 		position: relative;
@@ -90,28 +88,6 @@
 			> svg {
 				fill: var(--scheme-1);
 			}
-		}
-	}
-	#scroll_track {
-		position: fixed;
-		width: var(--scrollbar-width);
-		top: var(--titlebar-height);
-		right: 0px;
-		bottom: var(--taskbar-height);
-		border-top-width: 0px;
-		border-bottom-width: 0px;
-	}
-	#scroll_metre {
-		display: block;
-		width: 100%;
-		background-color: var(--scheme-2);
-		transition: background-color var(--transition);
-		will-change: background-color;
-		&:nth-child(2n) {
-			background-color: var(--scheme-3);
-		}
-		&.highlight {
-			background-color: var(--success);
 		}
 	}
 }

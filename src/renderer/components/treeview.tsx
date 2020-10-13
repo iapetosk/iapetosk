@@ -6,6 +6,7 @@ import listener from "@/modules/listener";
 import utility from "@/modules/utility";
 import request from "@/modules/request";
 import worker from "@/scheme/worker";
+
 import { Thread } from "@/modules/download";
 
 export type TreeViewState = {
@@ -21,7 +22,7 @@ class TreeView extends React.Component<TreeViewState, any> {
 		super(properties);
 		this.state = { ...properties };
 
-		listener.on("worker.threads", ($new: Thread[]) => {
+		listener.on("worker.listen", ($new: Thread[]) => {
 			this.update();
 		});
 	}
@@ -31,7 +32,7 @@ class TreeView extends React.Component<TreeViewState, any> {
 	public async update() {
 		const treeview: TreeViewState = {};
 
-		for (const thread of worker.index("threads").get()) {
+		for (const thread of worker.get()) {
 			const host: string = request.parse(thread.from).host;
 
 			if (treeview[host]) {

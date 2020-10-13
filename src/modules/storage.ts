@@ -9,11 +9,11 @@ export type StorageState = {
 	data: any;
 };
 class Storage {
-	private storage: (
+	private static container: (
 		Record<string, StorageState>
 	) = {};
-	constructor(storage: Storage["storage"]) {
-		this.storage = storage;
+	constructor(storage: typeof Storage.container) {
+		Storage.container = storage;
 	}
 	public $define(object: Record<string, any>, field: string, data: any): any {
 		const array: string[] = field.split(/\./g);
@@ -54,21 +54,21 @@ class Storage {
 		}
 	}
 	public get_path(key: string): StorageState["path"] {
-		return this.$return(this.storage, key + ".path");
+		return this.$return(Storage.container, key + ".path");
 	}
 	public set_path(key: string, path: StorageState["path"]): void {
-		this.$define(this.storage, key + ".path", path);
+		this.$define(Storage.container, key + ".path", path);
 		this.export(key);
 	}
 	public get_data(key: string): StorageState["data"] {
-		return this.$return(this.storage, key + ".data");
+		return this.$return(Storage.container, key + ".data");
 	}
 	public set_data(key: string, data: StorageState["data"]): void {
-		this.$define(this.storage, key + ".data", data);
+		this.$define(Storage.container, key + ".data", data);
 		this.export(key);
 	}
 	public register(key: string, path: StorageState["path"], data: StorageState["data"]): void {
-		this.$define(this.storage, key, {
+		this.$define(Storage.container, key, {
 			path: path,
 			data: data === "@import" ? this.import(path) : {}
 		});
@@ -76,7 +76,7 @@ class Storage {
 	}
 	public un_register(key: string): void {
 		fs.rmdirSync(path.dirname(this.get_path(key)), { recursive: true });
-		this.$delete(this.storage, key);
+		this.$delete(Storage.container, key);
 	}
 	public import(key: string): any {
 		try {
@@ -90,7 +90,7 @@ class Storage {
 		fs.writeFileSync(this.get_path(key), JSON.stringify(this.get_data(key)));
 	}
 	public exist(key: string): boolean {
-		return !!this.$return(this.storage, key);
+		return !!this.$return(Storage.container, key);
 	}
 }
 export default (new Storage({
