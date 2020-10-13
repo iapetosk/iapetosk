@@ -2,6 +2,7 @@ import * as React from "react";
 
 import "./app.scss";
 
+import ScrollBar from "@/renderer/components/scrollbar";
 import TitleBar from "@/renderer/components/titlebar";
 import QueryBox from "@/renderer/components/querybox";
 import TreeView from "@/renderer/components/treeview";
@@ -33,7 +34,8 @@ class App extends React.Component<AppState, any> {
 				<article id="content">
 					<QueryBox></QueryBox>
 					<TreeView></TreeView>
-					<Iterable scroll_length={10} scroll_index={0}></Iterable>
+					<Iterable></Iterable>
+					<ScrollBar></ScrollBar>
 				</article>
 				<TaskBar></TaskBar>
 			</main>

@@ -3,7 +3,9 @@ import * as tls from "tls";
 import * as path from "path";
 import * as http from "http";
 import * as https from "https";
+
 import utility from "@/modules/utility";
+
 import { File } from "@/modules/download";
 
 export type RequestOptions = PartialOptions & PrivateOptions & {
@@ -21,7 +23,10 @@ export type PrivateOptions = {
 };
 class Request {
 	readonly agent: https.Agent = new https.Agent({});
-	constructor() {
+	private max_redirects: number;
+	constructor(max_redirects: number = 1) {
+		// <define default properties>
+		this.max_redirects = max_redirects;
 		// @ts-ignore
 		this.agent.createConnection = (options, callback): tls.TLSSocket => {
 			return tls.connect({ ...options, servername: undefined }, callback);
@@ -44,7 +49,7 @@ class Request {
 					// debug
 					console.log(options);
 					// redirects
-					if ((options.max_redirects || 1) > (options.redirects || 0)) {
+					if ((options.max_redirects || I.max_redirects) > (options.redirects || 0)) {
 						// clone original options
 						const override: {
 							changed: boolean,

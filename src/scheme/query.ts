@@ -1,33 +1,18 @@
 import listener from "@/modules/listener";
 
 class Query {
-	private text: {
-		value: string,
-		readonly get: () => Query["text"]["value"],
-		readonly set: (text: Query["text"]["value"]) => void,
-		readonly clear: () => void;
-	} = {
-		// initial
-		value: "",
-		// functions
-		get: (): Query["text"]["value"] => {
-			return this.text.value;
-		},
-		set: (text: Query["text"]["value"]): void => {
-			// listener [new, old]
-			listener.emit("query.text", text, this.text.get());
-			// override
-			this.text.value = text;
-		},
-		clear: (): void => {
-			this.text.set("");
-		}
-	};
-	constructor() {
+	private static state: string = "";
+	public get(): typeof Query.state {
+		return Query.state;
 	}
-	/* AUTO GENERATED RETURN TYPE */
-	public index(property: "text") {
-		return this[property];
+	public set(value: typeof Query.state): void {
+		// listener [new, old]
+		listener.emit("query.listen", value, this.get());
+		// override
+		Query.state = value;
+	}
+	public clear(): void {
+		this.set("");
 	}
 }
 export default (new Query());

@@ -1,0 +1,22 @@
+#scrollbar {
+	position: fixed;
+	width: var(--scrollbar-width);
+	top: var(--titlebar-height);
+	right: 0px;
+	bottom: var(--taskbar-height);
+	border-top-width: 0px;
+	border-bottom-width: 0px;
+	#metre {
+		display: block;
+		width: 100%;
+		background-color: var(--scheme-2);
+		transition: background-color var(--transition);
+		will-change: background-color;
+		&:nth-child(2n) {
+			background-color: var(--scheme-3);
+		}
+		&.highlight {
+			background-color: var(--success);
+		}
+	}	
+}
