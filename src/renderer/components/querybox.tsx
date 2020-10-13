@@ -15,7 +15,7 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 		super(properties);
 		this.state = { ...properties };
 
-		listener.on("query.text", ($new: string) => {
+		listener.on("query.listen", ($new: string) => {
 			if ($new && $new.length) {
 				$new.split(/\s+/).forEach((link) => {
 					download.evaluate(link).then((callback) => {
