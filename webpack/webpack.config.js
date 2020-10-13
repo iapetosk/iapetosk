@@ -24,7 +24,7 @@ module.exports = {
 	module: {
 		rules: [
 			{
-				test: /\.(ts|tsx)$/,
+				test: /\.(ts?x)$/,
 				loader: "ts-loader"
 			},
 			{
@@ -54,11 +54,12 @@ module.exports = {
 				parallel: true,
 				terserOptions: {
 					output: {
-						beautify: false,
-						comments: false,
-						semicolons: true
+						ecma: 2020,
+						comments: false
 					},
 					compress: {
+						ecma: 2020,
+						unsafe: true,
 						drop_console: true
 					}
 				}
