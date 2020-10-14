@@ -1,10 +1,10 @@
-import * as fs from "fs";
-import * as tls from "tls";
-import * as path from "path";
-import * as http from "http";
-import * as https from "https";
+import * as Fs from "fs";
+import * as Tls from "tls";
+import * as Path from "path";
+import * as Http from "http";
+import * as Https from "https";
 
-import utility from "@/modules/utility";
+import Utility from "@/modules/utility";
 
 import { File } from "@/modules/download";
 
@@ -22,14 +22,14 @@ export type PrivateOptions = {
 	redirects?: number;
 };
 class Request {
-	readonly agent: https.Agent = new https.Agent({});
+	readonly agent: Https.Agent = new Https.Agent({});
 	private max_redirects: number;
 	constructor(max_redirects: number = 1) {
 		// <define default properties>
 		this.max_redirects = max_redirects;
 		// @ts-ignore
 		this.agent.createConnection = (options, callback): tls.TLSSocket => {
-			return tls.connect({ ...options, servername: undefined }, callback);
+			return Tls.connect({ ...options, servername: undefined }, callback);
 		};
 	}
 	public async send(options: RequestOptions, file?: File) {
@@ -39,7 +39,7 @@ class Request {
 				// content
 				const chunks: Buffer[] = [];
 				// send request
-				(I.SSL(options.url) ? https : http).request({
+				(I.SSL(options.url) ? Https : Http).request({
 					agent: options.agent ? undefined : I.agent,
 					method: options.method,
 					headers: options.headers,
@@ -77,7 +77,7 @@ class Request {
 								case "cloudflare": {
 									override.options.headers = {
 										"referer": options.url,
-										"cookie": utility.cookie_encode({ "__cfduid": utility.cookie_decode([...(response.headers["set-cookie"] || []), ...([options.headers?.cookie] || [])].join(";\u0020"))["__cfduid"] })
+										"cookie": Utility.cookie_encode({ "__cfduid": Utility.cookie_decode([...(response.headers["set-cookie"] || []), ...([options.headers?.cookie] || [])].join(";\u0020"))["__cfduid"] })
 									};
 									break;
 								}
@@ -97,12 +97,12 @@ class Request {
 					// file
 					if (file) {
 						// generates directory recursively
-						fs.mkdirSync(path.dirname(file.path), { recursive: true });
+						Fs.mkdirSync(Path.dirname(file.path), { recursive: true });
 						// content-length should be defined
 						if (response.headers["content-length"]) {
 							file.size = Number(response.headers["content-length"]);
 						}
-						var writable: fs.WriteStream = fs.createWriteStream(file.path);
+						var writable: Fs.WriteStream = Fs.createWriteStream(file.path);
 					}
 					response.on("data", (chunk) => {
 						// content

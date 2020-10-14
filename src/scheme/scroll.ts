@@ -1,5 +1,5 @@
-import listener from "@/modules/listener";
-import utility from "@/modules/utility";
+import Listener from "@/modules/listener";
+import Utility from "@/modules/utility";
 
 class Scroll {
 	private static state: {
@@ -16,11 +16,11 @@ class Scroll {
 	}
 	public set(value: typeof Scroll.state): void {
 		// listener [new, old]
-		listener.emit("scroll.listen", value, this.get());
+		Listener.emit("scroll", value, this.get());
 		// override
 		Scroll.state = {
 			...value,
-			index: utility.clamp(value.index, 0, value.size - 1)
+			index: Utility.clamp(value.index, 0, value.size - 1)
 		};
 	}
 }

@@ -1,5 +1,5 @@
-import request from "@/modules/request";
-import utility from "@/modules/utility";
+import Request from "@/modules/request";
+import Utility from "@/modules/Utility";
 
 import { PartialOptions } from "@/modules/request";
 import { PlaceHolders, Loaded } from "@/modules/download";
@@ -20,10 +20,10 @@ class JMana {
 			// TODO: none
 		};
 		return new Promise<Loaded>(async (resolve, rejects) => {
-			request.get(url, { agent: true }).then((callback) => {
+			Request.get(url, { agent: true }).then((callback) => {
 				const list: string[][] = [
-					utility.parse(callback.content.encode, ".view > li > img:nth-child(1)", "src") as string[],
-					utility.parse(callback.content.encode, ".view > li > img:nth-child(1)", "data-src") as string[]
+					Utility.parse(callback.content.encode, ".view > li > img:nth-child(1)", "src") as string[],
+					Utility.parse(callback.content.encode, ".view > li > img:nth-child(1)", "data-src") as string[]
 				];
 				for (let x: number = 0; x < list.length; x++) {
 					for (let y: number = 0; y < list[x].length; y++) {
@@ -34,7 +34,7 @@ class JMana {
 					}
 				}
 				return resolve({
-					title: utility.parse(callback.content.encode, "title") as string,
+					title: Utility.parse(callback.content.encode, "title") as string,
 					links: links,
 					options: options,
 					placeholders: placeholders

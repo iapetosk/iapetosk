@@ -2,14 +2,14 @@ import * as React from "react";
 
 import "./iterable.scss";
 
-import * as path from "path";
-import * as process from "child_process";
+import * as Path from "path";
+import * as Process from "child_process";
 
-import listener from "@/modules/listener";
-import download from "@/modules/download";
-import utility from "@/modules/utility";
-import worker from "@/scheme/worker";
-import scroll from "@/scheme/scroll";
+import Listener from "@/modules/listener";
+import Download from "@/modules/download";
+import Utility from "@/modules/utility";
+import Worker from "@/scheme/worker";
+import Scroll from "@/scheme/scroll";
 
 import { Status, Thread } from "@/modules/download";
 
@@ -21,21 +21,21 @@ class Iterable extends React.Component<IterableState, any> {
 		super(properties);
 		this.state = { ...properties };
 
-		scroll.set({ length: 15, index: 0, size: worker.get().length });
+		Scroll.set({ length: 15, index: 0, size: Worker.get().length });
 
-		listener.on("worker.listen", ($new: Thread[]) => {
-			scroll.set({ ...scroll.get(), size: $new.length });
+		Listener.on("worker", ($new: Thread[]) => {
+			Scroll.set({ ...Scroll.get(), size: $new.length });
 		});
-		listener.on("scroll.listen", () => {
+		Listener.on("scroll", () => {
 			const target: HTMLElement = document.getElementById("scrollable")!;
 
-			const height: number = utility.truncate(target.scrollHeight / worker.get().length);
+			const height: number = Utility.truncate(target.scrollHeight / Worker.get().length);
 
 			let start: number = (target.scrollTop) / height;
 			let finish: number = (target.scrollTop + target.clientHeight) / height;
 			let ranging: number = finish - start;
 
-			target.scroll(0, height * (scroll.get().index - Math.floor(ranging / 2)));
+			target.scroll(0, height * (Scroll.get().index - Math.floor(ranging / 2)));
 
 			this.setState({ ...this.state });
 		});
@@ -45,17 +45,17 @@ class Iterable extends React.Component<IterableState, any> {
 			<main id="iterable">
 				<section id="scrollable"
 					onWheel={(event) => {
-						if (event.deltaY > 0 && scroll.get().index < worker.get().length - 1) {
-							scroll.set({ ...scroll.get(), index: scroll.get().index + 1 });
-						} if (event.deltaY < 0 && scroll.get().index > 0) {
-							scroll.set({ ...scroll.get(), index: scroll.get().index - 1 });
+						if (event.deltaY > 0 && Scroll.get().index < Worker.get().length - 1) {
+							Scroll.set({ ...Scroll.get(), index: Scroll.get().index + 1 });
+						} if (event.deltaY < 0 && Scroll.get().index > 0) {
+							Scroll.set({ ...Scroll.get(), index: Scroll.get().index - 1 });
 						}
 					}}>
-					{worker.get().map((value, index) => {
+					{Worker.get().map((value, index) => {
 						return (
-							<section id="process" className={utility.inline({ contrast: true, highlight: scroll.get().index === index, [Status[value.status].toLowerCase()]: true })} key={index}
+							<section id="process" className={Utility.inline({ contrast: true, highlight: Scroll.get().index === index, [Status[value.status].toLowerCase()]: true })} key={index}
 								onClick={() => {
-									scroll.set({ ...scroll.get(), index: index });
+									Scroll.set({ ...Scroll.get(), index: index });
 								}}>
 								<legend id="title" className="contrast flowless">{value.title} - ({value.finished} / {value.files.length})</legend>
 								<figure id="wrapper" className="contrast">
@@ -63,7 +63,7 @@ class Iterable extends React.Component<IterableState, any> {
 									</canvas>
 									<button id="delete"
 										onClick={() => {
-											return download.remove(value.id);
+											return Download.remove(value.id);
 										}}
 										dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/delete.svg`) }}
 									>
@@ -77,7 +77,7 @@ class Iterable extends React.Component<IterableState, any> {
 									</button>
 									<button id="open"
 										onClick={() => {
-											return process.exec(`start "" "${path.dirname(value.files[0].path)}"`);
+											return Process.exec(`start "" "${Path.dirname(value.files[0].path)}"`);
 										}}
 										dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/open.svg`) }}
 									>

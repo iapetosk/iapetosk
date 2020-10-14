@@ -1,4 +1,5 @@
-import listener from "@/modules/listener";
+import Listener from "@/modules/listener";
+
 import { Status, Thread } from "@/modules/download";
 
 class Worker {
@@ -8,7 +9,7 @@ class Worker {
 	}
 	public set(value: typeof Worker.state) {
 		// listener [new, old]
-		listener.emit("worker.listen", value, Worker.state);
+		Listener.emit("worker", value, Worker.state);
 		// override
 		Worker.state = value
 	}
