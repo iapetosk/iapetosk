@@ -6,7 +6,6 @@ function resolve_path() {
 }
 
 module.exports = {
-	devtool: "cheap-module-eval-source-map",
 	target: "node-webkit",
 	stats: "errors-only",
 	entry: {
@@ -25,15 +24,15 @@ module.exports = {
 		rules: [
 			{
 				test: /\.(ts|tsx)$/,
-				loader: "ts-loader"
+				use: [{ loader: "ts-loader" }]
 			},
 			{
 				test: /\.(scss)$/,
-				loader: ["style-loader", "css-loader", "sass-loader"]
+				use: [{ loader: "style-loader" }, { loader: "css-loader" }, { loader: "sass-loader" }]
 			},
 			{
 				test: /\.(png|jpe?g|gif|svg)$/,
-				loader: "file-loader"
+				use: [{ loader: "file-loader" }]
 			}
 		]
 	},
