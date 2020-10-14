@@ -26,11 +26,14 @@ request("nwjs.io", "/versions.json").then((callback) => {
 	};
 	fs.rmdirSync(options.output.path, { recursive: true });
 	// bundle webpack
-	webpack({
+	const compiler = webpack({
 		...webpack_config,
+		devtool: "hidden-source-map",
 		mode: process.env.NODE_ENV
 	}, async (error, stats) => {
-		Promise.all([build(options)]);
+		compiler.close(() => {
+			Promise.all([build(options)]);
+		});
 	});
 });
 async function request(host, path) {

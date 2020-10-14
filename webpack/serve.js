@@ -6,6 +6,7 @@ const webpack_development_server = require("webpack-dev-server");
 
 const compiler = webpack({
 	...webpack_config,
+	devtool: "eval-cheap-module-source-map",
 	mode: process.env.NODE_ENV,
 	plugins: [
 		...webpack_config.plugins,
@@ -19,7 +20,9 @@ compiler.hooks.done.tap("done", () => {
 	if (!times) {
 		const child = require("child_process").spawn("npx.cmd", ["nw", "."], { args: ["--colors"], stdio: [process.stdin, process.stdout, "pipe"] });
 		child.on("close", () => {
-			process.exit();
+			compiler.close(() => {
+				process.exit();
+			});
 		});
 	}
 	times++;
