@@ -1,10 +1,10 @@
-import * as fs from "fs";
-import * as path from "path";
+import * as Fs from "fs";
+import * as Path from "path";
 import * as API from "@/assets/modules.json";
 
-import storage from "@/modules/storage";
-import request from "@/modules/request";
-import worker from "@/scheme/worker";
+import Storage from "@/modules/storage";
+import Request from "@/modules/request";
+import Worker from "@/scheme/worker";
 
 import { PartialOptions } from "@/modules/request";
 
@@ -71,13 +71,13 @@ export class Download {
 		this.max_working = max_working;
 		// <exception occured if folder isn't exist>
 		try {
-			for (const file of fs.readdirSync(Folder.BUNDLES)) {
+			for (const file of Fs.readdirSync(Folder.BUNDLES)) {
 				// check if file is .json
-				if (fs.statSync(path.join(Folder.BUNDLES, file)).isFile() && path.extname(file) === ".json") {
+				if (Fs.statSync(Path.join(Folder.BUNDLES, file)).isFile() && Path.extname(file) === ".json") {
 					// read thread from .json
-					storage.register(file.split(/\./)[0], path.join(Folder.BUNDLES, file), "@import");
+					Storage.register(file.split(/\./)[0], Path.join(Folder.BUNDLES, file), "@import");
 
-					const thread: Thread = storage.get_data(file.split(/\./)[0]);
+					const thread: Thread = Storage.get_data(file.split(/\./)[0]);
 
 					switch (thread.status) {
 						case Status.NONE:
@@ -86,7 +86,7 @@ export class Download {
 							break;
 						}
 						default: {
-							worker.declare(thread.id, thread);
+							Worker.declare(thread.id, thread);
 							break;
 						}
 					}
@@ -105,10 +105,10 @@ export class Download {
 			const valid: number[] = [];
 
 			// declare thread
-			worker.declare(thread.id, thread);
+			Worker.declare(thread.id, thread);
 
 			function next(): void {
-				worker.get(Status.QUEUED).every((value, index) => {
+				Worker.get(Status.QUEUED).every((value, index) => {
 					if (index) {
 						return resolve();
 					}
@@ -128,7 +128,7 @@ export class Download {
 				}
 				thread.working++;
 				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
-				request.get(
+				Request.get(
 					thread.files[valid[index]].link,
 					{
 						...thread.options,
@@ -163,7 +163,7 @@ export class Download {
 				}
 			}
 			// maximum thread exceeded
-			if (this.max_threads <= worker.get(Status.WORKING).length) {
+			if (this.max_threads <= Worker.get(Status.WORKING).length) {
 				thread.status = Status.QUEUED;
 				return resolve();
 			}
@@ -178,8 +178,8 @@ export class Download {
 				return resolve();
 			}
 			// register storage
-			if (!storage.exist(thread.id.toString())) {
-				storage.register(thread.id.toString(), path.join(Folder.BUNDLES, thread.id.toString() + ".json"), thread);
+			if (!Storage.exist(thread.id.toString())) {
+				Storage.register(thread.id.toString(), Path.join(Folder.BUNDLES, thread.id.toString() + ".json"), thread);
 			}
 			// observe thread
 			thread = new Proxy(thread, {
@@ -189,9 +189,9 @@ export class Download {
 					// update property
 					target[key] = value;
 					// update storage
-					storage.set_data(target.id.toString(), target);
+					Storage.set_data(target.id.toString(), target);
 					// update worker
-					worker.declare(target.id, target);
+					Worker.declare(target.id, target);
 					// approve
 					return true;
 				}
@@ -204,8 +204,8 @@ export class Download {
 	}
 	public remove(id: number): Promise<void> {
 		return new Promise<void>((resolve, rejects): void => {
-			for (const file of worker.get(id)[0]?.files) {
-				fs.unlink(file.path, (error) => {
+			for (const file of Worker.get(id)[0]?.files) {
+				Fs.unlink(file.path, (error) => {
 					if (error) {
 						// print ERROR
 						console.log(error);
@@ -215,9 +215,9 @@ export class Download {
 				});
 			}
 			// update worker
-			worker.declare(id, undefined);
+			Worker.declare(id, undefined);
 			// update storage
-			storage.un_register(id.toString());
+			Storage.un_register(id.toString());
 
 			return resolve();
 		});
@@ -233,13 +233,13 @@ export class Download {
 								const folder: string = Date.now().toString();
 
 								callback.links.forEach((link, $index) => {
-									files[$index] = new File(link, path.join(Folder.DOWNLOADS, LOADER, folder, `${$index}${path.extname(link)}`));
+									files[$index] = new File(link, Path.join(Folder.DOWNLOADS, LOADER, folder, `${$index}${Path.extname(link)}`));
 								});
 								return resolve(new Thread(link, callback.title, files, callback.options));
 							}
 							throw new Error("empty");
 						}).catch((error): void => {
-							fs.writeFile(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: LOADER, error: error }), (error) => {
+							Fs.writeFile(Path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: LOADER, error: error }), (error) => {
 								if (error) {
 									// print ERROR
 									console.log(error);

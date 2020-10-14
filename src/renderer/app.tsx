@@ -9,7 +9,7 @@ import TreeView from "@/renderer/components/treeview";
 import Iterable from "@/renderer/components/iterable";
 import TaskBar from "@/renderer/components/taskbar";
 
-import listener from "@/modules/listener";
+import Listener from "@/modules/listener";
 
 export type AppState = {};
 
@@ -22,7 +22,7 @@ class App extends React.Component<AppState, any> {
 		if (process.env.NODE_ENV === "development") {
 			nw.Window.get().showDevTools();
 		}
-		listener.on("reload", () => {
+		Listener.on("reload", () => {
 			window.location.reload();
 		});
 	}

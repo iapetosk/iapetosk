@@ -1,5 +1,5 @@
-import request from "@/modules/request";
-import utility from "@/modules/utility";
+import Request from "@/modules/request";
+import Utility from "@/modules/utility";
 
 import { PartialOptions } from "@/modules/request";
 import { PlaceHolders, Loaded } from "@/modules/download";
@@ -21,8 +21,8 @@ export type GalleryBlock = {
 class Hitomi_La {
 	private number_of_frontends: number = NaN;
 	constructor() {
-		request.get("https://ltn.hitomi.la/common.js").then((callback) => {
-			this.number_of_frontends = utility.extract(callback.content.encode, "number_of_frontends", "number");
+		Request.get("https://ltn.hitomi.la/common.js").then((callback) => {
+			this.number_of_frontends = Utility.extract(callback.content.encode, "number_of_frontends", "number");
 		});
 	}
 	public start(url: string): Promise<Loaded> {
@@ -45,8 +45,8 @@ class Hitomi_La {
 				return url.replace(/@/g, String.fromCharCode(97 + (chapter < 0x09 ? 1 : chapter) % (chapter < 0x30 ? 2 : I.number_of_frontends)).toString());
 			}
 			async function recursive(galleryblock?: GalleryBlock) {
-				galleryblock = galleryblock || await request.get(`https://ltn.hitomi.la/galleries/${I.ID(url)}.js`).then((callback) => {
-					return callback.status.code === 404 ? undefined : utility.extract(`${callback.content.encode};`, "galleryinfo", "object") as GalleryBlock;
+				galleryblock = galleryblock || await Request.get(`https://ltn.hitomi.la/galleries/${I.ID(url)}.js`).then((callback) => {
+					return callback.status.code === 404 ? undefined : Utility.extract(`${callback.content.encode};`, "galleryinfo", "object") as GalleryBlock;
 				});
 				if (!galleryblock) {
 					return rejects();
@@ -70,16 +70,16 @@ class Hitomi_La {
 							links[index] = format(/galleries\/\[0-9]*(0-9)/, `https://@a.hitomi.la/galleries/${I.ID(url)}/${file.name}`, 10);
 						}
 					});
-					request.get(`https://ltn.hitomi.la/galleryblock/${I.ID(url)}.html`).then((callback) => {
-						(utility.parse(callback.content.encode, "td") as string[]).forEach((value, index) => {
+					Request.get(`https://ltn.hitomi.la/galleryblock/${I.ID(url)}.html`).then((callback) => {
+						(Utility.parse(callback.content.encode, "td") as string[]).forEach((value, index) => {
 							if (index % 2) {
-								placeholders[Object.keys(placeholders).pop()!] = utility.unwrap(value.split(/\s\s+/).filter((value) => { return value.length; }));
+								placeholders[Object.keys(placeholders).pop()!] = Utility.unwrap(value.split(/\s\s+/).filter((value) => { return value.length; }));
 							} else {
 								placeholders[value.toLowerCase()] = undefined;
 							}
 						});
 						return resolve({
-							title: utility.parse(callback.content.encode, ".lillie a") as string,
+							title: Utility.parse(callback.content.encode, ".lillie a") as string,
 							links: links,
 							options: options,
 							placeholders: placeholders

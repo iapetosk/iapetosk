@@ -2,9 +2,9 @@ import * as React from "react";
 
 import "./scrollbar.scss";
 
-import listener from "@/modules/listener";
-import utility from "@/modules/utility";
-import scroll from "@/scheme/scroll";
+import Listener from "@/modules/listener";
+import Utility from "@/modules/utility";
+import Scroll from "@/scheme/scroll";
 
 export type ScrollBarState = {};
 
@@ -14,16 +14,16 @@ class ScrollBar extends React.Component<Object, ScrollBarState> {
 		super(properties);
 		this.state = { ...properties };
 
-		listener.on("scroll.listen", () => {
+		Listener.on("Scroll", () => {
 			this.setState({ ...this.state });
 		});
 	}
 	public render(): JSX.Element {
 		return (
 			<section id="scrollbar" className="contrast">
-				{[...new Array(scroll.get().length)].map((value, index) => {
+				{[...new Array(Scroll.get().length)].map((value, index) => {
 					return (
-						<button id="metre" className={utility.inline({ highlight: scroll.get().size < scroll.get().length ? (scroll.get().index) * (1.0 / scroll.get().size) < (index + 1.0) / scroll.get().length && (index + 1.0) / scroll.get().length <= (scroll.get().index + 1.0) * (1.0 / scroll.get().size) : (index) * (scroll.get().size / scroll.get().length) <= scroll.get().index && scroll.get().index < (index + 1.0) * (scroll.get().size / scroll.get().length) })} style={{ height: `${100 / scroll.get().length}%` }} key={index}>
+						<button id="metre" className={Utility.inline({ highlight: Scroll.get().size < Scroll.get().length ? (Scroll.get().index) * (1.0 / Scroll.get().size) < (index + 1.0) / Scroll.get().length && (index + 1.0) / Scroll.get().length <= (Scroll.get().index + 1.0) * (1.0 / Scroll.get().size) : (index) * (Scroll.get().size / Scroll.get().length) <= Scroll.get().index && Scroll.get().index < (index + 1.0) * (Scroll.get().size / Scroll.get().length) })} style={{ height: `${100 / Scroll.get().length}%` }} key={index}>
 						</button>
 					);
 				})}

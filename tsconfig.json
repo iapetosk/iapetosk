@@ -31,6 +31,7 @@
 		"**/*.json"
 	],
 	"exclude": [
+		"package.json",
 		"node_modules/"
 	]
 }

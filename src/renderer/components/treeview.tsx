@@ -2,10 +2,10 @@ import * as React from "react";
 
 import "./treeview.scss";
 
-import listener from "@/modules/listener";
-import utility from "@/modules/utility";
-import request from "@/modules/request";
-import worker from "@/scheme/worker";
+import Listener from "@/modules/listener";
+import Utility from "@/modules/utility";
+import Request from "@/modules/request";
+import Worker from "@/scheme/worker";
 
 import { Thread } from "@/modules/download";
 
@@ -22,7 +22,7 @@ class TreeView extends React.Component<TreeViewState, any> {
 		super(properties);
 		this.state = { ...properties };
 
-		listener.on("worker.listen", ($new: Thread[]) => {
+		Listener.on("worker", ($new: Thread[]) => {
 			this.update();
 		});
 	}
@@ -32,8 +32,8 @@ class TreeView extends React.Component<TreeViewState, any> {
 	public async update() {
 		const treeview: TreeViewState = {};
 
-		for (const thread of worker.get()) {
-			const host: string = request.parse(thread.from).host;
+		for (const thread of Worker.get()) {
+			const host: string = Request.parse(thread.from).host;
 
 			if (treeview[host]) {
 				treeview[host] = {
@@ -47,11 +47,11 @@ class TreeView extends React.Component<TreeViewState, any> {
 				};
 			} else {
 				treeview[host] = {
-					favicon: await request.get(`https://${host}`).then((callback) => {
+					favicon: await Request.get(`https://${host}`).then((callback) => {
 						const icon = {
 							// https://en.wikipedia.org/wiki/Favicon
-							default: utility.parse(callback.content.encode, "link[rel=\"icon\"]", "href"),
-							shortcut: utility.parse(callback.content.encode, "link[rel=\"shortcut icon\"]", "href")
+							default: Utility.parse(callback.content.encode, "link[rel=\"icon\"]", "href"),
+							shortcut: Utility.parse(callback.content.encode, "link[rel=\"shortcut icon\"]", "href")
 						};
 						return this.favicon(host, icon.default.length ? icon.default : icon.shortcut);
 					}),

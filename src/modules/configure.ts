@@ -1,4 +1,4 @@
-import storage from "@/modules/storage";
+import Storage from "@/modules/storage";
 import { StoragePreset } from "@/modules/storage";
 
 export type Configure = {

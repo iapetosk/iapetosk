@@ -1,5 +1,5 @@
-import * as fs from "fs";
-import * as path from "path";
+import * as Fs from "fs";
+import * as Path from "path";
 
 export enum StoragePreset {
 	SETTINGS = "settings"
@@ -75,19 +75,19 @@ class Storage {
 		this.export(key);
 	}
 	public un_register(key: string): void {
-		fs.rmdirSync(path.dirname(this.get_path(key)), { recursive: true });
+		Fs.rmdirSync(Path.dirname(this.get_path(key)), { recursive: true });
 		this.$delete(Storage.container, key);
 	}
 	public import(key: string): any {
 		try {
-			return JSON.parse(fs.readFileSync(this.get_path(key) || key, "utf8"));
+			return JSON.parse(Fs.readFileSync(this.get_path(key) || key, "utf8"));
 		} catch {
 			return undefined;
 		}
 	}
 	public export(key: string): void {
-		fs.mkdirSync(path.dirname(this.get_path(key)), { recursive: true });
-		fs.writeFileSync(this.get_path(key), JSON.stringify(this.get_data(key)));
+		Fs.mkdirSync(Path.dirname(this.get_path(key)), { recursive: true });
+		Fs.writeFileSync(this.get_path(key), JSON.stringify(this.get_data(key)));
 	}
 	public exist(key: string): boolean {
 		return !!this.$return(Storage.container, key);

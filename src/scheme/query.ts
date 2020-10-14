@@ -1,4 +1,4 @@
-import listener from "@/modules/listener";
+import Listener from "@/modules/listener";
 
 class Query {
 	private static state: string = "";
@@ -7,7 +7,7 @@ class Query {
 	}
 	public set(value: typeof Query.state): void {
 		// listener [new, old]
-		listener.emit("query.listen", value, this.get());
+		Listener.emit("query", value, this.get());
 		// override
 		Query.state = value;
 	}

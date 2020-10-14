@@ -2,10 +2,10 @@ import * as React from "react";
 
 import "./querybox.scss";
 
-import listener from "@/modules/listener";
-import download from "@/modules/download";
-import utility from "@/modules/utility";
-import query from "@/scheme/query";
+import Listener from "@/modules/listener";
+import Download from "@/modules/download";
+import Utility from "@/modules/utility";
+import Query from "@/scheme/query";
 
 export type QueryBoxState = {};
 
@@ -15,30 +15,35 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 		super(properties);
 		this.state = { ...properties };
 
-		listener.on("query.listen", ($new: string) => {
+		Listener.on("query", ($new: string) => {
 			if ($new && $new.length) {
 				$new.split(/\s+/).forEach((link) => {
-					download.evaluate(link).then((callback) => {
-						download.create(callback).then(() => {
+					Download.evaluate(link).then((callback) => {
+						Download.create(callback).then(() => {
 							// TODO: none
 						});
 					});
 				});
 				// clear QUERY data
-				query.clear();
+				Query.clear();
 				// clear HTML input
 				(document.getElementById("input")! as HTMLInputElement).value = "";
 			}
 		});
 	}
 	public render(): JSX.Element {
+		const placeholders: string[] = [
+			"strongly typed 👧🏻",
+			"paste links in here 👧🏻",
+			"press enter to start download 👧🏻"
+		];
 		return (
 			<section id="querybox">
-				<input id="input" className="contrast" placeholder={["strongly typed 👧🏻", "paste links in here 👧🏻", "press enter to start download 👧🏻"][utility.random(0, 2)]} autoComplete="off"
+				<input id="input" className="contrast" placeholder={placeholders[Utility.random(0, placeholders.length - 1)]} autoComplete="off"
 					onKeyDown={(event) => {
 						switch (event.key.toLowerCase()) {
 							case "enter": {
-								query.set((event.target as HTMLInputElement).value);
+								Query.set((event.target as HTMLInputElement).value);
 								break;
 							}
 						}
@@ -48,11 +53,11 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 
 						target.value = [
 							// before selection
-							utility.split(target.value, target.selectionStart!)[0],
+							Utility.split(target.value, target.selectionStart!)[0],
 							// clipboard
 							event.clipboardData!.getData("text"),
 							// after selection
-							utility.split(target.value, target.selectionEnd!).pop()
+							Utility.split(target.value, target.selectionEnd!).pop()
 						].join("");
 						
 						event.preventDefault();
