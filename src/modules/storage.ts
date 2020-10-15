@@ -69,7 +69,7 @@ class Storage {
 		this.export(key);
 	}
 	public un_register(key: string): void {
-		Fs.rmdirSync(Path.dirname(this.get_path(key)), { recursive: true });
+		Fs.unlinkSync(this.get_path(key));
 		this.$delete(Storage.container, [...key.split(/\./g)]);
 	}
 	public import(key: string): any {
