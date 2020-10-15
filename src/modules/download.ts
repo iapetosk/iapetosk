@@ -204,16 +204,8 @@ export class Download {
 	}
 	public remove(id: number): Promise<void> {
 		return new Promise<void>((resolve, rejects): void => {
-			for (const file of Worker.get(id)[0]?.files) {
-				Fs.unlink(file.path, (error) => {
-					if (error) {
-						// print ERROR
-						console.log(error);
-						// reject ERROR
-						return rejects(error);
-					}
-				});
-			}
+			// delete folder with files within
+			Fs.rmdirSync(Path.dirname(Worker.get(id)[0]?.files[0].path), { recursive: true });
 			// update worker
 			Worker.declare(id, undefined);
 			// update storage

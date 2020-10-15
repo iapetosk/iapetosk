@@ -27,29 +27,29 @@ class TreeView extends React.Component<TreeViewState, any> {
 			this.update();
 		});
 	}
-	public componentDidMount(): void {
-		this.update();
-	}
 	public async update() {
-		const treeview: TreeViewState = {};
+		const state: TreeViewState = {};
 
 		for (const thread of Worker.get()) {
 			const host: string = Request.parse(thread.from).host;
 
-			if (treeview[host]) {
-				treeview[host] = {
-					...treeview[host],
-					count: treeview[host].count + 1
+			if (state[host]) {
+				state[host] = {
+					...state[host],
+					count: state[host].count + 1
 				};
 			} else if (this.state[host]) {
-				treeview[host] = {
+				state[host] = {
 					...this.state[host],
 					count: 1
 				};
 			} else {
-				treeview[host] = {
+				state[host] = {
 					favicon: await Request.get(`https://${host}`).then((callback) => {
-						const icon = {
+						const icon: {
+							default: string | string[],
+							shortcut: string | string[];
+						} = {
 							// https://en.wikipedia.org/wiki/Favicon
 							default: Utility.parse(callback.content.encode, "link[rel=\"icon\"]", "href"),
 							shortcut: Utility.parse(callback.content.encode, "link[rel=\"shortcut icon\"]", "href")
@@ -60,7 +60,7 @@ class TreeView extends React.Component<TreeViewState, any> {
 				};
 			}
 		}
-		this.setState({ ...treeview });
+		this.setState({ ...state });
 	}
 	private favicon(hostname: string, path: string | string[]): string {
 		path = path instanceof Array ? path[0] : path;
