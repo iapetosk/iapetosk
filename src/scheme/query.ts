@@ -1,6 +1,6 @@
 import Listener from "@/modules/listener";
 
-import { AppEvent } from "@/scheme";
+import { Scheme } from "@/scheme";
 
 class Query {
 	private static state: string = "";
@@ -9,7 +9,7 @@ class Query {
 	}
 	public set(value: typeof Query.state): void {
 		// listener (new, old)
-		Listener.emit(AppEvent.QUERY, value, this.get());
+		Listener.emit(Scheme.QUERY, value, this.get());
 		// override
 		Query.state = value;
 	}

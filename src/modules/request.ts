@@ -10,7 +10,7 @@ import { File } from "@/modules/download";
 
 export type RequestOptions = PartialOptions & PrivateOptions & {
 	url: string,
-	method: "GET" | "PUT"  | "POST" | "DELETE";
+	method: "GET" | "PUT" | "POST" | "DELETE";
 };
 export type PartialOptions = {
 	agent?: boolean,
@@ -20,6 +20,16 @@ export type PartialOptions = {
 };
 export type PrivateOptions = {
 	redirects?: number;
+};
+export type RequestResponse = {
+	content: {
+		buffer: Buffer,
+		encode: string;
+	},
+	status: {
+		code?: number,
+		message?: string;
+	};
 };
 class Request {
 	readonly agent: Https.Agent = new Https.Agent({});
@@ -32,9 +42,9 @@ class Request {
 			return Tls.connect({ ...options, servername: undefined }, callback);
 		};
 	}
-	public async send(options: RequestOptions, file?: File) {
+	public async send(options: RequestOptions, file?: File): Promise<RequestResponse> {
 		const I: Request = this;
-		return new Promise<{ content: { buffer: Buffer, encode: string; }, status: { code?: number, message?: string; }; }>((resolve, rejects) => {
+		return new Promise<RequestResponse>((resolve, rejects) => {
 			function recursive(options: RequestOptions, file?: File): void {
 				// content
 				const chunks: Buffer[] = [];
@@ -152,16 +162,16 @@ class Request {
 			return recursive(options, file);
 		});
 	};
-	public async get(url: string, options: PartialOptions = {}, file?: File) {
+	public async get(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
 		return this.send({ url: url, method: "GET", ...options }, file);
 	}
-	public async put(url: string, options: PartialOptions = {}, file?: File) {
+	public async put(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
 		return this.send({ url: url, method: "PUT", ...options }, file);
 	}
-	public async post(url: string, options: PartialOptions = {}, file?: File) {
+	public async post(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
 		return this.send({ url: url, method: "POST", ...options }, file);
 	}
-	public async delete(url: string, options: PartialOptions = {}, file?: File) {
+	public async delete(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
 		return this.send({ url: url, method: "DELETE", ...options }, file);
 	}
 	public parse(url: string): { host: string, path: string; } {

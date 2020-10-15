@@ -107,6 +107,21 @@ export class Download {
 			// declare thread
 			Worker.declare(thread.id, thread);
 
+			// observe thread
+			thread = new Proxy(thread, {
+				set(target: Thread, key: never, value: never): boolean {
+					// debug
+					console.log(target);
+					// update property
+					target[key] = value;
+					// update storage
+					Storage.set_data(target.id.toString(), target);
+					// update worker
+					Worker.declare(target.id, target);
+					// approve
+					return true;
+				}
+			});
 			function next(): void {
 				Worker.get(Status.QUEUED).every((value, index) => {
 					if (index) {
@@ -167,6 +182,7 @@ export class Download {
 				thread.status = Status.QUEUED;
 				return resolve();
 			}
+			// check for incompleted files
 			for (let index: number = 0; index < thread.files.length; index++) {
 				if (thread.files[index].written !== thread.files[index].size) {
 					valid.push(index);
@@ -181,21 +197,6 @@ export class Download {
 			if (!Storage.exist(thread.id.toString())) {
 				Storage.register(thread.id.toString(), Path.join(Folder.BUNDLES, thread.id.toString() + ".json"), thread);
 			}
-			// observe thread
-			thread = new Proxy(thread, {
-				set(target: Thread, key: never, value: never): boolean {
-					// debug
-					console.log(target);
-					// update property
-					target[key] = value;
-					// update storage
-					Storage.set_data(target.id.toString(), target);
-					// update worker
-					Worker.declare(target.id, target);
-					// approve
-					return true;
-				}
-			});
 			// update status
 			thread.status = Status.WORKING;
 			// recursivly download

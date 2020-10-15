@@ -7,7 +7,7 @@ import Download from "@/modules/download";
 import Utility from "@/modules/utility";
 import Query from "@/scheme/query";
 
-import { AppEvent } from "@/scheme";
+import { Scheme } from "@/scheme";
 
 export type QueryBoxState = {};
 
@@ -17,7 +17,7 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 		super(properties);
 		this.state = { ...properties };
 
-		Listener.on(AppEvent.QUERY, ($new: string) => {
+		Listener.on(Scheme.QUERY, ($new: string) => {
 			if ($new && $new.length) {
 				$new.split(/\s+/).forEach((link) => {
 					Download.evaluate(link).then((callback) => {

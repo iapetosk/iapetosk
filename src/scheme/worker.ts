@@ -1,6 +1,6 @@
 import Listener from "@/modules/listener";
 
-import { AppEvent } from "@/scheme";
+import { Scheme } from "@/scheme";
 import { Status, Thread } from "@/modules/download";
 
 class Worker {
@@ -10,7 +10,7 @@ class Worker {
 	}
 	public set(value: typeof Worker.state) {
 		// listener (new, old)
-		Listener.emit(AppEvent.WORKER, value, Worker.state);
+		Listener.emit(Scheme.WORKER, value, Worker.state);
 		// override
 		Worker.state = value
 	}
