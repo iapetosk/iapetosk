@@ -52,14 +52,14 @@ class Request {
 					if ((options.max_redirects || I.max_redirects) > (options.redirects || 0)) {
 						// clone original options
 						const override: {
-							changed: boolean,
+							changed: number,
 							options: RequestOptions;
 						} = {
-							changed: false,
+							changed: 0,
 							options: new Proxy({ ...options }, {
 								set(target: RequestOptions, key: never, value: never): boolean {
 									// is changed!
-									override.changed = true;
+									override.changed++;
 									// update property
 									target[key] = value;
 									// approve

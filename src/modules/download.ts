@@ -225,7 +225,7 @@ export class Download {
 	public evaluate(link: string): Promise<Thread> {
 		return new Promise<Thread>((resolve, rejects): void => {
 			for (const LOADER of Object.keys(API)) {
-				for (const TEST of API[LOADER as never]["regular-expression"] as string[]) {
+				for (const TEST of API[LOADER as never] as string[]) {
 					if (new RegExp(TEST).test(link)) {
 						(require(`@/assets/loaders/${LOADER}`).default as Loader).start(link).then((callback): void => {
 							if (callback.links.length) {
