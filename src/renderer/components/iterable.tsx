@@ -11,7 +11,7 @@ import Utility from "@/modules/utility";
 import Worker from "@/scheme/worker";
 import Scroll from "@/scheme/scroll";
 
-import { AppEvent } from "@/scheme";
+import { Scheme } from "@/scheme";
 import { Status, Thread } from "@/modules/download";
 
 export type IterableState = {};
@@ -24,19 +24,17 @@ class Iterable extends React.Component<IterableState, any> {
 
 		Scroll.set({ length: 15, index: 0, size: Worker.get().length });
 
-		Listener.on(AppEvent.WORKER, ($new: Thread[]) => {
+		Listener.on(Scheme.WORKER, ($new: Thread[]) => {
 			Scroll.set({ ...Scroll.get(), size: $new.length });
 		});
-		Listener.on(AppEvent.SCROLL, () => {
-			const target: HTMLElement = document.getElementById("scrollable")!;
+		Listener.on(Scheme.SCROLL, () => {
+			const
+				target: HTMLElement = document.getElementById("scrollable")!,
+				height: number = Utility.truncate(target.scrollHeight / Worker.get().length),
+				begin: number = target.scrollTop / height,
+				end: number = (target.scrollTop + target.clientHeight) / height;
 
-			const height: number = Utility.truncate(target.scrollHeight / Worker.get().length);
-
-			let start: number = (target.scrollTop) / height;
-			let finish: number = (target.scrollTop + target.clientHeight) / height;
-			let ranging: number = finish - start;
-
-			target.scroll(0, height * (Scroll.get().index - Math.floor(ranging / 2)));
+			target.scroll(0, height * (Scroll.get().index - Math.floor((begin - end) / 2)));
 
 			this.setState({ ...this.state });
 		});

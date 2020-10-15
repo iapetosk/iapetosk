@@ -6,7 +6,7 @@ import Listener from "@/modules/listener";
 import Utility from "@/modules/utility";
 import Scroll from "@/scheme/scroll";
 
-import { AppEvent } from "@/scheme";
+import { Scheme } from "@/scheme";
 
 export type ScrollBarState = {};
 
@@ -16,7 +16,7 @@ class ScrollBar extends React.Component<Object, ScrollBarState> {
 		super(properties);
 		this.state = { ...properties };
 
-		Listener.on(AppEvent.SCROLL, () => {
+		Listener.on(Scheme.SCROLL, () => {
 			this.setState({ ...this.state });
 		});
 	}
