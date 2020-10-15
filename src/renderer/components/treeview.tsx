@@ -7,6 +7,7 @@ import Utility from "@/modules/utility";
 import Request from "@/modules/request";
 import Worker from "@/scheme/worker";
 
+import { AppEvent } from "@/scheme";
 import { Thread } from "@/modules/download";
 
 export type TreeViewState = {
@@ -22,7 +23,7 @@ class TreeView extends React.Component<TreeViewState, any> {
 		super(properties);
 		this.state = { ...properties };
 
-		Listener.on("worker", ($new: Thread[]) => {
+		Listener.on(AppEvent.WORKER, ($new: Thread[]) => {
 			this.update();
 		});
 	}

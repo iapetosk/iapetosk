@@ -1,5 +1,6 @@
 import Listener from "@/modules/listener";
 
+import { AppEvent } from "@/scheme";
 import { Status, Thread } from "@/modules/download";
 
 class Worker {
@@ -8,8 +9,8 @@ class Worker {
 		return filter ? Worker.state.filter((value) => { return typeof filter === typeof Status ? value.status === filter : value.id === filter; }) : Worker.state;
 	}
 	public set(value: typeof Worker.state) {
-		// listener [new, old]
-		Listener.emit("worker", value, Worker.state);
+		// listener (new, old)
+		Listener.emit(AppEvent.WORKER, value, Worker.state);
 		// override
 		Worker.state = value
 	}

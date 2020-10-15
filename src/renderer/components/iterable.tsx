@@ -11,6 +11,7 @@ import Utility from "@/modules/utility";
 import Worker from "@/scheme/worker";
 import Scroll from "@/scheme/scroll";
 
+import { AppEvent } from "@/scheme";
 import { Status, Thread } from "@/modules/download";
 
 export type IterableState = {};
@@ -23,10 +24,10 @@ class Iterable extends React.Component<IterableState, any> {
 
 		Scroll.set({ length: 15, index: 0, size: Worker.get().length });
 
-		Listener.on("worker", ($new: Thread[]) => {
+		Listener.on(AppEvent.WORKER, ($new: Thread[]) => {
 			Scroll.set({ ...Scroll.get(), size: $new.length });
 		});
-		Listener.on("scroll", () => {
+		Listener.on(AppEvent.SCROLL, () => {
 			const target: HTMLElement = document.getElementById("scrollable")!;
 
 			const height: number = Utility.truncate(target.scrollHeight / Worker.get().length);
@@ -53,7 +54,7 @@ class Iterable extends React.Component<IterableState, any> {
 					}}>
 					{Worker.get().map((value, index) => {
 						return (
-							<section id="process" className={Utility.inline({ contrast: true, highlight: Scroll.get().index === index, [Status[value.status].toLowerCase()]: true })} key={index}
+							<section id="process" className={Utility.inline({ contrast: true, highlight: Scroll.get().index === index, [Status[value.status].toLowerCase()]: true })} draggable={true} key={index}
 								onClick={() => {
 									Scroll.set({ ...Scroll.get(), index: index });
 								}}>

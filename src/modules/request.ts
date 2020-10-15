@@ -10,7 +10,7 @@ import { File } from "@/modules/download";
 
 export type RequestOptions = PartialOptions & PrivateOptions & {
 	url: string,
-	method: "GET" | "POST" | "PUT" | "DELETE";
+	method: "GET" | "PUT"  | "POST" | "DELETE";
 };
 export type PartialOptions = {
 	agent?: boolean,
@@ -155,11 +155,11 @@ class Request {
 	public async get(url: string, options: PartialOptions = {}, file?: File) {
 		return this.send({ url: url, method: "GET", ...options }, file);
 	}
-	public async post(url: string, options: PartialOptions = {}, file?: File) {
-		return this.send({ url: url, method: "POST", ...options }, file);
-	}
 	public async put(url: string, options: PartialOptions = {}, file?: File) {
 		return this.send({ url: url, method: "PUT", ...options }, file);
+	}
+	public async post(url: string, options: PartialOptions = {}, file?: File) {
+		return this.send({ url: url, method: "POST", ...options }, file);
 	}
 	public async delete(url: string, options: PartialOptions = {}, file?: File) {
 		return this.send({ url: url, method: "DELETE", ...options }, file);
