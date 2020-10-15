@@ -1,6 +1,8 @@
 import Listener from "@/modules/listener";
 import Utility from "@/modules/utility";
 
+import { AppEvent } from "@/scheme";
+
 class Scroll {
 	private static state: {
 		length: number,
@@ -15,8 +17,8 @@ class Scroll {
 		return Scroll.state;
 	}
 	public set(value: typeof Scroll.state): void {
-		// listener [new, old]
-		Listener.emit("scroll", value, this.get());
+		// listener (new, old)
+		Listener.emit(AppEvent.SCROLL, value, this.get());
 		// override
 		Scroll.state = {
 			...value,

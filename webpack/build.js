@@ -28,9 +28,9 @@ request("nwjs.io", "/versions.json").then((callback) => {
 	// bundle webpack
 	const compiler = webpack({
 		...webpack_config,
-		devtool: "hidden-source-map",
+		devtool: "inline-nosources-cheap-module-source-map",
 		mode: process.env.NODE_ENV
-	}, async (error, stats) => {
+	}, (error, stats) => {
 		compiler.close(() => {
 			Promise.all([build(options)]);
 		});
