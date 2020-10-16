@@ -34,7 +34,7 @@ class Iterable extends React.Component<IterableState, any> {
 				begin: number = target.scrollTop / height,
 				end: number = (target.scrollTop + target.clientHeight) / height;
 
-			target.scroll(0, height * (Scroll.get().index - Math.floor((begin - end) / 2)));
+			target.scroll(0, height * (Scroll.get().index - Math.floor((end - begin) / 2)));
 
 			this.setState({ ...this.state });
 		});
@@ -56,7 +56,7 @@ class Iterable extends React.Component<IterableState, any> {
 								onClick={() => {
 									Scroll.set({ ...Scroll.get(), index: index });
 								}}>
-								<legend id="title" className="contrast flowless">{value.title} - ({value.finished} / {value.files.length})</legend>
+								<legend id="title" className="contrast flowless">#{index} {value.title} - ({value.finished} / {value.files.length})</legend>
 								<figure id="wrapper" className="contrast">
 									<canvas id="thumbnail" className="contrast" style={{ backgroundImage: value.files[0].written === value.files[0].size ? `url(${value.files[0].path.replace(/\\/g, `/`)})` : undefined }}>
 									</canvas>
