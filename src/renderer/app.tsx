@@ -26,7 +26,6 @@ class App extends React.Component<AppState, any> {
 			window.location.reload();
 		});
 	}
-
 	public render(): JSX.Element {
 		return (
 			<main id="container">

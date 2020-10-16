@@ -2,6 +2,7 @@ import * as Fs from "fs";
 import * as Path from "path";
 import * as API from "@/assets/modules.json";
 
+import Utility from "@/modules/utility";
 import Storage from "@/modules/storage";
 import Request from "@/modules/request";
 import Worker from "@/scheme/worker";
@@ -232,14 +233,7 @@ export class Download {
 							}
 							throw new Error("empty");
 						}).catch((error): void => {
-							Fs.writeFile(Path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: LOADER, error: error }), (error) => {
-								if (error) {
-									// print ERROR
-									console.log(error);
-									// reject ERROR
-									return rejects(error);
-								}
-							});
+							Utility.write(Path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: LOADER, error: error }));
 						});
 					}
 				}

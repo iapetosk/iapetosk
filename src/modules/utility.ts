@@ -1,3 +1,6 @@
+import * as Fs from "fs";
+import * as Path from "path";
+
 class Utility {
 	public index_of<type>(array: type[], value: type): number {
 		for (let index: number = 0; index < array.length; index++) {
@@ -82,8 +85,14 @@ class Utility {
 		}
 		return array.join("\u0020");
 	}
-	public split(text: string, index: number): string[] {
+	public devide(text: string, index: number): string[] {
 		return [text.substring(0, index), text.substring(index)];
+	}
+	public write(path: string, content: any): void {
+		// generates directory recursively
+		Fs.mkdirSync(Path.dirname(path), { recursive: true });
+		// write file
+		Fs.writeFileSync(path, content);
 	}
 }
 export default (new Utility());
