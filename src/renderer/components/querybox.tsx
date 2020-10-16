@@ -55,11 +55,11 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 
 						target.value = [
 							// before selection
-							Utility.split(target.value, target.selectionStart!)[0],
+							Utility.devide(target.value, target.selectionStart!)[0],
 							// clipboard
 							event.clipboardData!.getData("text"),
 							// after selection
-							Utility.split(target.value, target.selectionEnd!).pop()
+							Utility.devide(target.value, target.selectionEnd!).pop()
 						].join("");
 						
 						event.preventDefault();
