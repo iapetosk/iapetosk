@@ -7,31 +7,29 @@ const webpack = require("webpack");
 const package = require("../package");
 const webpack_config = require("./webpack.config");
 
-request("nwjs.io", "/versions.json").then((callback) => {
-	const options = {
-		archive: {
-			flavor: "nwjs",
-			version: JSON.parse(callback.toString())["stable"],
-			platform: "win",
-			architecture: "x64",
-		},
-		output: {
-			path: "build/",
-			name: `${package.name}.exe`,
-			icon: {
-				file: "src/assets/icons/icon.ico",
-				task: "src/assets/icons/icon.png"
-			}
-		}
-	};
-	fs.rmdirSync(options.output.path, { recursive: true });
-	// bundle webpack
-	const compiler = webpack({
-		...webpack_config,
-		devtool: "inline-nosources-cheap-module-source-map",
-		mode: process.env.NODE_ENV
-	}, (error, stats) => {
-		compiler.close(() => {
+const compiler = webpack({
+	...webpack_config,
+	devtool: "inline-nosources-cheap-module-source-map",
+	mode: process.env.NODE_ENV
+}, (error, stats) => {
+	compiler.close(() => {
+		request("nwjs.io", "/versions.json").then((callback) => {
+			const options = {
+				archive: {
+					flavor: "nwjs",
+					version: JSON.parse(callback.toString())["stable"],
+					platform: "win",
+					architecture: "x64",
+				},
+				output: {
+					path: "build/",
+					name: `${package.name}.exe`,
+					icon: {
+						file: "src/assets/icons/icon.ico",
+						task: "src/assets/icons/icon.png"
+					}
+				}
+			};
 			Promise.all([build(options)]);
 		});
 	});
@@ -56,6 +54,15 @@ async function request(host, path) {
 }
 async function build(options) {
 	return new Promise((resolve, rejects) => {
+		// clean directory
+		for (const file of fs.readdirSync(path.resolve(options.output.path))) {
+			if (fs.statSync(path.resolve(options.output.path, file)).isFile()) {
+				fs.unlinkSync(path.resolve(options.output.path, file));
+			} else if (path.basename(webpack_config.output.path) !== file) {
+				fs.rmdirSync(path.resolve(options.output.path, file), { recursive: true });
+			}
+		}
+		// fetch binaries
 		request("dl.nwjs.io", `/${options.archive.version}/${options.archive.flavor}-${options.archive.version}-${options.archive.platform}-${options.archive.architecture}.zip`).then((callback) => {
 			// write files
 			for (const file of [
@@ -65,7 +72,7 @@ async function build(options) {
 				},
 				{
 					name: "package.json",
-					data: JSON.stringify({ name: package.name, main: "system/index.html", window: { ...package.window, icon: "system/icon.png" }})
+					data: JSON.stringify({ name: package.name, main: "system/index.html", window: { ...package.window, icon: "system/icon.png" } })
 				},
 				{
 					name: "system/icon.png",
