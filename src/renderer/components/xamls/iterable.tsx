@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import "./iterable.scss";
+import "@/renderer/components/styles/iterable.scss";
 
 import * as Path from "path";
 import * as Process from "child_process";

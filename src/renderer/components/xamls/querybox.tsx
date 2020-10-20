@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import "./querybox.scss";
+import "@/renderer/components/styles/querybox.scss";
 
 import Listener from "@/modules/listener";
 import Download from "@/modules/download";

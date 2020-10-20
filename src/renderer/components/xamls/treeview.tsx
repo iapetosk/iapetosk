@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import "./treeview.scss";
+import "@/renderer/components/styles/treeview.scss";
 
 import Listener from "@/modules/listener";
 import Utility from "@/modules/utility";
