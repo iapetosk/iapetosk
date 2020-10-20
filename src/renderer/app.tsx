@@ -1,13 +1,13 @@
 import * as React from "react";
 
-import "./app.scss";
+import "@/renderer/app.scss";
 
-import ScrollBar from "@/renderer/components/scrollbar";
-import TitleBar from "@/renderer/components/titlebar";
-import QueryBox from "@/renderer/components/querybox";
-import TreeView from "@/renderer/components/treeview";
-import Iterable from "@/renderer/components/iterable";
-import TaskBar from "@/renderer/components/taskbar";
+import ScrollBar from "@/renderer/components/xamls/scrollbar";
+import TitleBar from "@/renderer/components/xamls/titlebar";
+import QueryBox from "@/renderer/components/xamls/querybox";
+import TreeView from "@/renderer/components/xamls/treeview";
+import Iterable from "@/renderer/components/xamls/iterable";
+import TaskBar from "@/renderer/components/xamls/taskbar";
 
 import Listener from "@/modules/listener";
 

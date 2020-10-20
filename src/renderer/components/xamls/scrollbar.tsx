@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import "./scrollbar.scss";
+import "@/renderer/components/styles/scrollbar.scss";
 
 import Listener from "@/modules/listener";
 import Utility from "@/modules/utility";

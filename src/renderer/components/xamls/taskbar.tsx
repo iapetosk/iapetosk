@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import "./taskbar.scss";
+import "@/renderer/components/styles/taskbar.scss";
 
 export type TaskBarState = {};
 
