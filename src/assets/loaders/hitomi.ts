@@ -1,13 +1,18 @@
-import Request from "@/modules/request";
-import Utility from "@/modules/utility";
+import request from "@/modules/request";
+import utility from "@/modules/utility";
 
 import { PartialOptions } from "@/modules/request";
 import { PlaceHolders, Loaded } from "@/modules/download";
 
 export type GalleryBlock = {
+	id: number,
+	// title
+	japanese_title: string,
+	title: string,
+	// language
 	language_localname: string,
 	language: string,
-	date: string,
+	// files
 	files: {
 		width: number,
 		height: number,
@@ -15,14 +20,23 @@ export type GalleryBlock = {
 		haswebp: number,
 		name: string,
 		hash: string;
-	}[];
+	}[],
+	// tags
+	tags: {
+		female: number,
+		male: number,
+		url: string,
+		tag: string;
+	}[],
+	// date
+	date: string;
 };
 
 class Hitomi_La {
-	private number_of_frontends: number = NaN;
+	private common_js?: string = "";
 	constructor() {
-		Request.get("https://ltn.hitomi.la/common.js").then((callback) => {
-			this.number_of_frontends = Utility.extract(callback.content.encode, "number_of_frontends", "number");
+		request.get("https://ltn.hitomi.la/common.js").then((callback) => {
+			this.common_js = callback.content.encode.split(/function show_loading/)![0];
 		});
 	}
 	public start(url: string): Promise<Loaded> {
@@ -37,54 +51,34 @@ class Hitomi_La {
 			}
 		};
 		const placeholders: PlaceHolders = {
-			id: I.ID(url)
+			// TODO: none
 		};
 		return new Promise<Loaded>(async (resolve, rejects) => {
-			function format(regex: RegExp, url: string, base: number): string {
-				const chapter: number = parseInt(regex.exec(url)![1], base);
-				return url.replace(/@/g, String.fromCharCode(97 + (chapter < 0x09 ? 1 : chapter) % (chapter < 0x30 ? 2 : I.number_of_frontends)).toString());
-			}
-			async function recursive(galleryblock?: GalleryBlock) {
-				galleryblock = galleryblock || await Request.get(`https://ltn.hitomi.la/galleries/${I.ID(url)}.js`).then((callback) => {
-					return callback.status.code === 404 ? undefined : Utility.extract(`${callback.content.encode};`, "galleryinfo", "object") as GalleryBlock;
+			async function recursive(gallery?: GalleryBlock) {
+				gallery = gallery || await request.get(`https://ltn.hitomi.la/galleries/${I.ID(url)}.js`).then((callback) => {
+					return callback.status.code === 404 ? undefined : utility.extract(`${callback.content.encode};`, "galleryinfo", "object");
 				});
-				if (!galleryblock) {
-					return rejects();
+				if (!gallery) {
+					return rejects(404);
 				}
-				if (isNaN(I.number_of_frontends)) {
-					setTimeout(() => {
-						return recursive(galleryblock);
-					}, 1000);
-				} else {
-					galleryblock.files.forEach((file, index) => {
-						if (file.hash) {
-							// hash
-							const hash: string = file.hash.length < 3 ? file.hash : file.hash.replace(/^.*(..)(.)$/, "$2/$1/" + file.hash);
-							// condition
-							if (file.haswebp) {
-								links[index] = format(/webp\/[0-9a-f]\/([0-9a-f]{2})/, `https://@a.hitomi.la/webp/${hash}.webp`, 16);
-							} else {
-								links[index] = format(/images\/[0-9a-f]\/([0-9a-f]{2})/, `https://@a.hitomi.la/images/${hash}.${file.name.split(/\./).pop()}`, 16);
-							}
-						} else {
-							links[index] = format(/galleries\/\[0-9]*(0-9)/, `https://@a.hitomi.la/galleries/${I.ID(url)}/${file.name}`, 10);
+				if (I.common_js) {
+					for (let index: number = 0; index < gallery.files.length; index++) {
+						links[index] = eval(I.common_js + "url_from_url_from_hash(gallery.id, gallery.files[index]);") as string;
+					}
+					return resolve({
+						title: gallery.title,
+						links: links,
+						options: options,
+						placeholders: {
+							id: gallery.id,
+							title: gallery.title,
+							language: gallery.language
 						}
 					});
-					Request.get(`https://ltn.hitomi.la/galleryblock/${I.ID(url)}.html`).then((callback) => {
-						(Utility.parse(callback.content.encode, "td") as string[]).forEach((value, index) => {
-							if (index % 2) {
-								placeholders[Object.keys(placeholders).pop()!] = Utility.unwrap(value.split(/\s\s+/).filter((value) => { return value.length; }));
-							} else {
-								placeholders[value.toLowerCase()] = undefined;
-							}
-						});
-						return resolve({
-							title: Utility.parse(callback.content.encode, ".lillie a") as string,
-							links: links,
-							options: options,
-							placeholders: placeholders
-						});
-					});
+				} else {
+					setTimeout(() => {
+						return recursive(gallery);
+					}, 1000);
 				}
 			}
 			return recursive();

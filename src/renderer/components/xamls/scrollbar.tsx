@@ -2,30 +2,30 @@ import * as React from "react";
 
 import "@/renderer/components/styles/scrollbar.scss";
 
-import Listener from "@/modules/listener";
-import Utility from "@/modules/utility";
-import Scroll from "@/scheme/scroll";
+import listener from "@/modules/listener";
+import utility from "@/modules/utility";
+import scroll from "@/scheme/scroll";
 
 import { Scheme } from "@/scheme";
 
-export type ScrollBarState = {};
+export type scrollBarState = {};
 
-class ScrollBar extends React.Component<Object, ScrollBarState> {
-	public state: ScrollBarState;
-	constructor(properties: ScrollBarState) {
+class scrollBar extends React.Component<Object, scrollBarState> {
+	public state: scrollBarState;
+	constructor(properties: scrollBarState) {
 		super(properties);
 		this.state = { ...properties };
 
-		Listener.on(Scheme.SCROLL, () => {
+		listener.on(Scheme.SCROLL, () => {
 			this.setState({ ...this.state });
 		});
 	}
 	public render(): JSX.Element {
 		return (
 			<section id="scrollbar" className="contrast">
-				{[...new Array(Scroll.get().length)].map((value, index) => {
+				{[...new Array(scroll.get().length)].map((value, index) => {
 					return (
-						<button id="metre" className={Utility.inline({ highlight: Scroll.get().size < Scroll.get().length ? (Scroll.get().index) * (1.0 / Scroll.get().size) < (index + 1.0) / Scroll.get().length && (index + 1.0) / Scroll.get().length <= (Scroll.get().index + 1.0) * (1.0 / Scroll.get().size) : (index) * (Scroll.get().size / Scroll.get().length) <= Scroll.get().index && Scroll.get().index < (index + 1.0) * (Scroll.get().size / Scroll.get().length) })} style={{ height: `${100 / Scroll.get().length}%` }} key={index}>
+						<button id="metre" className={utility.inline({ highlight: scroll.get().size < scroll.get().length ? (scroll.get().index) * (1.0 / scroll.get().size) < (index + 1.0) / scroll.get().length && (index + 1.0) / scroll.get().length <= (scroll.get().index + 1.0) * (1.0 / scroll.get().size) : (index) * (scroll.get().size / scroll.get().length) <= scroll.get().index && scroll.get().index < (index + 1.0) * (scroll.get().size / scroll.get().length) })} style={{ height: `${100 / scroll.get().length}%` }} key={index}>
 						</button>
 					);
 				})}
@@ -33,4 +33,4 @@ class ScrollBar extends React.Component<Object, ScrollBarState> {
 		);
 	}
 }
-export default ScrollBar;
+export default scrollBar;

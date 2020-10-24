@@ -1,6 +1,6 @@
-import * as Fs from "fs";
+import * as fs from "fs";
 
-import Utility from "@/modules/utility";
+import utility from "@/modules/utility";
 
 export enum StoragePreset {
 	SETTINGS = "settings"
@@ -70,18 +70,18 @@ class Storage {
 		this.export(key);
 	}
 	public un_register(key: string): void {
-		Fs.unlinkSync(this.get_path(key));
+		fs.unlinkSync(this.get_path(key));
 		this.delete(Storage.container, [...key.split(/\./g)]);
 	}
 	public import(key: string): any {
 		try {
-			return JSON.parse(Fs.readFileSync(this.get_path(key) || key, "utf8"));
+			return JSON.parse(fs.readFileSync(this.get_path(key) || key, "utf8"));
 		} catch {
 			return undefined;
 		}
 	}
 	public export(key: string): void {
-		Utility.write(this.get_path(key), JSON.stringify(this.get_data(key)));
+		utility.write(this.get_path(key), JSON.stringify(this.get_data(key)));
 	}
 	public exist(key: string): boolean {
 		return !!this.return(Storage.container, [...key.split(/\./g)]);
