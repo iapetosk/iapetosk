@@ -14,7 +14,7 @@ class Worker {
 		// override
 		Worker.state = value
 	}
-	public declare(id: number, thread?: Thread): void {
+	public override(id: number, thread?: Thread): void {
 		let index: number = this.get().length;
 
 		for (const [$index, value] of this.get().entries()) {

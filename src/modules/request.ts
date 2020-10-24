@@ -1,14 +1,14 @@
-import * as Fs from "fs";
-import * as Tls from "tls";
-import * as Path from "path";
-import * as Http from "http";
-import * as Https from "https";
+import * as fs from "fs";
+import * as tls from "tls";
+import * as path from "path";
+import * as http from "http";
+import * as https from "https";
 
-import Utility from "@/modules/utility";
+import utility from "@/modules/utility";
 
 import { File } from "@/modules/download";
 
-export type RequestOptions = PartialOptions & PrivateOptions & {
+export type requestOptions = PartialOptions & PrivateOptions & {
 	url: string,
 	method: "GET" | "PUT" | "POST" | "DELETE";
 };
@@ -21,7 +21,7 @@ export type PartialOptions = {
 export type PrivateOptions = {
 	redirects?: number;
 };
-export type RequestResponse = {
+export type requestResponse = {
 	content: {
 		buffer: Buffer,
 		encode: string;
@@ -31,25 +31,25 @@ export type RequestResponse = {
 		message?: string;
 	};
 };
-class Request {
-	readonly agent: Https.Agent = new Https.Agent({});
+class request {
+	readonly agent: https.Agent = new https.Agent({});
 	private max_redirects: number;
 	constructor(max_redirects: number = 1) {
 		// <define default properties>
 		this.max_redirects = max_redirects;
 		// @ts-ignore
 		this.agent.createConnection = (options, callback): tls.TLSSocket => {
-			return Tls.connect({ ...options, servername: undefined }, callback);
+			return tls.connect({ ...options, servername: undefined }, callback);
 		};
 	}
-	public async send(options: RequestOptions, file?: File): Promise<RequestResponse> {
-		const I: Request = this;
-		return new Promise<RequestResponse>((resolve, rejects) => {
-			function recursive(options: RequestOptions, file?: File): void {
+	public async send(options: requestOptions, file?: File): Promise<requestResponse> {
+		const I: request = this;
+		return new Promise<requestResponse>((resolve, rejects) => {
+			function recursive(options: requestOptions, file?: File): void {
 				// content
 				const chunks: Buffer[] = [];
 				// send request
-				(I.SSL(options.url) ? Https : Http).request({
+				(I.SSL(options.url) ? https : http).request({
 					agent: options.agent ? undefined : I.agent,
 					method: options.method,
 					headers: options.headers,
@@ -63,11 +63,11 @@ class Request {
 						// clone original options
 						const override: {
 							changed: number,
-							options: RequestOptions;
+							options: requestOptions;
 						} = {
 							changed: 0,
 							options: new Proxy({ ...options }, {
-								set(target: RequestOptions, key: never, value: never): boolean {
+								set(target: requestOptions, key: never, value: never): boolean {
 									// is changed!
 									override.changed++;
 									// update property
@@ -87,7 +87,7 @@ class Request {
 								case "cloudflare": {
 									override.options.headers = {
 										"referer": options.url,
-										"cookie": Utility.cookie_encode({ "__cfduid": Utility.cookie_decode([...(response.headers["set-cookie"] || []), ...([options.headers?.cookie] || [])].join(";\u0020"))["__cfduid"] })
+										"cookie": utility.cookie_encode({ "__cfduid": utility.cookie_decode([...(response.headers["set-cookie"] || []), ...([options.headers?.cookie] || [])].join(";\u0020"))["__cfduid"] })
 									};
 									break;
 								}
@@ -107,12 +107,12 @@ class Request {
 					// file
 					if (file) {
 						// generates directory recursively
-						Fs.mkdirSync(Path.dirname(file.path), { recursive: true });
+						fs.mkdirSync(path.dirname(file.path), { recursive: true });
 						// content-length should be defined
 						if (response.headers["content-length"]) {
 							file.size = Number(response.headers["content-length"]);
 						}
-						var writable: Fs.WriteStream = Fs.createWriteStream(file.path);
+						var writable: fs.WriteStream = fs.createWriteStream(file.path);
 					}
 					response.on("data", (chunk) => {
 						// content
@@ -162,16 +162,16 @@ class Request {
 			return recursive(options, file);
 		});
 	};
-	public async get(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
+	public async get(url: string, options: PartialOptions = {}, file?: File): Promise<requestResponse> {
 		return this.send({ url: url, method: "GET", ...options }, file);
 	}
-	public async put(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
+	public async put(url: string, options: PartialOptions = {}, file?: File): Promise<requestResponse> {
 		return this.send({ url: url, method: "PUT", ...options }, file);
 	}
-	public async post(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
+	public async post(url: string, options: PartialOptions = {}, file?: File): Promise<requestResponse> {
 		return this.send({ url: url, method: "POST", ...options }, file);
 	}
-	public async delete(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
+	public async delete(url: string, options: PartialOptions = {}, file?: File): Promise<requestResponse> {
 		return this.send({ url: url, method: "DELETE", ...options }, file);
 	}
 	public parse(url: string): { host: string, path: string; } {
@@ -185,4 +185,4 @@ class Request {
 		return new RegExp(/^https/).test(url);
 	}
 }
-export default (new Request());
+export default (new request());

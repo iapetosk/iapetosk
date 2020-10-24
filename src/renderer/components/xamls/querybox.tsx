@@ -2,10 +2,10 @@ import * as React from "react";
 
 import "@/renderer/components/styles/querybox.scss";
 
-import Listener from "@/modules/listener";
-import Download from "@/modules/download";
-import Utility from "@/modules/utility";
-import Query from "@/scheme/query";
+import listener from "@/modules/listener";
+import download from "@/modules/download";
+import utility from "@/modules/utility";
+import query from "@/scheme/query";
 
 import { Scheme } from "@/scheme";
 
@@ -17,17 +17,17 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 		super(properties);
 		this.state = { ...properties };
 
-		Listener.on(Scheme.QUERY, ($new: string) => {
+		listener.on(Scheme.QUERY, ($new: string) => {
 			if ($new && $new.length) {
 				$new.split(/\s+/).forEach((link) => {
-					Download.evaluate(link).then((callback) => {
-						Download.create(callback).then(() => {
+					download.evaluate(link).then((callback) => {
+						download.create(callback).then(() => {
 							// TODO: none
 						});
 					});
 				});
 				// clear QUERY data
-				Query.clear();
+				query.clear();
 				// clear HTML input
 				(document.getElementById("input")! as HTMLInputElement).value = "";
 			}
@@ -41,11 +41,11 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 		];
 		return (
 			<section id="querybox">
-				<input id="input" className="contrast" placeholder={placeholders[Utility.random(0, placeholders.length - 1)]} autoComplete="off"
+				<input id="input" className="contrast" placeholder={placeholders[utility.random(0, placeholders.length - 1)]} autoComplete="off"
 					onKeyDown={(event) => {
 						switch (event.key.toLowerCase()) {
 							case "enter": {
-								Query.set((event.target as HTMLInputElement).value);
+								query.set((event.target as HTMLInputElement).value);
 								break;
 							}
 						}
@@ -55,11 +55,11 @@ class QueryBox extends React.Component<QueryBoxState, any> {
 
 						target.value = [
 							// before selection
-							Utility.devide(target.value, target.selectionStart!)[0],
+							utility.devide(target.value, target.selectionStart!)[0],
 							// clipboard
 							event.clipboardData!.getData("text"),
 							// after selection
-							Utility.devide(target.value, target.selectionEnd!).pop()
+							utility.devide(target.value, target.selectionEnd!).pop()
 						].join("");
 						
 						event.preventDefault();

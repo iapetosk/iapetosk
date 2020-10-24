@@ -1,10 +1,10 @@
-import * as Fs from "fs";
-import * as Path from "path";
+import * as fs from "fs";
+import * as path from "path";
 
-class Utility {
-	public index_of<type>(array: type[], value: type): number {
+class utility {
+	public index_of<type>(array: (type | RegExp)[], value: type): number {
 		for (let index: number = 0; index < array.length; index++) {
-			if (array[index] === value) {
+			if (array[index] instanceof RegExp ? (array[index] as RegExp).test(String(value)) : array[index] === value) {
 				return index;
 			}
 		}
@@ -13,8 +13,8 @@ class Utility {
 	public clamp(value: number, minimum: number, maximum: number): number {
 		return Math.min(Math.max(value, minimum), maximum);
 	}
-	public truncate(value: number): number {
-		return value - value % 10;
+	public truncate(value: number, index: number): number {
+		return Math.pow(~~value / Math.pow(10, index), index);
 	}
 	public random(minimum: number, maximum: number, type: "integer" | "double" = "integer"): number {
 		switch (type) {
@@ -43,13 +43,13 @@ class Utility {
 
 		switch (type) {
 			case "string": {
-				return String(capture);
+				return String(/^["'`]([\D\d]*)["'`]$/.exec(capture)![1]);
 			}
 			case "number": {
 				return Number(capture);
 			}
 			case "array": {
-				return JSON.parse(`{"capture":${capture}}`).capture;
+				return /^\[([\D\d]*)\]$/.exec(capture)![1].split(/\,/g);
 			}
 			case "object": {
 				return JSON.parse(capture);
@@ -88,11 +88,11 @@ class Utility {
 	public devide(text: string, index: number): string[] {
 		return [text.substring(0, index), text.substring(index)];
 	}
-	public write(path: string, content: any): void {
+	public write(directory: string, content: any): void {
 		// generates directory recursively
-		Fs.mkdirSync(Path.dirname(path), { recursive: true });
+		fs.mkdirSync(path.dirname(directory), { recursive: true });
 		// write file
-		Fs.writeFileSync(path, content);
+		fs.writeFileSync(directory, content);
 	}
 }
-export default (new Utility());
+export default (new utility());

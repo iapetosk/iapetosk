@@ -1,5 +1,5 @@
 import Listener from "@/modules/listener";
-import Utility from "@/modules/utility";
+import utility from "@/modules/utility";
 
 import { Scheme } from "@/scheme";
 
@@ -22,7 +22,7 @@ class Scroll {
 		// override
 		Scroll.state = {
 			...value,
-			index: Utility.clamp(value.index, 0, value.size - 1)
+			index: utility.clamp(value.index, 0, value.size - 1)
 		};
 	}
 }

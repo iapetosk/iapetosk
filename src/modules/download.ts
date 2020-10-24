@@ -1,10 +1,10 @@
-import * as Fs from "fs";
-import * as Path from "path";
+import * as fs from "fs";
+import * as path from "path";
 import * as API from "@/assets/modules.json";
 
-import Utility from "@/modules/utility";
-import Storage from "@/modules/storage";
-import Request from "@/modules/request";
+import utility from "@/modules/utility";
+import storage from "@/modules/storage";
+import request from "@/modules/request";
 import Worker from "@/scheme/worker";
 
 import { PartialOptions } from "@/modules/request";
@@ -72,13 +72,13 @@ export class Download {
 		this.max_working = max_working;
 		// <exception occured if folder isn't exist>
 		try {
-			for (const file of Fs.readdirSync(Folder.BUNDLES)) {
+			for (const file of fs.readdirSync(Folder.BUNDLES)) {
 				// check if file is .json
-				if (Fs.statSync(Path.join(Folder.BUNDLES, file)).isFile() && Path.extname(file) === ".json") {
+				if (fs.statSync(path.join(Folder.BUNDLES, file)).isFile() && path.extname(file) === ".json") {
 					// read thread from .json
-					Storage.register(file.split(/\./)[0], Path.join(Folder.BUNDLES, file), "@import");
+					storage.register(file.split(/\./)[0], path.join(Folder.BUNDLES, file), "@import");
 
-					const thread: Thread = Storage.get_data(file.split(/\./)[0]);
+					const thread: Thread = storage.get_data(file.split(/\./)[0]);
 
 					switch (thread.status) {
 						case Status.NONE:
@@ -87,7 +87,7 @@ export class Download {
 							break;
 						}
 						default: {
-							Worker.declare(thread.id, thread);
+							Worker.override(thread.id, thread);
 							break;
 						}
 					}
@@ -105,8 +105,8 @@ export class Download {
 			const I: Download = this;
 			const valid: number[] = [];
 
-			// declare thread
-			Worker.declare(thread.id, thread);
+			// update thread
+			Worker.override(thread.id, thread);
 
 			// observe thread
 			thread = new Proxy(thread, {
@@ -116,9 +116,9 @@ export class Download {
 					// update property
 					target[key] = value;
 					// update storage
-					Storage.set_data(target.id.toString(), target);
+					storage.set_data(String(target.id), target);
 					// update worker
-					Worker.declare(target.id, target);
+					Worker.override(target.id, target);
 					// approve
 					return true;
 				}
@@ -144,7 +144,7 @@ export class Download {
 				}
 				thread.working++;
 				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
-				Request.get(
+				request.get(
 					thread.files[valid[index]].link,
 					{
 						...thread.options,
@@ -195,8 +195,8 @@ export class Download {
 				return resolve();
 			}
 			// register storage
-			if (!Storage.exist(thread.id.toString())) {
-				Storage.register(thread.id.toString(), Path.join(Folder.BUNDLES, thread.id.toString() + ".json"), thread);
+			if (!storage.exist(String(thread.id))) {
+				storage.register(String(thread.id), path.join(Folder.BUNDLES, String(thread.id) + ".json"), thread);
 			}
 			// update status
 			thread.status = Status.WORKING;
@@ -207,11 +207,11 @@ export class Download {
 	public remove(id: number): Promise<void> {
 		return new Promise<void>((resolve, rejects): void => {
 			// delete folder with files within
-			Fs.rmdirSync(Path.dirname(Worker.get(id)[0]?.files[0].path), { recursive: true });
+			fs.rmdirSync(path.dirname(Worker.get(id)[0]?.files[0].path), { recursive: true });
 			// update worker
-			Worker.declare(id, undefined);
+			Worker.override(id, undefined);
 			// update storage
-			Storage.un_register(id.toString());
+			storage.un_register(String(id));
 
 			return resolve();
 		});
@@ -224,16 +224,16 @@ export class Download {
 						(require(`@/assets/loaders/${LOADER}`).default as Loader).start(link).then((callback): void => {
 							if (callback.links.length) {
 								const files: File[] = [];
-								const folder: string = Date.now().toString();
+								const folder: string = String(Date.now());
 
 								callback.links.forEach((link, $index) => {
-									files[$index] = new File(link, Path.join(Folder.DOWNLOADS, LOADER, folder, `${$index}${Path.extname(link)}`));
+									files[$index] = new File(link, path.join(Folder.DOWNLOADS, LOADER, folder, `${$index}${path.extname(link)}`));
 								});
 								return resolve(new Thread(link, callback.title, files, callback.options));
 							}
 							throw new Error("empty");
 						}).catch((error): void => {
-							Utility.write(Path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: LOADER, error: error }));
+							utility.write(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: LOADER, error: error }));
 						});
 					}
 				}

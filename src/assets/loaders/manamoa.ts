@@ -1,5 +1,5 @@
-import Request from "@/modules/request";
-import Utility from "@/modules/Utility";
+import request from "@/modules/request";
+import utility from "@/modules/utility";
 
 import { PartialOptions } from "@/modules/request";
 import { PlaceHolders, Loaded } from "@/modules/download";
@@ -16,13 +16,13 @@ class Manamoa {
 			// TODO: none
 		};
 		return new Promise<Loaded>(async (resolve, rejects) => {
-			Request.get(url).then((callback) => {
+			request.get(url).then((callback) => {
 				const list: string[][] = [
-					Utility.extract(callback.content.encode, "img_list", "array"),
-					Utility.extract(callback.content.encode, "img_list1", "array")
+					utility.extract(callback.content.encode, "img_list", "array"),
+					utility.extract(callback.content.encode, "img_list1", "array")
 				];
-				const domains: string[] = Utility.extract(callback.content.encode, "cdn_domains", "array");
-				const chapter: number = Utility.extract(callback.content.encode, "chapter", "number");
+				const domains: string[] = utility.extract(callback.content.encode, "cdn_domains", "array");
+				const chapter: number = utility.extract(callback.content.encode, "chapter", "number");
 
 				for (let x: number = 0; x < list.length; x++) {
 					for (let y: number = 0; y < list[x].length; y++) {
@@ -37,7 +37,7 @@ class Manamoa {
 					}
 				}
 				return resolve({
-					title: Utility.parse(callback.content.encode, "meta[name=\"title\"]", "content") as string,
+					title: utility.parse(callback.content.encode, "meta[name=\"title\"]", "content") as string,
 					links: links,
 					options: options,
 					placeholders: placeholders
