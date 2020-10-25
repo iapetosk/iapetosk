@@ -1,44 +1,9 @@
-import request from "@/modules/request";
-import utility from "@/modules/utility";
+import hitomi_la from "@/modules/hitomi";
 
 import { PartialOptions } from "@/modules/request";
 import { PlaceHolders, Loaded } from "@/modules/download";
 
-export type GalleryBlock = {
-	id: number,
-	// title
-	japanese_title: string,
-	title: string,
-	// language
-	language_localname: string,
-	language: string,
-	// files
-	files: {
-		width: number,
-		height: number,
-		hasavif: number,
-		haswebp: number,
-		name: string,
-		hash: string;
-	}[],
-	// tags
-	tags: {
-		female: number,
-		male: number,
-		url: string,
-		tag: string;
-	}[],
-	// date
-	date: string;
-};
-
 class Hitomi_La {
-	private common_js?: string = "";
-	constructor() {
-		request.get("https://ltn.hitomi.la/common.js").then((callback) => {
-			this.common_js = callback.content.encode.split(/function show_loading/)![0];
-		});
-	}
 	public start(url: string): Promise<Loaded> {
 		const I: Hitomi_La = this;
 
@@ -54,20 +19,11 @@ class Hitomi_La {
 			// TODO: none
 		};
 		return new Promise<Loaded>(async (resolve, rejects) => {
-			async function recursive(gallery?: GalleryBlock) {
-				gallery = gallery || await request.get(`https://ltn.hitomi.la/galleries/${I.ID(url)}.js`).then((callback) => {
-					return callback.status.code === 404 ? undefined : utility.extract(`${callback.content.encode};`, "galleryinfo", "object");
-				});
-				if (!gallery) {
-					return rejects(404);
-				}
-				if (I.common_js) {
-					for (let index: number = 0; index < gallery.files.length; index++) {
-						links[index] = eval(I.common_js + "url_from_url_from_hash(gallery.id, gallery.files[index]);") as string;
-					}
+			hitomi_la.read(this.ID(url)).then((gallery) => {
+				hitomi_la.files(gallery).then((files) => {
 					return resolve({
 						title: gallery.title,
-						links: links,
+						links: files,
 						options: options,
 						placeholders: {
 							id: gallery.id,
@@ -75,13 +31,8 @@ class Hitomi_La {
 							language: gallery.language
 						}
 					});
-				} else {
-					setTimeout(() => {
-						return recursive(gallery);
-					}, 1000);
-				}
-			}
-			return recursive();
+				})
+			});
 		});
 	}
 	public ID(url: string): number {

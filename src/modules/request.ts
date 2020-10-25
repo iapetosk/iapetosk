@@ -24,7 +24,8 @@ export type PrivateOptions = {
 export type requestResponse = {
 	content: {
 		buffer: Buffer,
-		encode: string;
+		encode: string,
+		headers: Record<string, string | string[] | undefined>;
 	},
 	status: {
 		code?: number,
@@ -129,11 +130,13 @@ class request {
 							writable.end();
 						}
 						const buffer: Buffer = Buffer.concat(chunks);
-						// debug
+
+						//debug
 						console.log({
 							content: {
 								buffer: buffer,
-								encode: buffer.toString(options.encoding)
+								encode: buffer.toString(options.encoding),
+								headers: response.headers
 							},
 							status: {
 								code: response.statusCode,
@@ -143,7 +146,8 @@ class request {
 						return resolve({
 							content: {
 								buffer: buffer,
-								encode: buffer.toString(options.encoding)
+								encode: buffer.toString(options.encoding),
+								headers: response.headers
 							},
 							status: {
 								code: response.statusCode,
