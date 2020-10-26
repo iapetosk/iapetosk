@@ -32,7 +32,18 @@ export type Filter = Record<Type, {
 	action: Action,
 	value: string;
 }[]>;
-export type Type = "language" | "type" | "series" | "artist" | "group" | "character" | "male" | "female" | "id" | "custom";
+export type Type = (
+	"id"		|
+	"type"		|
+	"language"	|
+	"character"	|
+	"series"	|
+	"artist"	|
+	"group"		|
+	"male"		|
+	"female"	|
+	"custom"
+);
 export enum Action {
 	POSITIVE,
 	NEGATIVE
@@ -58,7 +69,7 @@ class Hitomi_La {
 			for (const type of Object.keys(filter)) {
 				switch (type) {
 					case "language": {
-						if (filter.type.length + filter.series.length + filter.artist.length + filter.group.length + filter.character.length + filter.male.length + filter.female.length + filter.id.length + filter.custom.length) {
+						if (Object.values(filter).length - filter.language.length > 0) {
 							break;
 						}
 						for (let index: number = 0; index < filter[type as Type].length; index++) {
@@ -110,9 +121,9 @@ class Hitomi_La {
 					action: Action.POSITIVE,
 					url: [...URLs[Action.POSITIVE], ...URLs[Action.NEGATIVE]][index]
 				};
-
+				
 				if (SINGULAR || !Hitomi_La.collection[shortcut.url]) {
-					await request.get(URLs[0][0], { encoding: "binary", headers: SINGULAR ? { "range": `bytes=${page.index * page.size * 4}-${page.index * page.size * 8 - 1}` } : {} }).then((callback) => {
+					await request.get(shortcut.url, { encoding: "binary", headers: SINGULAR ? { "range": `bytes=${page.index * page.size * 4}-${page.index * page.size * 8 - 1}` } : {} }).then((callback) => {
 						switch (callback.status.code) {
 							case 200:
 							case 206: {
