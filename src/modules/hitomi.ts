@@ -121,7 +121,7 @@ class Hitomi_La {
 					action: Action.POSITIVE,
 					url: [...URLs[Action.POSITIVE], ...URLs[Action.NEGATIVE]][index]
 				};
-				
+
 				if (SINGULAR || !Hitomi_La.collection[shortcut.url]) {
 					await request.get(shortcut.url, { encoding: "binary", headers: SINGULAR ? { "range": `bytes=${page.index * page.size * 4}-${page.index * page.size * 8 - 1}` } : {} }).then((callback) => {
 						switch (callback.status.code) {
