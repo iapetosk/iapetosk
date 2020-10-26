@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 
-class utility {
+class Utility {
 	public index_of<type>(array: (type | RegExp)[], value: type): number {
 		for (let index: number = 0; index < array.length; index++) {
 			if (array[index] instanceof RegExp ? (array[index] as RegExp).test(String(value)) : array[index] === value) {
@@ -95,4 +95,4 @@ class utility {
 		fs.writeFileSync(directory, content);
 	}
 }
-export default (new utility());
+export default (new Utility());
