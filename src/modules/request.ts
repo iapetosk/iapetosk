@@ -8,7 +8,7 @@ import utility from "@/modules/utility";
 
 import { File } from "@/modules/download";
 
-export type requestOptions = PartialOptions & PrivateOptions & {
+export type RequestOptions = PartialOptions & PrivateOptions & {
 	url: string,
 	method: "GET" | "PUT" | "POST" | "DELETE";
 };
@@ -21,7 +21,7 @@ export type PartialOptions = {
 export type PrivateOptions = {
 	redirects?: number;
 };
-export type requestResponse = {
+export type RequestResponse = {
 	content: {
 		buffer: Buffer,
 		encode: string,
@@ -32,7 +32,7 @@ export type requestResponse = {
 		message?: string;
 	};
 };
-class request {
+class Request {
 	readonly agent: https.Agent = new https.Agent({});
 	private max_redirects: number;
 	constructor(max_redirects: number = 1) {
@@ -43,10 +43,10 @@ class request {
 			return tls.connect({ ...options, servername: undefined }, callback);
 		};
 	}
-	public async send(options: requestOptions, file?: File): Promise<requestResponse> {
-		const I: request = this;
-		return new Promise<requestResponse>((resolve, rejects) => {
-			function recursive(options: requestOptions, file?: File): void {
+	public async send(options: RequestOptions, file?: File): Promise<RequestResponse> {
+		const I: Request = this;
+		return new Promise<RequestResponse>((resolve, rejects) => {
+			function recursive(options: RequestOptions, file?: File): void {
 				// content
 				const chunks: Buffer[] = [];
 				// send request
@@ -64,11 +64,11 @@ class request {
 						// clone original options
 						const override: {
 							changed: number,
-							options: requestOptions;
+							options: RequestOptions;
 						} = {
 							changed: 0,
 							options: new Proxy({ ...options }, {
-								set(target: requestOptions, key: never, value: never): boolean {
+								set(target: RequestOptions, key: never, value: never): boolean {
 									// is changed!
 									override.changed++;
 									// update property
@@ -166,16 +166,16 @@ class request {
 			return recursive(options, file);
 		});
 	};
-	public async get(url: string, options: PartialOptions = {}, file?: File): Promise<requestResponse> {
+	public async get(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
 		return this.send({ url: url, method: "GET", ...options }, file);
 	}
-	public async put(url: string, options: PartialOptions = {}, file?: File): Promise<requestResponse> {
+	public async put(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
 		return this.send({ url: url, method: "PUT", ...options }, file);
 	}
-	public async post(url: string, options: PartialOptions = {}, file?: File): Promise<requestResponse> {
+	public async post(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
 		return this.send({ url: url, method: "POST", ...options }, file);
 	}
-	public async delete(url: string, options: PartialOptions = {}, file?: File): Promise<requestResponse> {
+	public async delete(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
 		return this.send({ url: url, method: "DELETE", ...options }, file);
 	}
 	public parse(url: string): { host: string, path: string; } {
@@ -189,4 +189,4 @@ class request {
 		return new RegExp(/^https/).test(url);
 	}
 }
-export default (new request());
+export default (new Request());
