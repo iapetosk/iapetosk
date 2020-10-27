@@ -8,7 +8,7 @@ export type TitleBarState = {
 	fullscreen: boolean;
 };
 
-class TitleBar extends React.Component<TitleBarState, any> {
+class TitleBar extends React.Component<TitleBarState> {
 	readonly app = nw.Window.get();
 	public state: TitleBarState;
 	constructor(properties: TitleBarState) {

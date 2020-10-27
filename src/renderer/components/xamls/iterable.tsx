@@ -16,7 +16,7 @@ import { Status, Thread } from "@/modules/download";
 
 export type IterableState = {};
 
-class Iterable extends React.Component<IterableState, any> {
+class Iterable extends React.Component<IterableState> {
 	public state: IterableState;
 	constructor(properties: IterableState) {
 		super(properties);

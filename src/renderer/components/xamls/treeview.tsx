@@ -17,7 +17,7 @@ export type TreeViewState = {
 	};
 };
 
-class TreeView extends React.Component<TreeViewState, any> {
+class TreeView extends React.Component<TreeViewState> {
 	public state: TreeViewState;
 	constructor(properties: TreeViewState) {
 		super(properties);

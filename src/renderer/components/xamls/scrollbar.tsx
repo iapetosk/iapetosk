@@ -8,11 +8,11 @@ import scroll from "@/scheme/scroll";
 
 import { Scheme } from "@/scheme";
 
-export type scrollBarState = {};
+export type ScrollBarState = {};
 
-class scrollBar extends React.Component<Object, scrollBarState> {
-	public state: scrollBarState;
-	constructor(properties: scrollBarState) {
+class ScrollBar extends React.Component<ScrollBarState> {
+	public state: ScrollBarState;
+	constructor(properties: ScrollBarState) {
 		super(properties);
 		this.state = { ...properties };
 
@@ -33,4 +33,4 @@ class scrollBar extends React.Component<Object, scrollBarState> {
 		);
 	}
 }
-export default scrollBar;
+export default ScrollBar;
