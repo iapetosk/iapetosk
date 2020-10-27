@@ -5,7 +5,7 @@ import * as API from "@/assets/modules.json";
 import utility from "@/modules/utility";
 import storage from "@/modules/storage";
 import request from "@/modules/request";
-import Worker from "@/scheme/worker";
+import worker from "@/scheme/worker";
 
 import { PartialOptions } from "@/modules/request";
 
@@ -87,7 +87,7 @@ export class Download {
 							break;
 						}
 						default: {
-							Worker.override(thread.id, thread);
+							worker.define(thread.id, thread);
 							break;
 						}
 					}
@@ -106,7 +106,7 @@ export class Download {
 			const valid: number[] = [];
 
 			// update thread
-			Worker.override(thread.id, thread);
+			worker.define(thread.id, thread);
 
 			// observe thread
 			thread = new Proxy(thread, {
@@ -118,13 +118,13 @@ export class Download {
 					// update storage
 					storage.set_data(String(target.id), target);
 					// update worker
-					Worker.override(target.id, target);
+					worker.define(target.id, target);
 					// approve
 					return true;
 				}
 			});
 			function next(): void {
-				Worker.get(Status.QUEUED).every((value, index) => {
+				worker.get(Status.QUEUED).every((value, index) => {
 					if (index) {
 						return resolve();
 					}
@@ -179,7 +179,7 @@ export class Download {
 				}
 			}
 			// maximum thread exceeded
-			if (this.max_threads <= Worker.get(Status.WORKING).length) {
+			if (this.max_threads <= worker.get(Status.WORKING).length) {
 				thread.status = Status.QUEUED;
 				return resolve();
 			}
@@ -207,9 +207,9 @@ export class Download {
 	public remove(id: number): Promise<void> {
 		return new Promise<void>((resolve, rejects): void => {
 			// delete folder with files within
-			fs.rmdirSync(path.dirname(Worker.get(id)[0]?.files[0].path), { recursive: true });
+			fs.rmdirSync(path.dirname(worker.get(id)[0]?.files[0].path), { recursive: true });
 			// update worker
-			Worker.override(id, undefined);
+			worker.define(id, undefined);
 			// update storage
 			storage.un_register(String(id));
 
