@@ -1,20 +1,14 @@
-import Listener from "@/modules/listener";
+import { Scheme, Schema } from "@/scheme";
 
-import { Scheme } from "@/scheme";
-
-class Query {
-	private static state: string = "";
-	public get(): typeof Query.state {
-		return Query.state;
+class Query extends Schema<string> {
+	public get() {
+		return this.$get();
 	}
-	public set(value: typeof Query.state): void {
-		// listener (new, old)
-		Listener.emit(Scheme.QUERY, value, this.get());
-		// override
-		Query.state = value;
+	public set(value: Query["state"]) {
+		return this.$set(value);
 	}
 	public clear(): void {
 		this.set("");
 	}
 }
-export default (new Query());
+export default (new Query("", Scheme.QUERY));

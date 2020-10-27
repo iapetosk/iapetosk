@@ -2,12 +2,5 @@
 	"hitomi": [
 		"^https?:\\\/\\\/hitomi.la\\\/galleries\\\/([\\d]+).html$",
 		"^https?:\\\/\\\/hitomi.la\\\/(manga|doujinshi|gamecg|cg|reader)\\\/([\\D\\d]+)-([\\D\\d]+)-([\\d]+).html$"
-	],
-	"manamoa": [
-		"^https?:\\\/\\\/manamoa.net\\\/bbs\\\/board.php\\?bo_table=manga&wr_id=([\\d]+)$"
-	],
-	"jmana": [
-		"^https?:\\\/\\\/jmana.net\\\/bookid\\\/([\\d]+)$",
-		"^https?:\\\/\\\/jmana.net\\\/bookdetail\\?bookname=([\\D\\d]+)&bookdetail=([\\d]+)$"
 	]
 }

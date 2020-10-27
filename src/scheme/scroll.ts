@@ -1,29 +1,13 @@
-import Listener from "@/modules/listener";
 import utility from "@/modules/utility";
 
-import { Scheme } from "@/scheme";
+import { Scheme, Schema } from "@/scheme";
 
-class Scroll {
-	private static state: {
-		length: number,
-		index: number,
-		size: number;
-	} = {
-		length: 0,
-		index: 0,
-		size: 0
-	};
-	public get(): typeof Scroll.state {
-		return Scroll.state;
+class Scroll extends Schema<{ length: number, index: number, size: number; }> {
+	public get() {
+		return this.$get();
 	}
-	public set(value: typeof Scroll.state): void {
-		// listener (new, old)
-		Listener.emit(Scheme.SCROLL, value, this.get());
-		// override
-		Scroll.state = {
-			...value,
-			index: utility.clamp(value.index, 0, value.size - 1)
-		};
+	public set(value: Scroll["state"]) {
+		return this.$set({ ...value, index: utility.clamp(value.index, 0, value.size - 1) });
 	}
 }
-export default (new Scroll());
+export default (new Scroll({ length: 0, index: 0, size: 0 }, Scheme.SCROLL));
