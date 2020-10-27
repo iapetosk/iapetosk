@@ -1,20 +1,14 @@
-import Listener from "@/modules/listener";
+import { Scheme, Schema } from "@/scheme";
+import { Thread, Status } from "@/modules/download";
 
-import { Scheme } from "@/scheme";
-import { Status, Thread } from "@/modules/download";
-
-class Worker {
-	private static state: Thread[] = [];
-	public get(filter?: number | Status): typeof Worker.state {
-		return filter ? Worker.state.filter((value) => { return typeof filter === typeof Status ? value.status === filter : value.id === filter; }) : Worker.state;
+class Worker extends Schema<Thread[]> {
+	public get(condition?: number | Status) {
+		return condition ? this.$get().filter((value) => { return typeof condition === typeof Status ? value.status === condition : value.id === condition; }) : this.$get();
 	}
-	public set(value: typeof Worker.state) {
-		// listener (new, old)
-		Listener.emit(Scheme.WORKER, value, Worker.state);
-		// override
-		Worker.state = value
+	public set(value: Worker["state"]) {
+		return this.$set(value);
 	}
-	public override(id: number, thread?: Thread): void {
+	public define(id: number, thread?: Thread): void {
 		let index: number = this.get().length;
 
 		for (const [$index, value] of this.get().entries()) {
@@ -31,4 +25,4 @@ class Worker {
 		this.set([...this.get().slice(0, index), ...(thread ? [thread] : []), ...this.get().slice(index + 1)]);
 	}
 }
-export default (new Worker());
+export default (new Worker([], Scheme.WORKER));
