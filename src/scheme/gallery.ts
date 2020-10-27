@@ -1,4 +1,4 @@
-import { GalleryBlock } from '@/modules/hitomi';
+import { GalleryBlock } from "@/modules/hitomi";
 import { Scheme, Schema } from "@/scheme";
 
 class Gallery extends Schema<GalleryBlock[]> {
