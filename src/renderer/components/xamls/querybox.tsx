@@ -11,7 +11,7 @@ import { Scheme } from "@/scheme";
 
 export type QueryBoxState = {};
 
-class QueryBox extends React.Component<QueryBoxState, any> {
+class QueryBox extends React.Component<QueryBoxState> {
 	public state: QueryBoxState;
 	constructor(properties: QueryBoxState) {
 		super(properties);

@@ -4,7 +4,7 @@ import "@/renderer/components/styles/taskbar.scss";
 
 export type TaskBarState = {};
 
-class TaskBar extends React.Component<Object, TaskBarState> {
+class TaskBar extends React.Component<TaskBarState> {
 	public state: TaskBarState;
 	constructor(properties: TaskBarState) {
 		super(properties);

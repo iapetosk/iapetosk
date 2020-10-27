@@ -13,7 +13,7 @@ import Listener from "@/modules/listener";
 
 export type AppState = {};
 
-class App extends React.Component<AppState, any> {
+class App extends React.Component<AppState> {
 	public state: AppState;
 	constructor(properties: AppState) {
 		super(properties);
