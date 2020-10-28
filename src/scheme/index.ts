@@ -13,10 +13,10 @@ export class Schema<type> {
 		this.state = init;
 		this.event = event;
 	}
-	public $get(): type {
+	protected $get(): type {
 		return this.state;
 	}
-	public $set(value: type): void {
+	protected $set(value: type): void {
 		// listener (new, old)
 		listener.emit(this.event, value, this.$get());
 		// override
