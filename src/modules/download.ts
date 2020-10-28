@@ -21,7 +21,7 @@ export enum Status {
 	QUEUED,
 	PAUSED,
 	ERROR
-}
+};
 export type Loader = {
 	start(url: string): Promise<Loaded>;
 };

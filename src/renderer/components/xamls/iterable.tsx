@@ -31,10 +31,10 @@ class Iterable extends React.Component<IterableState> {
 			const
 				target: HTMLElement = document.getElementById("scrollable")!,
 				height: number = utility.truncate(target.scrollHeight / worker.get().length, 1),
-				begin: number = target.scrollTop / height,
-				end: number = (target.scrollTop + target.clientHeight) / height;
+				start: number = target.scrollTop / height,
+				final: number = (target.scrollTop + target.clientHeight) / height;
 
-			target.scroll(0, height * (scroll.get().index - Math.floor((end - begin) / 2)));
+			target.scroll(0, height * (scroll.get().index - Math.floor((final - start) / 2)));
 
 			this.setState({ ...this.state });
 		});

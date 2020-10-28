@@ -2,10 +2,10 @@ import { Scheme, Schema } from "@/scheme";
 import { Thread, Status } from "@/modules/download";
 
 class Worker extends Schema<Thread[]> {
-	public get(condition?: number | Status) {
+	public get(condition?: number | Status): Worker["state"] {
 		return condition ? this.$get().filter((value) => { return typeof condition === typeof Status ? value.status === condition : value.id === condition; }) : this.$get();
 	}
-	public set(value: Worker["state"]) {
+	public set(value: Worker["state"]): void {
 		return this.$set(value);
 	}
 	public define(id: number, thread?: Thread): void {
