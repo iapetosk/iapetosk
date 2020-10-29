@@ -40,6 +40,7 @@ export type Type = (
 	"series"	|
 	"artist"	|
 	"group"		|
+	"tag"		|
 	"male"		|
 	"female"	|
 	"custom"
@@ -52,20 +53,25 @@ export enum Action {
 class Hitomi_La {
 	private static common_js: string = "";
 	private static index_all: string = "https://ltn.hitomi.la/index-all.nozomi";
-	private static collection: Record<string, number[]> = {};
+	private static collection: { reference: Record<string, number[]>, gallery: Record<number, GalleryBlock>; } = { reference: {}, gallery: {} };
 	constructor() {
 		request.get("https://ltn.hitomi.la/common.js").then((callback) => {
 			Hitomi_La.common_js = callback.content.encode.split(/function show_loading/)![0];
 		});
 	}
-	public search(filter: Filter, page: { size: number, index: number; }): Promise<{ IDs: number[], SIZE: number; }> {
+	public search(filter: Filter, page: { size: number, index: number; }): Promise<{ list: number[], size: number; }> {
+		// array of gallery IDs
 		let IDs: number[] = [];
+		// length of gallery IDs
 		let SIZE: number = 0;
+		// request counts
+		let COUNT: number = 0;
+		// request adresses
 		let URLs: Record<Action, string[]> = {
 			[Action.POSITIVE]: [],
 			[Action.NEGATIVE]: []
 		};
-		return new Promise<{ IDs: number[], SIZE: number; }>(async (resolve, rejects) => {
+		return new Promise<{ list: number[], size: number; }>((resolve, rejects) => {
 			for (const type of Object.keys(filter)) {
 				switch (type) {
 					case "language": {
@@ -95,7 +101,9 @@ class Hitomi_La {
 
 			function $(action: Action, list: number[]): void {
 				const collection: Set<number> = new Set(list);
-
+				// increase slot
+				COUNT++;
+				// determine action
 				switch (action) {
 					case Action.POSITIVE: {
 						if (IDs.length) {
@@ -112,6 +120,16 @@ class Hitomi_La {
 						break;
 					}
 				}
+				// none async resolve fix
+				if (COUNT === URLs[Action.POSITIVE].length + URLs[Action.NEGATIVE].length) {
+					// debug
+					console.table(URLs);
+					// return
+					return resolve({
+						list: IDs,
+						size: SIZE + (SINGULAR ? 0 : IDs.length)
+					});
+				}
 			};
 			for (let index: number = 0; index < URLs[Action.POSITIVE].length + URLs[Action.NEGATIVE].length; index++) {
 				const shortcut: {
@@ -122,8 +140,8 @@ class Hitomi_La {
 					url: [...URLs[Action.POSITIVE], ...URLs[Action.NEGATIVE]][index]
 				};
 
-				if (SINGULAR || !Hitomi_La.collection[shortcut.url]) {
-					await request.get(shortcut.url, { encoding: "binary", headers: SINGULAR ? { "range": `bytes=${page.index * page.size * 4}-${page.index * page.size * 8 - 1}` } : {} }).then((callback) => {
+				if (SINGULAR || !Hitomi_La.collection.reference[shortcut.url]) {
+					request.get(shortcut.url, { encoding: "binary", headers: SINGULAR ? { "range": `bytes=${page.index * page.size * 4}-${page.index * page.size * 8 - 1}` } : {} }).then((callback) => {
 						switch (callback.status.code) {
 							case 200:
 							case 206: {
@@ -136,7 +154,7 @@ class Hitomi_La {
 								if (SINGULAR) {
 									SIZE += Number((callback.content.headers["content-range"]! as string).replace(/^bytes\s[0-9]+-[0-9]+\//, "")) / 4;
 								} else {
-									Hitomi_La.collection[shortcut.url] = list;
+									Hitomi_La.collection.reference[shortcut.url] = list;
 								}
 								$(shortcut.action, list);
 								break;
@@ -144,23 +162,26 @@ class Hitomi_La {
 						}
 					});
 				} else {
-					$(shortcut.action, Hitomi_La.collection[shortcut.url]);
+					$(shortcut.action, Hitomi_La.collection.reference[shortcut.url]);
 				}
 			}
-			// debug
-			console.table(URLs);
-
-			return resolve({
-				IDs: IDs,
-				SIZE: SIZE
-			});
 		});
 	}
 	public read(id: number): Promise<GalleryBlock> {
-		return new Promise<GalleryBlock>((resolve, rejects) => {
-			request.get(`https://ltn.hitomi.la/galleries/${id}.js`).then((callback) => {
-				return resolve(callback.status.code === 404 ? undefined : utility.extract(`${callback.content.encode};`, "galleryinfo", "object"));
-			});
+		return new Promise<GalleryBlock>(async (resolve, rejects) => {
+			return resolve(Hitomi_La.collection.gallery[id] || await request.get(`https://ltn.hitomi.la/galleries/${id}.js`).then((callback) => {
+				switch (callback.status.code) {
+					case 404: {
+						return undefined;
+					}
+					default: {
+						// save
+						Hitomi_La.collection.gallery[id] = utility.extract(`${callback.content.encode};`, "galleryinfo", "object");
+						// resolve
+						return Hitomi_La.collection.gallery[id];
+					}
+				}
+			}));
 		});
 	}
 	public files(gallery: GalleryBlock): Promise<string[]> {

@@ -3,11 +3,13 @@ import * as React from "react";
 import "@/renderer/components/styles/querybox.scss";
 
 import listener from "@/modules/listener";
-import download from "@/modules/download";
 import utility from "@/modules/utility";
+import history from "@/scheme/history";
+import hitomi from "@/modules/hitomi";
 import query from "@/scheme/query";
 
 import { Scheme } from "@/scheme";
+import { Filter, Type, Action } from "@/modules/hitomi";
 
 export type QueryBoxState = {};
 
@@ -18,18 +20,53 @@ class QueryBox extends React.Component<QueryBoxState> {
 		this.state = { ...properties };
 
 		listener.on(Scheme.QUERY, ($new: string) => {
+			// query.clear() also emit listener
 			if ($new && $new.length) {
-				$new.split(/\s+/).forEach((link) => {
-					download.evaluate(link).then((callback) => {
-						download.create(callback).then(() => {
-							// TODO: none
-						});
-					});
+				// create filter
+				const filter: Filter = {
+					id: [],
+					type: [],
+					language: [],
+					character: [],
+					series: [],
+					artist: [],
+					group: [],
+					tag: [],
+					male: [],
+					female: [],
+					custom: []
+				};
+				// analyze each words
+				for (const keyword of $new.split(/\s+/g)) {
+					// remove prefix, spacing underscore, split by field and value
+					const analyze: string[] = keyword.replace(/^-/, "").replace(/_/g, "%20").split(/:/);
+					// vertify field
+					switch (analyze[0]) {
+						case "id":
+						case "type":
+						case "language":
+						case "character":
+						case "series":
+						case "artist":
+						case "group":
+						case "tag":
+						case "male":
+						case "female":
+						case "custom": {
+							filter[analyze[0] as Type].push({ action: /^-/.test(keyword) ? Action.NEGATIVE : Action.POSITIVE, value: analyze[1] });
+							break;
+						}
+					}
+				}
+				// search hitomi
+				hitomi.search(filter, { index: 0, size: 25 }).then((callback) => {
+					// write history
+					history.set([{ filter: filter, index: 0, size: callback.size }]);
+					// clear QUERY data
+					query.clear();
+					// clear HTML input
+					(document.getElementById("input")! as HTMLInputElement).value = "";
 				});
-				// clear QUERY data
-				query.clear();
-				// clear HTML input
-				(document.getElementById("input")! as HTMLInputElement).value = "";
 			}
 		});
 	}
@@ -61,7 +98,7 @@ class QueryBox extends React.Component<QueryBoxState> {
 							// after selection
 							utility.devide(target.value, target.selectionEnd!).pop()
 						].join("");
-						
+
 						event.preventDefault();
 					}}>
 				</input>
