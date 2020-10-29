@@ -66,8 +66,8 @@ class TreeView extends React.Component<TreeViewState> {
 		path = path instanceof Array ? path[0] : path;
 		// for unknown reason, sometimes path is undefined
 		if (path) {
-			path = new RegExp(/^\/\/?/).test(path) ? path : [hostname, path].join("/");
-			path = new RegExp(/^https?/).test(path) ? path : `https://${path}`;
+			path = /^\/\/?/.test(path) ? path : [hostname, path].join("/");
+			path = /^https?/.test(path) ? path : `https://${path}`;
 		}
 		return path;
 	}

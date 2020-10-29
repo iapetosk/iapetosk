@@ -1,4 +1,4 @@
-import hitomi_la from "@/modules/hitomi";
+import hitomi from "@/modules/hitomi";
 
 import { PartialOptions } from "@/modules/request";
 import { PlaceHolders, Loaded } from "@/modules/download";
@@ -19,8 +19,8 @@ class Hitomi_La {
 			// TODO: none
 		};
 		return new Promise<Loaded>(async (resolve, rejects) => {
-			hitomi_la.read(this.ID(url)).then((gallery) => {
-				hitomi_la.files(gallery).then((files) => {
+			hitomi.read(this.ID(url)).then((gallery) => {
+				hitomi.files(gallery).then((files) => {
 					return resolve({
 						title: gallery.title,
 						links: files,
@@ -36,7 +36,7 @@ class Hitomi_La {
 		});
 	}
 	public ID(url: string): number {
-		return Number(new RegExp(/([0-9]+).html$/).exec(url)![1]);
+		return Number(/([0-9]+).html$/.exec(url)![1]);
 	}
 }
 

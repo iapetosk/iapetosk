@@ -186,7 +186,7 @@ class Request {
 		};
 	}
 	public SSL(url: string): boolean {
-		return new RegExp(/^https/).test(url);
+		return /^https/.test(url);
 	}
 }
 export default (new Request());

@@ -4,7 +4,8 @@ export enum Scheme {
 	QUERY = "query",
 	SCROLL = "scroll",
 	WORKER = "worker",
-	GALLERY = "gallery"
+	PAGING = "paging",
+	HISTORY = "history"
 };
 export class Schema<type> {
 	private state: type;
