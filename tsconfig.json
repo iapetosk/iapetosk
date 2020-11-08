@@ -7,7 +7,7 @@
 		"jsx": "react",
 		"paths": {
 			"@/*": [
-				"src/*"
+				"source/*"
 			]
 		},
 		"strict": true,
@@ -23,7 +23,7 @@
 		"esnext"
 	],
 	"files": [
-		"src/typings/jsx.ts"
+		"source/typings/jsx.ts"
 	],
 	"include": [
 		"**/*.ts",

@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import "@/renderer/components/styles/taskbar.scss";
+import "./index.scss";
 
 export type TaskBarState = {};
 
@@ -12,7 +12,7 @@ class TaskBar extends React.Component<TaskBarState> {
 	}
 	public render(): JSX.Element {
 		return (
-			<footer id="taskbar" className="contrast center">Copyright (c) {new Date().getFullYear()} Sombian</footer>
+			<section id="taskbar" class="contrast center">Copyright (c) {new Date().getFullYear()} Sombian</section>
 		);
 	}
 }

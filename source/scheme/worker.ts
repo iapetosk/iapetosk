@@ -8,7 +8,7 @@ class Worker extends Schema<Thread[]> {
 	public set(value: Worker["state"]): void {
 		return this.$set(value);
 	}
-	public define(id: number, thread?: Thread): void {
+	public index(id: number, thread?: Thread): void {
 		let index: number = this.get().length;
 
 		for (const [$index, value] of this.get().entries()) {

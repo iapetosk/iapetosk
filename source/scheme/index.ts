@@ -2,6 +2,7 @@ import listener from "@/modules/listener";
 
 export enum Scheme {
 	QUERY = "query",
+	ROUTER = "route",
 	SCROLL = "scroll",
 	WORKER = "worker",
 	PAGING = "paging",

@@ -1,0 +1,95 @@
+:root {
+	// colour(s)
+	--colour_0: #070707;
+	--colour_1: #111111;
+	--colour_2: #1b1b1b;
+	--colour_3: #252525;
+	--colour_4: #2e2e2e;
+	--colour_5: #383838;
+	--colour_6: #424242;
+	--colour_7: #4c4c4c;
+	--colour_8: #565656;
+	--colour_9: #5f5f5f;
+	--colour_error: #ff505050;
+	--colour_success: #99ff9950;
+	--colour_warning: #ff990050;
+	// common
+	--transition: 250ms ease-in-out;
+	// component(s)
+	--scrollbar-width: 10px;
+	--querybox-height: 25px;
+	--titlebar-height: 30px;
+	--taskbar-height: 30px;
+}
+// HTML5
+html,
+body {
+	user-select: none;
+	overflow: hidden;
+	font-size: small;
+	font-family: sans-serif;
+	color: var(--colour_6);
+	caret-color: var(--colour_5);
+}
+* {
+	margin: 0px;
+	padding: 0px;
+	border: none;
+	outline: none;
+	background: none;
+	box-sizing: border-box;
+}
+svg {
+	pointer-events: none;
+	top: 0px;
+	left: 0px;
+	right: 0px;
+	bottom: 0px;
+	margin: auto;
+}
+::selection {
+	background: var(--colour_6);
+}
+// class(es)
+.draggable {
+	-webkit-app-region: drag;
+}
+.none-draggable {
+	-webkit-app-region: no-drag;
+}
+.contrast {
+	border-width: thin;
+	border-style: solid;
+	border-color: var(--colour_0);
+}
+.center {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+// @see (app.tsx)
+#container {
+	> * {
+		position: fixed;
+	}
+	> #titlebar {
+		z-index: 999;
+	}
+	> #content {
+		width: 100%;
+		top: var(--titlebar-height);
+		left: 0px;
+		right: 0px;
+		bottom: var(--taskbar-height);
+		> * {
+			width: 100%;
+			height: 100%;
+			border-top-width: 0px;
+			border-bottom-width: 0px;
+			background-color: var(--colour_2);
+		}
+	}
+	> #taskbar {
+		z-index: 999;
+	}
+}

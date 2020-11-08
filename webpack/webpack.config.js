@@ -1,5 +1,4 @@
 const path = require("path");
-const { dependencies } = require("../package");
 
 function resolve_path() {
 	return path.resolve(__dirname, "..", ...arguments);
@@ -9,17 +8,8 @@ module.exports = {
 	target: "node-webkit",
 	stats: "errors-only",
 	entry: {
-		renderer: resolve_path("src", "renderer", "index.tsx")
+		renderer: resolve_path("source", "renderer", "index.tsx")
 	},
-	externals: [
-		(context, request, callback) => {
-			if (dependencies && dependencies[request]) {
-				return callback(null, `commonjs ${request}`);
-			} else {
-				callback();
-			}
-		}
-	],
 	module: {
 		rules: [
 			{
@@ -42,7 +32,7 @@ module.exports = {
 	},
 	resolve: {
 		alias: {
-			"@": resolve_path("src")
+			"@": resolve_path("source")
 		},
 		extensions: [".js", ".jsx", ".ts", ".tsx", ".scss", ".json"]
 	},
@@ -58,7 +48,6 @@ module.exports = {
 					},
 					compress: {
 						ecma: 2020,
-						unsafe: true,
 						drop_console: true
 					}
 				}
@@ -68,7 +57,7 @@ module.exports = {
 	plugins: [
 		new (require("html-webpack-plugin"))({
 			filename: "index.html",
-			template: resolve_path("src", "index.html")
+			template: resolve_path("source", "index.html")
 		})
 	]
 };
