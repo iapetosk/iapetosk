@@ -25,8 +25,8 @@ const compiler = webpack({
 					path: "build/",
 					name: `${package.name}.exe`,
 					icon: {
-						file: "src/assets/icons/icon.ico",
-						task: "src/assets/icons/icon.png"
+						file: "source/assets/icons/icon.ico",
+						task: "source/assets/icons/icon.png"
 					}
 				}
 			};

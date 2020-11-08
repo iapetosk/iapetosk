@@ -1,35 +1,32 @@
 #titlebar {
 	width: 100%;
 	height: var(--titlebar-height);
-	background-color: var(--scheme-1);
-	#focus,
-	#restore,
-	#close {
+	background-color: var(--colour_1);
+	> * {
 		position: absolute;
 		width: 45px;
 		height: 100%;
 		transition: background-color var(--transition);
 		will-change: background-color;
 		&:hover {
-			background-color: var(--scheme-2);
+			background-color: var(--colour_2);
 		}
 		> svg {
-			position: absolute;
-			width: 12.5px;
-			height: 12.5px;
-			fill: var(--scheme-9);
+			width: 11.5px;
+			height: 11.5px;
+			fill: var(--colour_9);
 		}
 	}
-	#focus {
+	> #focus {
 		right: 90px;
 	}
-	#restore {
+	> #restore {
 		right: 45px;
 	}
-	#close {
+	> #close {
 		right: 0px;
 		&:hover {
-			background-color: var(--error);
+			background-color: var(--colour_error);
 		}
 	}
 }

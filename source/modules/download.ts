@@ -87,7 +87,7 @@ export class Download {
 							break;
 						}
 						default: {
-							worker.define(thread.id, thread);
+							worker.index(thread.id, thread);
 							break;
 						}
 					}
@@ -106,7 +106,7 @@ export class Download {
 			const valid: number[] = [];
 
 			// update thread
-			worker.define(thread.id, thread);
+			worker.index(thread.id, thread);
 
 			// observe thread
 			thread = new Proxy(thread, {
@@ -118,7 +118,7 @@ export class Download {
 					// update storage
 					storage.set_data(String(target.id), target);
 					// update worker
-					worker.define(target.id, target);
+					worker.index(target.id, target);
 					// approve
 					return true;
 				}
@@ -209,7 +209,7 @@ export class Download {
 			// delete folder with files within
 			fs.rmdirSync(path.dirname(worker.get(id)[0]?.files[0].path), { recursive: true });
 			// update worker
-			worker.define(id, undefined);
+			worker.index(id, undefined);
 			// update storage
 			storage.un_register(String(id));
 

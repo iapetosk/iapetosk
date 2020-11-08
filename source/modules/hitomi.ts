@@ -1,6 +1,31 @@
 import utility from "@/modules/utility";
 import request from "@/modules/request";
 
+export type Type = (
+	"id"		|
+	"type"		|
+	"language"	|
+	"character"	|
+	"series"	|
+	"artist"	|
+	"group"		|
+	"tag"		|
+	"male"		|
+	"female"	|
+	"custom"
+);
+export enum Action {
+	POSITIVE,
+	NEGATIVE
+}
+export type Filter = Record<Type, {
+	action: Action,
+	value: string;
+}[]>;
+export type Archive = {
+	list: number[],
+	size: number;
+};
 export type GalleryBlock = {
 	id: number,
 	// title
@@ -28,27 +53,6 @@ export type GalleryBlock = {
 	// date
 	date: string;
 };
-export type Filter = Record<Type, {
-	action: Action,
-	value: string;
-}[]>;
-export type Type = (
-	"id"		|
-	"type"		|
-	"language"	|
-	"character"	|
-	"series"	|
-	"artist"	|
-	"group"		|
-	"tag"		|
-	"male"		|
-	"female"	|
-	"custom"
-);
-export enum Action {
-	POSITIVE,
-	NEGATIVE
-}
 
 class Hitomi_La {
 	private static common_js: string = "";
@@ -59,7 +63,7 @@ class Hitomi_La {
 			Hitomi_La.common_js = callback.content.encode.split(/function show_loading/)![0];
 		});
 	}
-	public search(filter: Filter, page: { size: number, index: number; }): Promise<{ list: number[], size: number; }> {
+	public search(filter: Filter, page: { size: number, index: number; }): Promise<Archive> {
 		// array of gallery IDs
 		let IDs: number[] = [];
 		// length of gallery IDs
@@ -71,7 +75,7 @@ class Hitomi_La {
 			[Action.POSITIVE]: [],
 			[Action.NEGATIVE]: []
 		};
-		return new Promise<{ list: number[], size: number; }>((resolve, rejects) => {
+		return new Promise<Archive>((resolve, rejects) => {
 			for (const type of Object.keys(filter)) {
 				switch (type) {
 					case "language": {

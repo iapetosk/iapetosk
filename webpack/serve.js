@@ -26,7 +26,7 @@ compiler.hooks.done.tap("done", () => {
 		});
 	}
 	times++;
-	require("../src/modules/listener").default.emit("reload");
+	require("../source/modules/listener").default.emit("reload");
 });
 
 new webpack_development_server(compiler,
