@@ -2,6 +2,8 @@ import * as React from "react";
 
 import "./index.scss";
 
+import ScrollBar from "@/renderer/components/scrollbar";
+
 export type BrowserState = {};
 
 class Browser extends React.Component<BrowserState> {
@@ -13,7 +15,7 @@ class Browser extends React.Component<BrowserState> {
 	public render(): JSX.Element {
 		return (
 			<section id="browser" class="contrast">
-			
+				<ScrollBar router="browser"></ScrollBar>
 			</section>
 		);
 	}

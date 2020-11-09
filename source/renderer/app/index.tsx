@@ -3,7 +3,7 @@ import * as React from "react";
 import "./index.scss";
 // components
 import TitleBar from "@/renderer/components/titlebar";
-import TaskBar from "@/renderer/components/taskbar";
+import Paging from "@/renderer/components/paging";
 // views
 import Browser from "@/renderer/views/browser";
 import Reader from "@/renderer/views/reader";
@@ -45,7 +45,7 @@ class App extends React.Component<AppState> {
 					}
 				})()}
 				</code>
-				<TaskBar></TaskBar>
+				<Paging></Paging>
 			</main>
 		);
 	}

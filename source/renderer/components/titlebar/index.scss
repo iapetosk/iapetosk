@@ -1,21 +1,11 @@
 #titlebar {
 	width: 100%;
-	height: var(--titlebar-height);
+	height: var(--titlebar_height);
 	background-color: var(--colour_1);
 	> * {
 		position: absolute;
-		width: 45px;
 		height: 100%;
-		transition: background-color var(--transition);
-		will-change: background-color;
-		&:hover {
-			background-color: var(--colour_2);
-		}
-		> svg {
-			width: 11.5px;
-			height: 11.5px;
-			fill: var(--colour_9);
-		}
+		width: 45px;
 	}
 	> #focus {
 		right: 90px;
