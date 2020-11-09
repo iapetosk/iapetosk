@@ -16,10 +16,9 @@
 	// common
 	--transition: 250ms ease-in-out;
 	// component(s)
-	--scrollbar-width: 10px;
-	--querybox-height: 25px;
-	--titlebar-height: 30px;
-	--taskbar-height: 30px;
+	--scrollbar_width: 10px;
+	--titlebar_height: 30px;
+	--paging_height: 30px;
 }
 // HTML5
 html,
@@ -47,6 +46,19 @@ svg {
 	bottom: 0px;
 	margin: auto;
 }
+button[data-type="stereo"] {
+	color: var(--colour_9);
+	transition: color var(--transition), background-color var(--transition);
+	&:hover {
+		background-color: var(--colour_2);
+	}
+	> svg {
+		width: 11.5px;
+		height: 11.5px;
+		fill: var(--colour_9);
+		transition: fill var(--transition);
+	}
+}
 ::selection {
 	background: var(--colour_6);
 }
@@ -54,7 +66,7 @@ svg {
 .draggable {
 	-webkit-app-region: drag;
 }
-.none-draggable {
+.un_draggable {
 	-webkit-app-region: no-drag;
 }
 .contrast {
@@ -77,10 +89,10 @@ svg {
 	}
 	> #content {
 		width: 100%;
-		top: var(--titlebar-height);
+		top: var(--titlebar_height);
 		left: 0px;
 		right: 0px;
-		bottom: var(--taskbar-height);
+		bottom: var(--paging_height);
 		> * {
 			width: 100%;
 			height: 100%;

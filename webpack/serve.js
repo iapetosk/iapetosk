@@ -18,8 +18,8 @@ var times = 0;
 
 compiler.hooks.done.tap("done", () => {
 	if (!times) {
-		const child = require("child_process").spawn("npx.cmd", ["nw", "."], { args: ["--colors"], stdio: [process.stdin, process.stdout, "pipe"] });
-		child.on("close", () => {
+		const NWJS = require("child_process").spawn("npx.cmd", ["nw", "."], { args: ["--colors"], stdio: [process.stdin, process.stdout, "pipe"] });
+		NWJS.on("close", () => {
 			compiler.close(() => {
 				process.exit();
 			});

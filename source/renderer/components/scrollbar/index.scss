@@ -1,6 +1,6 @@
 #scrollbar {
 	position: absolute;
-	width: var(--scrollbar-width);
+	width: var(--scrollbar_width);
 	top: 0px;
 	right: 0px;
 	bottom: 0px;
@@ -11,11 +11,10 @@
 		width: 100%;
 		background-color: var(--colour_2);
 		transition: background-color var(--transition);
-		will-change: background-color;
 		&:nth-child(2n) {
 			background-color: var(--colour_3);
 		}
-		&.highlight {
+		&.active {
 			background-color: var(--colour_success);
 		}
 	}	

@@ -30,10 +30,10 @@ class ScrollBar extends React.Component<ScrollBarState> {
 	}
 	public render(): JSX.Element {
 		return (
-			<section id="scrollbar" class="contrast">
-				{[...new Array(scroll.get().length)].map((value, index) => {
+			<section id="scrollbar" class="contrast" style={{ display: scroll.get().size ? "block" : "none" }}>
+				{[...new Array<number>(scroll.get().metre)].map((value, index) => {
 					return (
-						<button id="metre" class={utility.inline({ highlight: scroll.get().size < scroll.get().length ? (scroll.get().index) * (1.0 / scroll.get().size) < (index + 1.0) / scroll.get().length && (index + 1.0) / scroll.get().length <= (scroll.get().index + 1.0) * (1.0 / scroll.get().size) : (index) * (scroll.get().size / scroll.get().length) <= scroll.get().index && scroll.get().index < (index + 1.0) * (scroll.get().size / scroll.get().length) })} style={{ height: `${100 / scroll.get().length}%` }} key={index}>
+						<button id="metre" class={utility.inline({ "active": scroll.get().size < scroll.get().metre ? (scroll.get().index) * (1 / scroll.get().size) < (index + 1) / scroll.get().metre && (index + 1) / scroll.get().metre <= (scroll.get().index + 1) * (1 / scroll.get().size) : (index) * (scroll.get().size / scroll.get().metre) <= scroll.get().index && scroll.get().index < (index + 1) * (scroll.get().size / scroll.get().metre) })} style={{ height: `${100 / scroll.get().metre}%` }} key={index}>
 						</button>
 					);
 				})}
