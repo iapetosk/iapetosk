@@ -3,7 +3,6 @@ import listener from "@/modules/listener";
 export enum Scheme {
 	QUERY = "query",
 	ROUTER = "route",
-	SCROLL = "scroll",
 	WORKER = "worker",
 	PAGING = "paging",
 	HISTORY = "history"
@@ -19,9 +18,11 @@ export class Schema<type> {
 		return this.state;
 	}
 	protected $set(value: type): void {
-		// listener (new, old)
-		listener.emit(this.event, value, this.$get());
-		// override
-		this.state = value;
+		if (value !== this.$get()) {
+			// listener (new, old)
+			listener.emit(this.event, value, this.$get());
+			// override
+			this.state = value;
+		}
 	}
 }

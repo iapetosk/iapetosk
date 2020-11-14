@@ -9,55 +9,54 @@ export type TitleBarState = {
 };
 
 class TitleBar extends React.Component<TitleBarState> {
-	static readonly NWJS: NWJS_Helpers.win = nw.Window.get();
 	public state: TitleBarState;
 	constructor(properties: TitleBarState) {
 		super(properties);
 		this.state = { ...properties };
 
-		TitleBar.NWJS.on("focus", () => {
+		nw.Window.get().on("focus", () => {
 			this.setState({ ...this.state, focus: true });
 		});
-		TitleBar.NWJS.on("blur", () => {
+		nw.Window.get().on("blur", () => {
 			this.setState({ ...this.state, focus: false });
 		});
-		TitleBar.NWJS.on("maximize", () => {
+		nw.Window.get().on("maximize", () => {
 			this.setState({ ...this.state, restore: true });
 		});
-		TitleBar.NWJS.on("enter-fullscreen", () => {
-			this.setState({ ...this.state, fullscreen: true });
-		});
-		TitleBar.NWJS.on("restore", () => {
+		nw.Window.get().on("restore", () => {
 			this.setState({ ...this.state, restore: false, fullscreen: false });
+		});
+		nw.Window.get().on("enter-fullscreen", () => {
+			this.setState({ ...this.state, fullscreen: true });
 		});
 	}
 	public componentDidUpdate(): void {
 		if (this.state.restore) {
-			TitleBar.NWJS.maximize();
+			nw.Window.get().maximize();
 		} else if (this.state.focus) {
-			TitleBar.NWJS.restore();
+			nw.Window.get().restore();
 		}
 	}
 	public render(): JSX.Element {
 		return (
 			<section id="titlebar" class="contrast draggable">
-				<button id="focus" class="un_draggable" data-type="stereo"
+				<button id="close" class="un_draggable"
 					onClick={() => {
-						TitleBar.NWJS.minimize();
+						nw.Window.get().close();
 					}}
-					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/focus.svg`) }}>
+					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/close.svg`) }}>
 				</button>
-				<button id="restore" class="un_draggable" data-type="stereo"
+				<button id="restore" class="un_draggable"
 					onClick={() => {
 						this.setState({ ...this.state, restore: !this.state.restore });
 					}}
 					dangerouslySetInnerHTML={{ __html: require(this.state.restore ? "!html-loader!@/assets/icons/minimize.svg" : "!html-loader!@/assets/icons/maximize.svg") }}>
 				</button>
-				<button id="close" class="un_draggable" data-type="stereo"
+				<button id="focus" class="un_draggable"
 					onClick={() => {
-						TitleBar.NWJS.close();
+						nw.Window.get().minimize();
 					}}
-					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/close.svg`) }}>
+					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/focus.svg`) }}>
 				</button>
 			</section>
 		);

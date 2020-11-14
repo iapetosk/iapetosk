@@ -1,0 +1,16 @@
+#iterable {
+	overflow-x: hidden;
+	overflow-y: auto;
+	display: grid;
+	height: 100%;
+	padding: 15px;
+	grid-gap: 15px;
+	grid-auto-rows: 475px;
+	grid-template-columns: repeat(auto-fit, minmax(360px, auto));
+	> #gallery {
+		background-color: var(--colour_3);
+		> #thumbnail {
+			
+		}
+	}
+}

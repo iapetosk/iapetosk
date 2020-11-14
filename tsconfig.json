@@ -23,7 +23,8 @@
 		"esnext"
 	],
 	"files": [
-		"source/typings/jsx.ts"
+		"source/typings/jsx.ts",
+		"source/typings/merge.ts"
 	],
 	"include": [
 		"**/*.ts",

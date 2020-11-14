@@ -1,9 +1,4 @@
 #paging {
-	display: flex;
-	justify-content: center;
-	width: 100%;
-	height: var(--paging_height);
-	bottom: 0px;
 	background-color: var(--colour_1);
 	> * {
 		height: 100%;

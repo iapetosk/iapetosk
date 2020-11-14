@@ -2,7 +2,7 @@ import * as React from "react";
 
 import "./index.scss";
 
-import ScrollBar from "@/renderer/components/scrollbar";
+import Iterable from "@/renderer/components/iterable";
 
 export type BrowserState = {};
 
@@ -15,7 +15,7 @@ class Browser extends React.Component<BrowserState> {
 	public render(): JSX.Element {
 		return (
 			<section id="browser" class="contrast">
-				<ScrollBar router="browser"></ScrollBar>
+				<Iterable></Iterable>
 			</section>
 		);
 	}

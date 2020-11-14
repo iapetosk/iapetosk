@@ -1,6 +1,8 @@
 import utility from "@/modules/utility";
 import request from "@/modules/request";
 
+import { RequestResponse } from "@/modules/request";
+
 export type Type = (
 	"id"		|
 	"type"		|
@@ -53,6 +55,13 @@ export type GalleryBlock = {
 	// date
 	date: string;
 };
+export type GalleryIterable = (Merge<GalleryBlock, {
+	files: {
+		url: string,
+		width: number,
+		height: number;
+	}[];
+}>);
 
 class Hitomi_La {
 	private static common_js: string = "";
@@ -60,7 +69,7 @@ class Hitomi_La {
 	private static collection: { reference: Record<string, number[]>, gallery: Record<number, GalleryBlock>; } = { reference: {}, gallery: {} };
 	constructor() {
 		request.get("https://ltn.hitomi.la/common.js").then((callback) => {
-			Hitomi_La.common_js = callback.content.encode.split(/function show_loading/)![0];
+			Hitomi_La.common_js = callback.encode.split(/function show_loading/)![0];
 		});
 	}
 	public search(filter: Filter, page: { size: number, index: number; }): Promise<Archive> {
@@ -97,7 +106,7 @@ class Hitomi_La {
 					}
 				}
 			}
-			if (URLs[Action.POSITIVE][0].length === 0) {
+			if (URLs[Action.POSITIVE].length === 0) {
 				URLs[Action.POSITIVE].unshift(Hitomi_La.index_all);
 			}
 
@@ -149,18 +158,14 @@ class Hitomi_La {
 						switch (callback.status.code) {
 							case 200:
 							case 206: {
-								const view: DataView = new DataView(callback.content.buffer.slice(callback.content.buffer.byteOffset, callback.content.buffer.byteOffset + callback.content.buffer.byteLength));
-								const list: number[] = [];
-
-								for (let $index: number = 0; $index < view.byteLength; $index++) {
-									list.push(view.getInt32($index * 4, false));
-								}
+								const array: number[] = this.nozomi(callback);
+								// if only INDEX_ALL assigned
 								if (SINGULAR) {
-									SIZE += Number((callback.content.headers["content-range"]! as string).replace(/^bytes\s[0-9]+-[0-9]+\//, "")) / 4;
+									SIZE += Number((callback.headers["content-range"]! as string).replace(/^bytes\s[0-9]+-[0-9]+\//, "")) / 4;
 								} else {
-									Hitomi_La.collection.reference[shortcut.url] = list;
+									Hitomi_La.collection.reference[shortcut.url] = array;
 								}
-								$(shortcut.action, list);
+								$(shortcut.action, array);
 								break;
 							}
 						}
@@ -180,7 +185,7 @@ class Hitomi_La {
 					}
 					default: {
 						// save
-						Hitomi_La.collection.gallery[id] = utility.extract(`${callback.content.encode};`, "galleryinfo", "object");
+						Hitomi_La.collection.gallery[id] = utility.extract(`${callback.encode};`, "galleryinfo", "object");
 						// resolve
 						return Hitomi_La.collection.gallery[id];
 					}
@@ -205,6 +210,16 @@ class Hitomi_La {
 			}
 			return recursive();
 		});
+	}
+	private nozomi(response: RequestResponse): number[] {
+		const bytes: Buffer = Buffer.from(response.encode, "binary");
+		const view: DataView = new DataView(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
+		const list: number[] = [];
+
+		for (let index: number = 0; index < view.byteLength / 4; index++) {
+			list.push(view.getInt32(index * 4, false));
+		}
+		return list;
 	}
 }
 export default (new Hitomi_La());
