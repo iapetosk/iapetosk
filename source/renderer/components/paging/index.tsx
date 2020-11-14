@@ -18,7 +18,24 @@ class Paging extends React.Component<PagingState> {
 		this.state = { ...properties };
 
 		listener.on(Scheme.PAGING, () => {
-			this.setState({ ...this.state });
+			this.forceUpdate();
+		});
+		window.addEventListener("keydown", (event) => {
+			// check for focused input
+			if (!document.querySelectorAll("input:focus").length) {
+				switch (event.key) {
+					case "ArrowLeft": {
+						paging.backward();
+						break;
+					}
+					case "ArrowRight": {
+						paging.forward();
+						break;
+					}
+				}
+				// for reason unknown, DOM don't update correctly despite Scheme.PAGING is triggered.
+				this.forceUpdate();
+			}
 		});
 	}
 	public offset(value: number): number {
@@ -31,35 +48,35 @@ class Paging extends React.Component<PagingState> {
 	}
 	public render(): JSX.Element {
 		return (
-			<section id="paging" class="contrast">
-				<button id="first" class={utility.inline({ "un_draggable": true, "disable": paging.get().index === 0 })} data-type="stereo"
+			<section id="paging" class="contrast center">
+				<button id="first" class={utility.inline({ "un_draggable": true, "disable": paging.get().index === 0 })}
 					onClick={() => {
 						return paging.first();
 					}}
 					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/first.svg") }}>
 				</button>
-				<button id="previous" class={utility.inline({ "un_draggable": true, "disable": paging.get().index === 0 })} data-type="stereo"
+				<button id="backward" class={utility.inline({ "un_draggable": true, "disable": paging.get().index === 0 })}
 					onClick={() => {
-						return paging.previous();
+						return paging.backward();
 					}}
-					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/previous.svg") }}>
+					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/backward.svg") }}>
 				</button>
 				{[...new Array<number>(paging.get().metre < paging.get().size ? paging.get().metre : paging.get().size)].map((value, index) => {
 					return (
-						<button class={utility.inline({ "un_draggable": true, "active": paging.get().index === this.offset(index) })} data-type="stereo" key={index}
+						<button class={utility.inline({ "un_draggable": true, "active": paging.get().index === this.offset(index) })} key={index}
 							onClick={() => {
 								return paging.set({ ...paging.get(), index: this.offset(index) });
 							}}
 						>{this.offset(index) + 1}</button>
 					);
 				})}
-				<button id="next" class={utility.inline({ "un_draggable": true, "disable": paging.get().index === paging.get().size - 1 })} data-type="stereo"
+				<button id="forward" class={utility.inline({ "un_draggable": true, "disable": paging.get().index === paging.get().size - 1 })}
 					onClick={() => {
-						return paging.next();
+						return paging.forward();
 					}}
-					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/next.svg") }}>
+					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/forward.svg") }}>
 				</button>
-				<button id="last" class={utility.inline({ "un_draggable": true, "disable": paging.get().index === paging.get().size - 1 })} data-type="stereo"
+				<button id="last" class={utility.inline({ "un_draggable": true, "disable": paging.get().index === paging.get().size - 1 })}
 					onClick={() => {
 						return paging.last();
 					}}

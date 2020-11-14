@@ -22,15 +22,12 @@ export type PrivateOptions = {
 	redirects?: number;
 };
 export type RequestResponse = {
-	content: {
-		buffer: Buffer,
-		encode: string,
-		headers: Record<string, string | string[] | undefined>;
-	},
+	encode: string,
 	status: {
 		code?: number,
 		message?: string;
-	};
+	},
+	headers: Record<string, string | string[] | undefined>;
 };
 class Request {
 	readonly agent: https.Agent = new https.Agent({});
@@ -133,26 +130,20 @@ class Request {
 
 						//debug
 						console.log({
-							content: {
-								buffer: buffer,
-								encode: buffer.toString(options.encoding),
-								headers: response.headers
-							},
+							encode: buffer.toString(options.encoding),
 							status: {
 								code: response.statusCode,
 								message: response.statusMessage
-							}
+							},
+							headers: response.headers
 						});
 						return resolve({
-							content: {
-								buffer: buffer,
-								encode: buffer.toString(options.encoding),
-								headers: response.headers
-							},
+							encode: buffer.toString(options.encoding),
 							status: {
 								code: response.statusCode,
 								message: response.statusMessage
-							}
+							},
+							headers: response.headers
 						});
 					});
 					response.on("error", (error) => {

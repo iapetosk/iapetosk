@@ -13,9 +13,6 @@ class Utility {
 	public clamp(value: number, minimum: number, maximum: number): number {
 		return Math.min(Math.max(value, minimum), maximum);
 	}
-	public truncate(value: number, index: number): number {
-		return Math.pow(~~value / Math.pow(10, index), index);
-	}
 	public random(minimum: number, maximum: number, type: "integer" | "double" = "integer"): number {
 		switch (type) {
 			case "integer": {

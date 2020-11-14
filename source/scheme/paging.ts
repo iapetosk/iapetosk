@@ -12,11 +12,11 @@ class Paging extends Schema<{ metre: number, index: number, size: number; }> {
 	public first(): void {
 		return this.set({ ...this.get(), index: 0 });
 	}
-	public previous(): void {
-		return this.set({ ...this.get(), index: this.get().index - 1 });
-	}
-	public next(): void {
+	public forward(): void {
 		return this.set({ ...this.get(), index: this.get().index + 1 });
+	}
+	public backward(): void {
+		return this.set({ ...this.get(), index: this.get().index - 1 });
 	}
 	public last(): void {
 		return this.set({ ...this.get(), index: this.get().size - 1 });
