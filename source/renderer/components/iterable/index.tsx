@@ -35,14 +35,13 @@ class Iterable extends React.Component<IterableState> {
 	public render(): JSX.Element {
 		return (
 			<section id="iterable">
-				<section id="scrollable">
-					{Iterable.array.map((value, index) => {
-						return (
-							<section id="gallery" class="contrast" key={index}>
+				{Iterable.array.map((value, index) => {
+					return (
+						<section id="gallery" class="contrast" key={index}>
 
-							</section>
-						);
-					})}</section>
+						</section>
+					);
+				})}
 			</section>
 		);
 	}
