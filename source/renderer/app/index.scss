@@ -54,7 +54,7 @@
 }
 #container {
 	display: grid;
-	grid-template-rows: var(--titlebar_height) 1fr var(--paging_height);
+	grid-template-rows: auto 1fr auto;
 	grid-template-columns: 1fr;
 	grid-template-areas:
 	"header"
@@ -64,6 +64,7 @@
 	width: 100vw;
 	> #titlebar {
 		grid-area: "header";
+		height: var(--titlebar_height);
 	}
 	> #content {
 		grid-area: content;
@@ -80,5 +81,6 @@
 	}
 	> #paging {
 		grid-area: "footer";
+		height: var(--paging_height);
 	}
 }
