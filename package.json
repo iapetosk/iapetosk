@@ -4,6 +4,7 @@
 	"description": "WIP",
 	"main": "http://localhost:8080",
 	"node-remote": "*://localhost/*",
+	"chromium-args": "--mixed-context",
 	"scripts": {
 		"serve": "node webpack/serve.js",
 		"build": "node webpack/build.js",
@@ -25,7 +26,7 @@
 		"file-loader": "^6.2.0",
 		"html-loader": "^1.3.2",
 		"html-webpack-plugin": "4.5.0",
-		"node-stream-zip": "^1.11.7",
+		"node-stream-zip": "^1.12.0",
 		"nw": "0.49.2-sdk",
 		"rcedit": "^2.2.0",
 		"react": "^17.0.1",

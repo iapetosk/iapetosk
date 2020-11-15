@@ -31,7 +31,7 @@ export type Archive = {
 export type GalleryBlock = {
 	id: number,
 	// title
-	japanese_title: string,
+	japanese_title?: string,
 	title: string,
 	// language
 	language_localname: string,
@@ -46,9 +46,9 @@ export type GalleryBlock = {
 		hash: string;
 	}[],
 	// tags
-	tags: {
-		female: number,
-		male: number,
+	tags?: {
+		female?: number,
+		male?: number,
 		url: string,
 		tag: string;
 	}[],
