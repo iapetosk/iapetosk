@@ -38,7 +38,13 @@ class Iterable extends React.Component<IterableState> {
 				{Iterable.array.map((value, index) => {
 					return (
 						<section id="gallery" class="contrast" key={index}>
-
+							<legend id="id">{value.id}</legend>
+							<legend id="title">{value.title}</legend>
+							<legend id="language">{value.language}</legend>
+							{value.tags?.map((value, index) => {
+								return <mark key={index}>{value.male ? "♂" : value.female ? "♀️" : ""}{value.tag}</mark>
+							})}
+							<legend id="date">{value.date}</legend>
 						</section>
 					);
 				})}
