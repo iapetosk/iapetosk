@@ -12,8 +12,4 @@
 }
 ::-webkit-scrollbar-thumb {
 	background-color: var(--colour_2);
-	transition: background-color var(--transition);
-	&:hover {
-		background-color: var(--colour_3);
-	}
 }
