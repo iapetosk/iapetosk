@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as path from "path";
 
 import utility from "@/modules/utility";
 
@@ -81,7 +82,8 @@ class Storage {
 		}
 	}
 	public export(key: string): void {
-		utility.write(this.get_path(key), JSON.stringify(this.get_data(key)));
+		fs.mkdirSync(path.dirname(this.get_path(key)), { recursive: true });
+		fs.writeFileSync(this.get_path(key), JSON.stringify(this.get_data(key)));
 	}
 	public exist(key: string): boolean {
 		return !!this.return(Storage.container, [...key.split(/\./g)]);

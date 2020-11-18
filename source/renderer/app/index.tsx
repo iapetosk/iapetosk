@@ -1,14 +1,15 @@
 import * as React from "react";
-// style
+
 import "./index.scss";
-// components
+
 import TitleBar from "@/renderer/components/titlebar";
 import Paging from "@/renderer/components/paging";
-// views
+
 import Browser from "@/renderer/views/browser";
 import Reader from "@/renderer/views/reader";
-// modules
+
 import listener from "@/modules/listener";
+import utility from "@/modules/utility";
 import router from "@/scheme/router";
 
 export type AppState = {};
@@ -18,6 +19,8 @@ class App extends React.Component<AppState> {
 	constructor(properties: AppState) {
 		super(properties);
 		this.state = { ...properties };
+
+		utility.referer("https://hitomi.la/search.html");
 
 		if (process.env.NODE_ENV === "development") {
 			nw.Window.get().showDevTools();

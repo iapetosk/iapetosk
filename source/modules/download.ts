@@ -29,11 +29,8 @@ export type Loaded = {
 	readonly title: string,
 	readonly links: string[],
 	readonly options?: PartialOptions,
-	readonly placeholders?: PlaceHolders;
+	readonly placeholders?: Record<string, any>;
 };
-export type PlaceHolders = (
-	Record<string, any>
-);
 export class File {
 	public link: string;
 	public path: string;
@@ -233,7 +230,8 @@ export class Download {
 							}
 							throw new Error("empty");
 						}).catch((error): void => {
-							utility.write(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: LOADER, error: error }));
+							fs.mkdirSync(path.join(Folder.DEBUGS), { recursive: true });
+							fs.writeFileSync(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: LOADER, error: error }));
 						});
 					}
 				}
