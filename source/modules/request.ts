@@ -108,7 +108,7 @@ class Request {
 						fs.mkdirSync(path.dirname(file.path), { recursive: true });
 						// content-length should be defined
 						if (response.headers["content-length"]) {
-							file.size = Number(response.headers["content-length"]);
+							file = { ...file, size: Number(response.headers["content-length"]) };
 						}
 						var writable: fs.WriteStream = fs.createWriteStream(file.path);
 					}
@@ -117,7 +117,7 @@ class Request {
 						chunks.push(Buffer.from(chunk, "binary"));
 						// file
 						if (file) {
-							file.written += chunk.length;
+							file = { ...file, written: file.written + chunk.length };
 							writable.write(chunk);
 						}
 					});

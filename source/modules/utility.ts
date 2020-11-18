@@ -1,6 +1,3 @@
-import * as fs from "fs";
-import * as path from "path";
-
 class Utility {
 	public index_of<type>(array: (type | RegExp)[], value: type): number {
 		for (let index: number = 0; index < array.length; index++) {
@@ -85,11 +82,26 @@ class Utility {
 	public devide(text: string, index: number): string[] {
 		return [text.substring(0, index), text.substring(index)];
 	}
-	public write(directory: string, content: any): void {
-		// generates directory recursively
-		fs.mkdirSync(path.dirname(directory), { recursive: true });
-		// write file
-		fs.writeFileSync(directory, content);
+	public referer(referer?: string): void {
+		chrome.webRequest.onBeforeSendHeaders.addListener((response: Record<string, any>) => {
+			var socket: number = NaN;
+
+			for (let index: number = 0; index < response.requestHeaders.length; index++) {
+				switch (response.requestHeaders[index].name) {
+					case "Referer": {
+						socket = index;
+						break;
+					}
+				}
+			}
+			if (isNaN(socket)) {
+				response.requestHeaders = [...response.requestHeaders, { name: "Referer", value: referer }];
+			} else {
+				response.requestHeaders[socket] = { ...response.requestHeaders[socket], value: referer };
+			}
+			return { requestHeaders: response.requestHeaders };
+		},
+		{ urls: ["<all_urls>"] }, ["blocking", "requestHeaders", "extraHeaders"]);
 	}
 }
 export default (new Utility());
