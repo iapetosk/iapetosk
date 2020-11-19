@@ -20,7 +20,7 @@ class App extends React.Component<AppState> {
 		super(properties);
 		this.state = { ...properties };
 
-		utility.referer("https://hitomi.la/search.html");
+		utility.referer("https://hitomi.la");
 
 		if (process.env.NODE_ENV === "development") {
 			nw.Window.get().showDevTools();

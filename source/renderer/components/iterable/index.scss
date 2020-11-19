@@ -6,8 +6,8 @@
 	grid-template-columns: repeat(auto-fit, minmax(360px, auto));
 	> #gallery {
 		background-color: var(--colour_3);
-		> #thumbnail {
-			
-		}
+		background-size: contain;
+		background-repeat: no-repeat;
+		background-position: center center;
 	}
 }
