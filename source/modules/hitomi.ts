@@ -26,7 +26,8 @@ export type Filter = Record<Type, {
 }[]>;
 export type Archive = {
 	list: number[],
-	size: number;
+	size: number,
+	singular: boolean;
 };
 export type GalleryBlock = {
 	id: number,
@@ -69,7 +70,7 @@ class Hitomi_La {
 	private static collection: { reference: Record<string, number[]>, gallery: Record<number, GalleryBlock>; } = { reference: {}, gallery: {} };
 	constructor() {
 		request.get("https://ltn.hitomi.la/common.js").then((callback) => {
-			Hitomi_La.common_js = callback.encode.split(/function show_loading/)![0];
+			Hitomi_La.common_js = callback.content.encode.split(/function show_loading/)![0];
 		});
 	}
 	public search(filter: Filter, page: { size: number, index: number; }): Promise<Archive> {
@@ -110,7 +111,7 @@ class Hitomi_La {
 				URLs[Action.POSITIVE].unshift(Hitomi_La.index_all);
 			}
 
-			const SINGULAR: boolean = URLs[Action.POSITIVE][0].length === 1 && URLs[Action.NEGATIVE].length === 0 && URLs[Action.POSITIVE][0] === Hitomi_La.index_all;
+			const SINGULAR: boolean = URLs[Action.POSITIVE].length === 1 && URLs[Action.NEGATIVE].length === 0 && URLs[Action.POSITIVE][0] === Hitomi_La.index_all;
 
 			function $(action: Action, list: number[]): void {
 				const collection: Set<number> = new Set(list);
@@ -136,11 +137,17 @@ class Hitomi_La {
 				// none async resolve fix
 				if (COUNT === URLs[Action.POSITIVE].length + URLs[Action.NEGATIVE].length) {
 					// debug
-					console.table(URLs);
+					console.table({
+						positive: URLs[Action.POSITIVE],
+						negative: URLs[Action.NEGATIVE],
+						singular: SINGULAR,
+						array: IDs
+					});
 					// return
 					return resolve({
 						list: IDs,
-						size: SIZE + (SINGULAR ? 0 : IDs.length)
+						size: SIZE + (SINGULAR ? 0 : IDs.length),
+						singular: SINGULAR
 					});
 				}
 			};
@@ -154,7 +161,7 @@ class Hitomi_La {
 				};
 
 				if (SINGULAR || !Hitomi_La.collection.reference[shortcut.url]) {
-					request.get(shortcut.url, { encoding: "binary", headers: SINGULAR ? { "range": `bytes=${page.index * page.size * 4}-${page.index * page.size * 8 - 1}` } : {} }).then((callback) => {
+					request.get(shortcut.url, { encoding: "binary", headers: SINGULAR ? { "range": `bytes=${page.index * page.size * 4}-${page.index * page.size * 4 + page.size * 4 - 1}` } : {} }).then((callback) => {
 						switch (callback.status.code) {
 							case 200:
 							case 206: {
@@ -184,8 +191,8 @@ class Hitomi_La {
 						return undefined;
 					}
 					default: {
-						// save
-						Hitomi_La.collection.gallery[id] = utility.extract(`${callback.encode};`, "galleryinfo", "object");
+						// assign
+						Hitomi_La.collection.gallery[id] = utility.extract(`${callback.content.encode};`, "galleryinfo", "object");
 						// resolve
 						return Hitomi_La.collection.gallery[id];
 					}
@@ -194,14 +201,12 @@ class Hitomi_La {
 		});
 	}
 	public files(gallery: GalleryBlock): Promise<string[]> {
-		const files: string[] = [];
 		return new Promise<string[]>(async (resolve, rejects) => {
 			async function recursive() {
 				if (Hitomi_La.common_js.length) {
-					for (let index: number = 0; index < gallery.files.length; index++) {
-						files[index] = eval(Hitomi_La.common_js + "url_from_url_from_hash(gallery.id, gallery.files[index]);") as string;
-					}
-					return resolve(files);
+					return resolve(gallery.files.map((value, index) => {
+						return eval(Hitomi_La.common_js + "url_from_url_from_hash(gallery.id, gallery.files[index]);") as string;;
+					}));
 				} else {
 					setTimeout(() => {
 						return recursive();
@@ -212,14 +217,14 @@ class Hitomi_La {
 		});
 	}
 	private nozomi(response: RequestResponse): number[] {
-		const bytes: Buffer = Buffer.from(response.encode, "binary");
-		const view: DataView = new DataView(bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength));
-		const list: number[] = [];
+		const binary: Buffer = new Buffer(response.content.encode, "binary");
+		const endian: DataView = new DataView(binary.buffer.slice(binary.byteOffset, binary.byteOffset + binary.byteLength));
+		const array: Array<number> = new Array(endian.byteLength / 4);
 
-		for (let index: number = 0; index < view.byteLength / 4; index++) {
-			list.push(view.getInt32(index * 4, false));
+		for (let index: number = 0; index < endian.byteLength / 4; index++) {
+			array[index] = endian.getInt32(index * 4, false);
 		}
-		return list;
+		return array;
 	}
 }
 export default (new Hitomi_La());

@@ -22,7 +22,10 @@ export type PrivateOptions = {
 	redirects?: number;
 };
 export type RequestResponse = {
-	encode: string,
+	content: {
+		buffer: Buffer,
+		encode: string;
+	},
 	status: {
 		code?: number,
 		message?: string;
@@ -54,8 +57,6 @@ class Request {
 					protocol: I.SSL(options.url) ? "https:" : "http:",
 					...I.parse(options.url)
 				}, (response) => {
-					// debug
-					console.log(options);
 					// redirects
 					if ((options.max_redirects || I.max_redirects) > (options.redirects || 0)) {
 						// clone original options
@@ -130,7 +131,13 @@ class Request {
 
 						//debug
 						console.log({
-							encode: buffer.toString(options.encoding),
+							// addition
+							options: options,
+							// request response
+							content: {
+								buffer: buffer,
+								encode: buffer.toString(options.encoding)
+							},
 							status: {
 								code: response.statusCode,
 								message: response.statusMessage
@@ -138,7 +145,10 @@ class Request {
 							headers: response.headers
 						});
 						return resolve({
-							encode: buffer.toString(options.encoding),
+							content: {
+								buffer: buffer,
+								encode: buffer.toString(options.encoding)
+							},
 							status: {
 								code: response.statusCode,
 								message: response.statusMessage

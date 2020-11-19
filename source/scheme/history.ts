@@ -34,9 +34,9 @@ class History extends Schema<Session> {
 			// size and index only matters @if SINGULAR === true
 			hitomi.search(this.get().filter, { size: 25, index: this.get().index }).then((archive) => {
 				// loop 0~24 => 25 times
-				for (let index: number = 0; index < 25; index++) {
+				for (let index: number = 0; index < Math.min(archive.list.length, 25); index++) {
 					// get galleryblock from id
-					hitomi.read(archive.list[index + (25 * this.get().index)]).then((gallery) => {
+					hitomi.read(archive.list[index + (archive.singular ? 0 : 25 * this.get().index)]).then((gallery) => {
 						// get files from galleryblock
 						hitomi.files(gallery).then((files) => {
 							// assign to array
@@ -50,7 +50,7 @@ class History extends Schema<Session> {
 								})
 							};
 							// none-async return
-							if (Object.keys(list).length === 25) {
+							if (Object.keys(list).length === Math.min(archive.list.length, 25)) {
 								return resolve(list);
 							}
 						});

@@ -41,7 +41,7 @@ class Paging extends React.Component<PagingState> {
 	public offset(value: number): number {
 		const breakpoint: number = ~~(paging.get().metre / 2);
 		const undeflow: boolean = (paging.get().size > paging.get().metre);
-		const viewport: number = (paging.get().index > breakpoint && undeflow) ? (breakpoint > paging.get().index) ? (breakpoint - paging.get().index) : (paging.get().index - breakpoint) : 0;
+		const viewport: number = (paging.get().index > breakpoint && undeflow) ? Math.abs(paging.get().index - breakpoint) : 0;
 		const overflow: number = (paging.get().metre + viewport);
 
 		return value + viewport + ((overflow > paging.get().size && undeflow) ? (paging.get().size - overflow) : 0);
