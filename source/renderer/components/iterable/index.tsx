@@ -22,14 +22,14 @@ class Iterable extends React.Component<IterableState> {
 			filter: {
 				"id": [],
 				"type": [],
-				"language": [],
+				"language": [{ action: Action.POSITIVE, value: "korean" }],
 				"character": [],
 				"series": [],
 				"artist": [],
 				"group": [],
 				"tag": [],
 				"male": [],
-				"female": [{ action: Action.POSITIVE, value: "anal" }],
+				"female": [{ action: Action.POSITIVE, value: "tomboy" }],
 				"custom": []
 			},
 			index: 0
