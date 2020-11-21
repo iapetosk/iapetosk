@@ -13,29 +13,9 @@ class TitleBar extends React.Component<TitleBarState> {
 	constructor(properties: TitleBarState) {
 		super(properties);
 		this.state = { ...properties };
-
-		nw.Window.get().on("focus", () => {
-			this.setState({ ...this.state, focus: true });
-		});
-		nw.Window.get().on("blur", () => {
-			this.setState({ ...this.state, focus: false });
-		});
-		nw.Window.get().on("maximize", () => {
-			this.setState({ ...this.state, restore: true });
-		});
-		nw.Window.get().on("restore", () => {
-			this.setState({ ...this.state, restore: false, fullscreen: false });
-		});
-		nw.Window.get().on("enter-fullscreen", () => {
-			this.setState({ ...this.state, fullscreen: true });
-		});
 	}
-	public componentDidUpdate(): void {
-		if (this.state.restore) {
-			nw.Window.get().maximize();
-		} else if (this.state.focus) {
-			nw.Window.get().restore();
-		}
+	static getDerivedStateFromProps($new: TitleBarState, $old: TitleBarState): TitleBarState {
+		return $new;
 	}
 	public render(): JSX.Element {
 		return (
@@ -48,7 +28,11 @@ class TitleBar extends React.Component<TitleBarState> {
 				</button>
 				<button id="restore" class="un_draggable"
 					onClick={() => {
-						this.setState({ ...this.state, restore: !this.state.restore });
+						if (!this.state.restore) {
+							nw.Window.get().maximize();
+						} else if (this.state.focus && !this.state.fullscreen) {
+							nw.Window.get().restore();
+						}
 					}}
 					dangerouslySetInnerHTML={{ __html: require(this.state.restore ? "!html-loader!@/assets/icons/minimize.svg" : "!html-loader!@/assets/icons/maximize.svg") }}>
 				</button>

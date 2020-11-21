@@ -11,7 +11,7 @@ import { GalleryIterable } from "@/modules/hitomi";
 export type IterableState = {};
 
 class Iterable extends React.Component<IterableState> {
-	private static array: GalleryIterable[] = [];
+	public array: GalleryIterable[] = [];
 	public state: IterableState;
 	constructor(properties: IterableState) {
 		super(properties);
@@ -32,13 +32,13 @@ class Iterable extends React.Component<IterableState> {
 				"female": [],
 				"custom": []
 			},
-			index: 23049
+			index: 23050
 		});
 
 		function update(I: Iterable): void {
 			history.iterable().then((iterable) => {
 				// assgin
-				Iterable.array = iterable;
+				I.array = iterable;
 				// update
 				I.forceUpdate();
 			});
@@ -53,16 +53,11 @@ class Iterable extends React.Component<IterableState> {
 	public render(): JSX.Element {
 		return (
 			<section id="iterable">
-				{Iterable.array.map((value, index) => {
+				{this.array.map((value, index) => {
 					return (
-						<section id="gallery" class="contrast" key={index} style={{
-							background: (() => {
-								const subdomain: string[] = value.files[0].url.split(/\./g);
-								const directory: string[] = value.files[0].url.split(/\//g);
-
-								return `url(${value.files[0].url.replace(subdomain[0], "https://tn").replace(directory[3], "smalltn").replace("png", "jpg")})`;
-							})()
-						}}>
+						<section id="gallery" class="contrast center" key={index}>
+							<canvas id="thumbnail" class="contrast" style={{ background: `url(${value.files[0]}) no-repeat center / cover` }}></canvas>
+							{/*
 							<legend id="id">{value.id}</legend>
 							<legend id="title">{value.title}</legend>
 							<legend id="language">{value.language}</legend>
@@ -70,6 +65,7 @@ class Iterable extends React.Component<IterableState> {
 								return <mark key={index}>{value.male ? "male" : value.female ? "female" : "tag"}:{value.tag.replace(/\s/g, "_")}</mark>;
 							})}
 							<legend id="date">{value.date}</legend>
+							*/}
 						</section>
 					);
 				})}

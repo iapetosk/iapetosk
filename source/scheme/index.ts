@@ -7,17 +7,17 @@ export enum Scheme {
 	PAGING = "paging",
 	HISTORY = "history"
 };
-export class Schema<type> {
-	private state: type;
+export class Schema<state> {
+	private state: state;
 	private event: Scheme;
-	constructor(init: type, event: Scheme) {
+	constructor(init: state, event: Scheme) {
 		this.state = init;
 		this.event = event;
 	}
-	protected $get(): type {
+	protected $get(): state {
 		return this.state;
 	}
-	protected $set(value: type): void {
+	protected $set(value: state): void {
 		if (value !== this.$get()) {
 			// listener (new, old)
 			listener.emit(this.event, value, this.$get());

@@ -29,29 +29,21 @@ class History extends Schema<Session> {
 	}
 	public iterable(): Promise<GalleryIterable[]> {
 		// galleryiterable is extends of galleryblock
-		const list: GalleryIterable[] = [];
+		const array: GalleryIterable[] = [];
 		return new Promise<GalleryIterable[]>((resolve, rejects) => {
 			// size and index only matters @if SINGULAR === true
 			hitomi.search(this.get().filter, { size: 25, index: this.get().index }).then((archive) => {
 				// loop 0~24 => 25 times
-				for (let index: number = 0; index < Math.min(archive.list.length, 25); index++) {
+				for (let index: number = 0; index < Math.min(archive.array.length, 25); index++) {
 					// get galleryblock from id
-					hitomi.read(archive.list[index + (archive.singular ? 0 : 25 * this.get().index)]).then((gallery) => {
+					hitomi.read(archive.array[index + (archive.singular ? 0 : 25 * this.get().index)]).then((gallery) => {
 						// get files from galleryblock
 						hitomi.files(gallery).then((files) => {
 							// assign to array
-							list[index] = {
-								...gallery, files: files.map((value, index) => {
-									return {
-										url: value,
-										width: gallery.files[index].width,
-										height: gallery.files[index].height
-									};
-								})
-							};
+							array[index] = { ...gallery, files: files };
 							// none-async return
-							if (Object.keys(list).length === Math.min(archive.list.length, 25)) {
-								return resolve(list);
+							if (Object.keys(array).length === Math.min(archive.array.length, 25)) {
+								return resolve(array);
 							}
 						});
 					});

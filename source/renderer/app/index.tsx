@@ -12,7 +12,11 @@ import listener from "@/modules/listener";
 import utility from "@/modules/utility";
 import router from "@/scheme/router";
 
-export type AppState = {};
+export type AppState = {
+	focus: boolean,
+	restore: boolean,
+	fullscreen: boolean;
+};
 
 class App extends React.Component<AppState> {
 	public state: AppState;
@@ -22,33 +26,73 @@ class App extends React.Component<AppState> {
 
 		utility.referer("https://hitomi.la");
 
-		if (process.env.NODE_ENV === "development") {
+		try {
 			nw.Window.get().showDevTools();
+		} catch {
+			// TODO: none
 		}
+		nw.App.registerGlobalHotKey(new nw.Shortcut(
+			{ key: "F11", active: () => { if (this.state.focus) { nw.Window.get().toggleFullscreen(); } } },
+			// @ts-ignore
+			{ key: "ESCAPE", active: () => { if (this.state.fullscreen) { nw.Window.get().leaveFullscreen(); } } }
+		));
 		listener.on("reload", () => {
 			window.location.reload();
+		});
+		nw.Window.get().on("focus", () => {
+			this.setState({ ...this.state, focus: true });
+		});
+		nw.Window.get().on("blur", () => {
+			this.setState({ ...this.state, focus: false });
+		});
+		nw.Window.get().on("maximize", () => {
+			this.setState({ ...this.state, restore: true });
+		});
+		nw.Window.get().on("restore", () => {
+			this.setState({ ...this.state, restore: false, fullscreen: false });
+		});
+		nw.Window.get().on("enter-fullscreen", () => {
+			this.setState({ ...this.state, fullscreen: true });
 		});
 	}
 	public render(): JSX.Element {
 		return (
 			<main id="container">
-				<TitleBar focus={false} restore={false} fullscreen={false}></TitleBar>
-				<code id="content">
 				{(() => {
-					switch (router.index()) {
-						case "browser": {
-							return (<Browser></Browser>);
-						}
-						case "reader": {
-							return (<Reader></Reader>);
+					switch (this.state.fullscreen) {
+						case true: {
+							return undefined;
 						}
 						default: {
-							return undefined;
+							return <TitleBar focus={this.state.focus} restore={this.state.restore} fullscreen={this.state.fullscreen}></TitleBar>;
 						}
 					}
 				})()}
+				<code id="content">
+					{(() => {
+						switch (router.index()) {
+							case "browser": {
+								return (<Browser></Browser>);
+							}
+							case "reader": {
+								return (<Reader></Reader>);
+							}
+							default: {
+								return undefined;
+							}
+						}
+					})()}
 				</code>
-				<Paging></Paging>
+				{(() => {
+					switch (this.state.fullscreen) {
+						case true: {
+							return undefined;
+						}
+						default: {
+							return <Paging></Paging>;
+						}
+					}
+				})()}
 			</main>
 		);
 	}

@@ -19,14 +19,14 @@ export type Type = (
 export enum Action {
 	POSITIVE,
 	NEGATIVE
-}
+};
 export type Filter = Record<Type, {
 	action: Action,
 	value: string;
 }[]>;
 export type Archive = {
-	list: number[],
 	size: number,
+	array: number[],
 	singular: boolean;
 };
 export type GalleryBlock = {
@@ -57,11 +57,7 @@ export type GalleryBlock = {
 	date: string;
 };
 export type GalleryIterable = (Merge<GalleryBlock, {
-	files: {
-		url: string,
-		width: number,
-		height: number;
-	}[];
+	files: string[];
 }>);
 
 class Hitomi_La {
@@ -70,7 +66,7 @@ class Hitomi_La {
 	private static collection: { reference: Record<string, number[]>, gallery: Record<number, GalleryBlock>; } = { reference: {}, gallery: {} };
 	constructor() {
 		request.get("https://ltn.hitomi.la/common.js").then((callback) => {
-			Hitomi_La.common_js = callback.content.encode.split(/function show_loading/)![0];
+			Hitomi_La.common_js = callback.encode.split(/function show_loading/)![0];
 		});
 	}
 	public search(filter: Filter, page: { size: number, index: number; }): Promise<Archive> {
@@ -113,8 +109,8 @@ class Hitomi_La {
 
 			const SINGULAR: boolean = URLs[Action.POSITIVE].length === 1 && URLs[Action.NEGATIVE].length === 0 && URLs[Action.POSITIVE][0] === Hitomi_La.index_all;
 
-			function $(action: Action, list: number[]): void {
-				const collection: Set<number> = new Set(list);
+			function $(action: Action, array: number[]): void {
+				const collection: Set<number> = new Set(array);
 				// increase slot
 				COUNT++;
 				// determine action
@@ -125,7 +121,7 @@ class Hitomi_La {
 							IDs = IDs.filter((id) => collection.has(id));
 							SIZE -= SINGULAR ? LENGTH - IDs.length : 0;
 						} else {
-							IDs = list;
+							IDs = array;
 						}
 						break;
 					}
@@ -140,13 +136,12 @@ class Hitomi_La {
 					console.table({
 						positive: URLs[Action.POSITIVE],
 						negative: URLs[Action.NEGATIVE],
-						singular: SINGULAR,
-						array: IDs
+						singular: SINGULAR
 					});
 					// return
 					return resolve({
-						list: IDs,
 						size: SIZE + (SINGULAR ? 0 : IDs.length),
+						array: IDs,
 						singular: SINGULAR
 					});
 				}
@@ -192,7 +187,7 @@ class Hitomi_La {
 					}
 					default: {
 						// assign
-						Hitomi_La.collection.gallery[id] = utility.extract(`${callback.content.encode};`, "galleryinfo", "object");
+						Hitomi_La.collection.gallery[id] = utility.extract(`${callback.encode};`, "galleryinfo", "object");
 						// resolve
 						return Hitomi_La.collection.gallery[id];
 					}
@@ -205,7 +200,7 @@ class Hitomi_La {
 			async function recursive() {
 				if (Hitomi_La.common_js.length) {
 					return resolve(gallery.files.map((value, index) => {
-						return eval(Hitomi_La.common_js + "url_from_url_from_hash(gallery.id, gallery.files[index]);") as string;;
+						return eval(Hitomi_La.common_js + "url_from_url_from_hash(gallery.id, gallery.files[index]);") as string;
 					}));
 				} else {
 					setTimeout(() => {
@@ -216,8 +211,8 @@ class Hitomi_La {
 			return recursive();
 		});
 	}
-	private nozomi(response: RequestResponse): number[] {
-		const binary: Buffer = new Buffer(response.content.encode, "binary");
+	public nozomi(response: RequestResponse): number[] {
+		const binary: Buffer = new Buffer(response.encode, "binary");
 		const endian: DataView = new DataView(binary.buffer.slice(binary.byteOffset, binary.byteOffset + binary.byteLength));
 		const array: Array<number> = new Array(endian.byteLength / 4);
 
