@@ -85,7 +85,7 @@ class Hitomi_La {
 			for (const type of Object.keys(filter)) {
 				switch (type) {
 					case "language": {
-						if (Object.values(filter).length - filter.language.length > 0) {
+						if (Object.values(filter).map((value) => { return value.length; }).reduce(($old, $new) => { return $old + $new; }, 0) - filter.language.length > 0) {
 							break;
 						}
 						for (let index: number = 0; index < filter[type as Type].length; index++) {
