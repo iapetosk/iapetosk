@@ -37,10 +37,12 @@ class History extends Schema<Session> {
 				for (let index: number = 0; index < Math.min(archive.array.length, 25); index++) {
 					// get galleryblock from id
 					hitomi.read(archive.array[index + (archive.singular ? 0 : 25 * this.get().index)]).then((gallery) => {
-						// get files from galleryblock
-						hitomi.files(gallery).then((files) => {
+						// get thumbnail from id
+						hitomi.thumbnail(gallery.id).then((thumbnail) => {
 							// assign to array
-							array[index] = { ...gallery, files: files };
+							array[index] = { ...gallery, thumbnail: thumbnail };
+							// @ts-ignore
+							delete array[index].files;
 							// none-async return
 							if (Object.keys(array).length === Math.min(archive.array.length, 25)) {
 								return resolve(array);

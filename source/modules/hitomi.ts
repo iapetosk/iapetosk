@@ -32,11 +32,11 @@ export type Archive = {
 export type GalleryBlock = {
 	id: number,
 	// title
-	japanese_title?: string,
 	title: string,
+	japanese_title?: string,
 	// language
-	language_localname: string,
 	language: string,
+	language_localname: string,
 	// files
 	files: {
 		width: number,
@@ -56,8 +56,8 @@ export type GalleryBlock = {
 	// date
 	date: string;
 };
-export type GalleryIterable = (Merge<GalleryBlock, {
-	files: string[];
+export type GalleryIterable = (Merge<Omit<GalleryBlock, "files">, {
+	thumbnail: string[];
 }>);
 
 class Hitomi_La {
@@ -95,8 +95,8 @@ class Hitomi_La {
 					}
 					default: {
 						for (let index: number = 0; index < filter[type as Type].length; index++) {
-							for (const language of Object.values(filter.language || [{ action: Action.POSITIVE, value: "all" }])) {
-								URLs[filter[type as Type][index].action].push(`https://ltn.hitomi.la/${type === "male" || type === "female" ? "tag" : type}/${filter[type as Type][index].value}-${filter[type as Type][index].action === Action.POSITIVE && language.action === Action.POSITIVE ? language.value : "all"}.nozomi`);
+							for (const language of filter.language.length ? filter.language : [{ action: Action.POSITIVE, value: "all" }]) {
+								URLs[filter[type as Type][index].action].push(`https://ltn.hitomi.la/${type === "male" || type === "female" ? "tag" : type}/${type === "male" || type === "female" ? `${type}:${filter[type as Type][index].value}` : filter[type as Type][index].value}-${filter[type as Type][index].action === Action.POSITIVE && language.action === Action.POSITIVE ? language.value : "all"}.nozomi`);
 							}
 						}
 						break;
@@ -209,6 +209,13 @@ class Hitomi_La {
 				}
 			}
 			return recursive();
+		});
+	}
+	public thumbnail(id: number): Promise<string[]> {
+		return new Promise<string[]>(async (resolve, rejects) => {
+			request.get(`https://ltn.hitomi.la/galleryblock/${id}.html`).then((callback) => {
+				return resolve(utility.parse(callback.encode, "picture > img", "src") as string[]);
+			});
 		});
 	}
 	public nozomi(response: RequestResponse): number[] {

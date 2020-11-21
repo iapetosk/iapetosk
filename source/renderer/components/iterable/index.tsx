@@ -6,7 +6,7 @@ import listener from "@/modules/listener";
 import history from "@/scheme/history";
 
 import { Scheme } from "@/scheme";
-import { GalleryIterable } from "@/modules/hitomi";
+import { Action, GalleryIterable } from "@/modules/hitomi";
 
 export type IterableState = {};
 
@@ -29,10 +29,10 @@ class Iterable extends React.Component<IterableState> {
 				"group": [],
 				"tag": [],
 				"male": [],
-				"female": [],
+				"female": [{ action: Action.POSITIVE, value: "anal" }],
 				"custom": []
 			},
-			index: 23050
+			index: 0
 		});
 
 		function update(I: Iterable): void {
@@ -56,7 +56,7 @@ class Iterable extends React.Component<IterableState> {
 				{this.array.map((value, index) => {
 					return (
 						<section id="gallery" class="contrast center" key={index}>
-							<canvas id="thumbnail" class="contrast" style={{ background: `url(${value.files[0]}) no-repeat center / cover` }}></canvas>
+							<canvas id="thumbnail" class="contrast" style={{ background: `url(${value.thumbnail[0]}) no-repeat center / cover` }}></canvas>
 							{/*
 							<legend id="id">{value.id}</legend>
 							<legend id="title">{value.title}</legend>
