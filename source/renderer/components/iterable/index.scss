@@ -6,8 +6,19 @@
 	grid-template-columns: repeat(auto-fit, minmax(360px, auto));
 	> #gallery {
 		background-color: var(--colour_3);
-		background-size: contain;
-		background-repeat: no-repeat;
-		background-position: center center;
+		transition: border-color var(--transition);
+		> #thumbnail {
+			opacity: 50%;
+			width: calc(100% - 10px * 2);
+			height: calc(100% - 10px * 2);
+			transition: opacity var(--transition), border-color var(--transition);
+		}
+		&:hover > #thumbnail {
+			opacity: 100%;
+		}
+		&:hover,
+		&:hover .contrast {
+			border-color: var(--colour_9);
+		}
 	}
 }

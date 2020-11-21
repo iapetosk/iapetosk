@@ -22,10 +22,7 @@ export type PrivateOptions = {
 	redirects?: number;
 };
 export type RequestResponse = {
-	content: {
-		buffer: Buffer,
-		encode: string;
-	},
+	encode: string,
 	status: {
 		code?: number,
 		message?: string;
@@ -134,10 +131,7 @@ class Request {
 							// addition
 							options: options,
 							// request response
-							content: {
-								buffer: buffer,
-								encode: buffer.toString(options.encoding)
-							},
+							encode: buffer.toString(options.encoding),
 							status: {
 								code: response.statusCode,
 								message: response.statusMessage
@@ -145,10 +139,7 @@ class Request {
 							headers: response.headers
 						});
 						return resolve({
-							content: {
-								buffer: buffer,
-								encode: buffer.toString(options.encoding)
-							},
+							encode: buffer.toString(options.encoding),
 							status: {
 								code: response.statusCode,
 								message: response.statusMessage

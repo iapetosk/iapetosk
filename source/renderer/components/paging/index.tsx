@@ -61,7 +61,7 @@ class Paging extends React.Component<PagingState> {
 					}}
 					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/backward.svg") }}>
 				</button>
-				{[...new Array<number>(paging.get().metre < paging.get().size ? paging.get().metre : paging.get().size)].map((value, index) => {
+				{[...new Array<number>(Math.min(paging.get().metre, paging.get().size))].map((value, index) => {
 					return (
 						<button class={utility.inline({ "un_draggable": true, "active": paging.get().index === this.offset(index) })} key={index}
 							onClick={() => {
