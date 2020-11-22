@@ -200,7 +200,7 @@ class Hitomi_La {
 			async function recursive() {
 				if (Hitomi_La.common_js.length) {
 					return resolve(gallery.files.map((value, index) => {
-						return eval(Hitomi_La.common_js + "url_from_url_from_hash(gallery.id, gallery.files[index]);") as string;
+						return "https:" + eval(Hitomi_La.common_js + "url_from_url_from_hash(gallery.id, gallery.files[index]);") as string;
 					}));
 				} else {
 					setTimeout(() => {
@@ -214,7 +214,9 @@ class Hitomi_La {
 	public thumbnail(id: number): Promise<string[]> {
 		return new Promise<string[]>(async (resolve, rejects) => {
 			request.get(`https://ltn.hitomi.la/galleryblock/${id}.html`).then((callback) => {
-				return resolve(utility.parse(callback.encode, "picture > img", "src") as string[]);
+				return resolve((utility.parse(callback.encode, "picture > img", "src") as string[]).map((value, index) => {
+					return "https:" + value;
+				}));
 			});
 		});
 	}
