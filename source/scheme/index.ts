@@ -10,8 +10,8 @@ export enum Scheme {
 export class Schema<state> {
 	private state: state;
 	private event: Scheme;
-	constructor(init: state, event: Scheme) {
-		this.state = init;
+	constructor(state: state, event: Scheme) {
+		this.state = state;
 		this.event = event;
 	}
 	protected $get(): state {

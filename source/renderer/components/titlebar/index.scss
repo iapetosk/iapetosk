@@ -1,11 +1,26 @@
 #titlebar {
+	display: grid;
+	grid-template-areas:
+	". focus restore close";
+	grid-template-rows: 1fr auto auto auto;
+	grid-template-columns: 1fr;
 	background-color: var(--colour_1);
-	> * {
-		float: right;
+	> #focus,
+	> #restore,
+	> #close {
 		height: 100%;
 		width: 45px;
 	}
-	> #close:hover {
-		background-color: var(--colour_error);
+	> #focus {
+		grid-area: focus;
+	}
+	> #restore {
+		grid-area: restore;
+	}
+	> #close {
+		grid-area: close;
+		&:hover {
+			background-color: var(--colour_error);
+		}
 	}
 }

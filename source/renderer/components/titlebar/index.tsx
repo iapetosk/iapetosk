@@ -20,11 +20,12 @@ class TitleBar extends React.Component<TitleBarState> {
 	public render(): JSX.Element {
 		return (
 			<section id="titlebar" class="contrast draggable">
-				<button id="close" class="un_draggable"
+				<area id="occupy"></area>
+				<button id="focus" class="un_draggable"
 					onClick={() => {
-						nw.Window.get().close();
+						nw.Window.get().minimize();
 					}}
-					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/close.svg`) }}>
+					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/focus.svg`) }}>
 				</button>
 				<button id="restore" class="un_draggable"
 					onClick={() => {
@@ -36,11 +37,11 @@ class TitleBar extends React.Component<TitleBarState> {
 					}}
 					dangerouslySetInnerHTML={{ __html: require(this.state.restore ? "!html-loader!@/assets/icons/minimize.svg" : "!html-loader!@/assets/icons/maximize.svg") }}>
 				</button>
-				<button id="focus" class="un_draggable"
+				<button id="close" class="un_draggable"
 					onClick={() => {
-						nw.Window.get().minimize();
+						nw.Window.get().close();
 					}}
-					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/focus.svg`) }}>
+					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/close.svg`) }}>
 				</button>
 			</section>
 		);

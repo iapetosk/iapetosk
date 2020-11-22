@@ -43,7 +43,7 @@ class Utility {
 				return Number(capture);
 			}
 			case "array": {
-				return /^\[([\D\d]*)\]$/.exec(capture)![1].split(/\,/g);
+				return String(/^\[([\D\d]*)\]$/.exec(capture)![1]).split(/\,/g);
 			}
 			case "object": {
 				return JSON.parse(capture);

@@ -27,9 +27,9 @@ class Iterable extends React.Component<IterableState> {
 				"series": [],
 				"artist": [],
 				"group": [],
-				"tag": [],
+				"tag": [{ action: Action.POSITIVE, value: "uncensored" }],
 				"male": [],
-				"female": [{ action: Action.POSITIVE, value: "tomboy" }],
+				"female": [],
 				"custom": []
 			},
 			index: 0
@@ -55,8 +55,12 @@ class Iterable extends React.Component<IterableState> {
 			<section id="iterable">
 				{this.array.map((value, index) => {
 					return (
-						<section id="gallery" class="contrast center" key={index}>
-							<canvas id="thumbnail" class="contrast" style={{ background: `url(${value.thumbnail[0]}) no-repeat center / cover` }}></canvas>
+						<section id="gallery" class="contrast" key={index}>
+							<legend id="thumbnail" class="contrast" style={{ background: `url(${value.thumbnail[0]}) no-repeat center / cover` }}></legend>
+							<legend id="flexbox" class="center-y">
+								<legend id="title" class="eclipse">{value.title}</legend>
+								<legend id="id" class="center">({value.id})</legend>
+							</legend>
 							{/*
 							<legend id="id">{value.id}</legend>
 							<legend id="title">{value.title}</legend>
