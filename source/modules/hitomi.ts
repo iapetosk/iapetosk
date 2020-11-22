@@ -63,7 +63,7 @@ export type GalleryIterable = (Merge<Omit<GalleryBlock, "files">, {
 class Hitomi_La {
 	private static common_js: string = "";
 	private static index_all: string = "https://ltn.hitomi.la/index-all.nozomi";
-	private static collection: { reference: Record<string, number[]>, gallery: Record<number, GalleryBlock>; } = { reference: {}, gallery: {} };
+	private static collection: { reference: Record<string, number[]>, block: Record<number, GalleryBlock>; } = { reference: {}, block: {} };
 	constructor() {
 		request.get("https://ltn.hitomi.la/common.js").then((callback) => {
 			Hitomi_La.common_js = callback.encode.split(/function show_loading/)![0];
@@ -180,16 +180,16 @@ class Hitomi_La {
 	}
 	public read(id: number): Promise<GalleryBlock> {
 		return new Promise<GalleryBlock>(async (resolve, rejects) => {
-			return resolve(Hitomi_La.collection.gallery[id] || await request.get(`https://ltn.hitomi.la/galleries/${id}.js`).then((callback) => {
+			return resolve(Hitomi_La.collection.block[id] || await request.get(`https://ltn.hitomi.la/galleries/${id}.js`).then((callback) => {
 				switch (callback.status.code) {
 					case 404: {
 						return undefined;
 					}
 					default: {
 						// assign
-						Hitomi_La.collection.gallery[id] = utility.extract(`${callback.encode};`, "galleryinfo", "object");
+						Hitomi_La.collection.block[id] = utility.extract(`${callback.encode};`, "galleryinfo", "object");
 						// resolve
-						return Hitomi_La.collection.gallery[id];
+						return Hitomi_La.collection.block[id];
 					}
 				}
 			}));
