@@ -83,8 +83,8 @@ class Utility {
 		return [text.substring(0, index), text.substring(index)];
 	}
 	public referer(referer?: string): void {
-		chrome.webRequest.onBeforeSendHeaders.addListener((response: Record<string, any>) => {
-			var socket: number = NaN;
+		chrome.webRequest.onBeforeSendHeaders.addListener((response: any) => {
+			let socket: number = NaN;
 
 			for (let index: number = 0; index < response.requestHeaders.length; index++) {
 				switch (response.requestHeaders[index].name) {

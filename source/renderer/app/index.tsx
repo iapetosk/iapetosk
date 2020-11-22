@@ -26,16 +26,14 @@ class App extends React.Component<AppState> {
 
 		utility.referer("https://hitomi.la");
 
-		try {
-			nw.Window.get().showDevTools();
-		} catch {
-			// TODO: none
-		}
 		nw.App.registerGlobalHotKey(new nw.Shortcut(
 			{ key: "F11", active: () => { if (this.state.focus) { nw.Window.get().toggleFullscreen(); } } },
 			// @ts-ignore
 			{ key: "ESCAPE", active: () => { if (this.state.fullscreen) { nw.Window.get().leaveFullscreen(); } } }
 		));
+		if (process.env.NODE_ENV = "production") {
+			nw.Window.get().showDevTools();	
+		}
 		listener.on("reload", () => {
 			window.location.reload();
 		});

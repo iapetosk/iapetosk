@@ -58,7 +58,7 @@ class Iterable extends React.Component<IterableState> {
 					return (
 						<section id="gallery" class="contrast" key={index}>
 							<section id="upper" class="contrast">
-								<legend id="thumbnail" class={utility.inline({ "censored": !(index % 5) })} style={{ background: `url(${value.thumbnail[0]}) no-repeat center / cover` }}></legend>
+								<legend id="thumbnail" style={{ background: `url(${value.thumbnail[0]}) no-repeat center / cover` }}></legend>
 							</section>
 							<section id="lower" class="center-y">
 								<legend id="title" class="eclipse">{value.title}</legend>
