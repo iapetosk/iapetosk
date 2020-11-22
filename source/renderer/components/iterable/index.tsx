@@ -7,6 +7,7 @@ import history from "@/scheme/history";
 
 import { Scheme } from "@/scheme";
 import { Action, GalleryIterable } from "@/modules/hitomi";
+import utility from "@/modules/utility";
 
 export type IterableState = {};
 
@@ -56,11 +57,13 @@ class Iterable extends React.Component<IterableState> {
 				{this.array.map((value, index) => {
 					return (
 						<section id="gallery" class="contrast" key={index}>
-							<legend id="thumbnail" class="contrast" style={{ background: `url(${value.thumbnail[0]}) no-repeat center / cover` }}></legend>
-							<legend id="flexbox" class="center-y">
+							<section id="upper" class="contrast">
+								<legend id="thumbnail" class={utility.inline({ "censored": !(index % 5) })} style={{ background: `url(${value.thumbnail[0]}) no-repeat center / cover` }}></legend>
+							</section>
+							<section id="lower" class="center-y">
 								<legend id="title" class="eclipse">{value.title}</legend>
 								<legend id="id" class="center">({value.id})</legend>
-							</legend>
+							</section>
 							{/*
 							<legend id="id">{value.id}</legend>
 							<legend id="title">{value.title}</legend>
