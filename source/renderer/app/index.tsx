@@ -31,7 +31,7 @@ class App extends React.Component<AppState> {
 			// @ts-ignore
 			{ key: "ESCAPE", active: () => { if (this.state.fullscreen) { nw.Window.get().leaveFullscreen(); } } }
 		));
-		if (process.env.NODE_ENV = "production") {
+		if (process.env.NODE_ENV === "development") {
 			nw.Window.get().showDevTools();	
 		}
 		listener.on("reload", () => {
