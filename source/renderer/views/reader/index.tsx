@@ -11,7 +11,7 @@ class Reader extends React.Component<ReaderState> {
 	}
 	public render(): JSX.Element {
 		return (
-			<section id="reader" class="contrast">
+			<section id="reader">
 			</section>
 		);
 	}

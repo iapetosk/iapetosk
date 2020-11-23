@@ -36,7 +36,6 @@
 	user-select: none;
 	font-family: arial;
 	box-sizing: border-box;
-	backface-visibility: hidden;
 }
 // class(es)
 .draggable {
@@ -83,16 +82,16 @@
 		height: var(--titlebar_height);
 	}
 	> #content {
-		grid-area: main;
 		overflow: hidden;
+		grid-area: main;
+		border-top-width: 0px;
+		border-bottom-width: 0px;
+		background-color: var(--colour_2);
 		> * {
 			overflow-x: hidden;
 			overflow-y: auto;
 			width: 100%;
 			height: 100%;
-			border-top-width: 0px;
-			border-bottom-width: 0px;
-			background-color: var(--colour_2);
 		}
 	}
 	> #paging {
