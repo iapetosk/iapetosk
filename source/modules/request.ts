@@ -32,7 +32,7 @@ export type RequestResponse = {
 class Request {
 	readonly agent: https.Agent = new https.Agent({});
 	private max_redirects: number;
-	constructor(max_redirects: number = 1) {
+	constructor(max_redirects: number) {
 		// <define default properties>
 		this.max_redirects = max_redirects;
 		// @ts-ignore
@@ -78,6 +78,7 @@ class Request {
 							override.options.url = response.headers.location || options.url;
 						}
 						// DDOS protection services
+						/*
 						if (response.headers.server) {
 							switch (response.headers.server) {
 								case "cloudflare": {
@@ -89,6 +90,7 @@ class Request {
 								}
 							}
 						}
+						*/
 						if (override.changed) {
 							// subtract by one
 							override.options.redirects = override.options.redirects ? override.options.redirects + 1 : 1;
@@ -181,4 +183,4 @@ class Request {
 		return /^https/.test(url);
 	}
 }
-export default (new Request());
+export default (new Request(10));

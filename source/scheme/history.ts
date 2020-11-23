@@ -2,7 +2,7 @@ import hitomi from "@/modules/hitomi";
 import utility from "@/modules/utility";
 
 import { Scheme, Schema } from "@/scheme";
-import { Filter, GalleryIterable } from "@/modules/hitomi";
+import { Filter, GalleryBlock } from "@/modules/hitomi";
 
 export type Session = {
 	history: {
@@ -27,27 +27,20 @@ class History extends Schema<Session> {
 	public backward(): void {
 		return this.$set({ ...this.$get(), index: this.$get().index - 1 });
 	}
-	public iterable(): Promise<GalleryIterable[]> {
-		// galleryiterable is extends of galleryblock
-		const array: GalleryIterable[] = [];
-		return new Promise<GalleryIterable[]>((resolve, rejects) => {
-			// size and index only matters @if SINGULAR === true
+	public iterable(): Promise<GalleryBlock[]> {
+		return new Promise<GalleryBlock[]>((resolve, rejects) => {
+			// size and index only matters if SINGULAR equals true
 			hitomi.search(this.get().filter, { size: 25, index: this.get().index }).then((archive) => {
-				// loop 0~24 => 25 times
-				for (let index: number = 0; index < Math.min(archive.array.length, 25); index++) {
-					// get galleryblock from id
-					hitomi.read(archive.array[index + (archive.singular ? 0 : 25 * this.get().index)]).then((gallery) => {
-						// get thumbnail from id
-						hitomi.thumbnail(gallery.id).then((thumbnail) => {
-							// assign to array
-							array[index] = { ...gallery, thumbnail: thumbnail };
-							// @ts-ignore
-							delete array[index].files;
-							// none-async return
-							if (Object.keys(array).length === Math.min(archive.array.length, 25)) {
-								return resolve(array);
-							}
-						});
+				const array: Array<GalleryBlock> = new Array(Math.min(archive.array.length, 25));
+				// loop 25 or less times
+				for (let index: number = 0; index < array.length; index++) {
+					hitomi.block(archive.array[index + (archive.singular ? 0 : 25 * this.get().index)]).then((block) => {
+						// assign
+						array[index] = block;
+						// none-async resolve
+						if (Object.keys(array).length === array.length) {
+							return resolve(array);
+						}
 					});
 				}
 			});

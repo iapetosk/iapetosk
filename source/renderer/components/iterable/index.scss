@@ -13,19 +13,43 @@
 		grid-template-columns: 1fr;
 		background-color: var(--colour_3);
 		transition: border-color var(--transition), background-color var(--transition);
-		> #upper {
+		> * {
 			overflow: hidden;
+		}
+		> #upper {
 			grid-area: upper;
 			margin: 10px;
 			margin-bottom: 0px;
 			transition: border-color var(--transition);
-			> #thumbnail {
-				opacity: 50%;
+			> * {
 				width: 100%;
 				height: 100%;
+				background-color: var(--colour_4);
+			}
+			> #thumbnail {
+				opacity: 50%;
 				transition: opacity var(--transition);
 				&.censored {
 					filter: blur(10px);
+				}
+			}
+			> #interacts {
+				height: 45px;
+				border-left-width: 0px;
+				border-right-width: 0px;
+				border-bottom-width: 0px;
+				transform: translateY(0%);
+				transition: transform var(--transition);
+				> * {
+					width: 45px;
+					height: 100%;
+					&:hover {
+						background-color: var(--colour_3);
+					}
+					> svg {
+						width: 20px;
+						height: 20px;
+					}
 				}
 			}
 		}
@@ -36,29 +60,34 @@
 			"title id";
 			grid-template-rows: 1fr;
 			grid-template-columns: 1fr 85px;
+			> * {
+				font-weight: bold;
+			}
 			> #title {
 				grid-area: title;
 				font-size: 15px;
-				font-weight: bold;
 				margin-left: 10px;
 				color: var(--colour_9);
 			}
 			> #id {
 				grid-area: id;
 				font-size: 12.5px;
-				font-weight: bold;
-				color: var(--colour_2);
+				color: var(--colour_1);
 			}
 		}
 		&:hover {
-			z-index: 99;
 			border-color: var(--colour_9);
 			background-color: var(--colour_5);
 			.contrast {
 				border-color: var(--colour_9);
 			}
-			> #upper > #thumbnail {
-				opacity: 100%;
+			> #upper {
+				> #thumbnail {
+					opacity: 100%;
+				}
+				> #interacts {
+					transform: translateY(-100%);
+				}
 			}
 		}
 	}
