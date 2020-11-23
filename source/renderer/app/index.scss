@@ -33,9 +33,10 @@
 	border: none;
 	outline: none;
 	background: none;
+	user-select: none;
+	font-family: arial;
 	box-sizing: border-box;
-	font-family: arial, sans-serif, monospace;
-	color: var(--colour_9);
+	backface-visibility: hidden;
 }
 // class(es)
 .draggable {

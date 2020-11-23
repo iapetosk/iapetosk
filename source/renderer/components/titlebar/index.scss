@@ -5,9 +5,7 @@
 	grid-template-rows: 1fr auto auto auto;
 	grid-template-columns: 1fr;
 	background-color: var(--colour_1);
-	> #focus,
-	> #restore,
-	> #close {
+	> * {
 		width: 45px;
 	}
 	> #focus {

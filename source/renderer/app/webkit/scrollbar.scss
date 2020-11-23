@@ -11,8 +11,5 @@
 	background-color: var(--colour_1);
 }
 ::-webkit-scrollbar-thumb {
-	background-color: var(--colour_2);
-	&:hover {
-		background-color: var(--colour_3);
-	}
+	background-color: var(--colour_success);
 }

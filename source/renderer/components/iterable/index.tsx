@@ -3,16 +3,16 @@ import * as React from "react";
 import "./index.scss";
 
 import listener from "@/modules/listener";
+import utility from "@/modules/utility";
 import history from "@/scheme/history";
 
 import { Scheme } from "@/scheme";
-import { Action, GalleryIterable } from "@/modules/hitomi";
-import utility from "@/modules/utility";
+import { Action, GalleryBlock } from "@/modules/hitomi";
 
 export type IterableState = {};
 
 class Iterable extends React.Component<IterableState> {
-	public array: GalleryIterable[] = [];
+	public array: GalleryBlock[] = [];
 	public state: IterableState;
 	constructor(properties: IterableState) {
 		super(properties);
@@ -38,6 +38,8 @@ class Iterable extends React.Component<IterableState> {
 
 		function update(I: Iterable): void {
 			history.iterable().then((iterable) => {
+				// debug
+				console.log(iterable);
 				// assgin
 				I.array = iterable;
 				// update
@@ -58,7 +60,23 @@ class Iterable extends React.Component<IterableState> {
 					return (
 						<section id="gallery" class="contrast" key={index}>
 							<section id="upper" class="contrast">
-								<legend id="thumbnail" style={{ background: `url(${value.thumbnail[0]}) no-repeat center / cover` }}></legend>
+								<legend id="thumbnail" class="censored" style={{ background: `url(${value.thumbnail[0]}) no-repeat center / cover` }}></legend>
+								<section id="interacts" class="contrast center">
+									{[
+										{ html: require(`!html-loader!@/assets/icons/read.svg`), click: () => { return; } },
+										{ html: require(`!html-loader!@/assets/icons/open.svg`), click: () => { return; } },
+										{ html: require(`!html-loader!@/assets/icons/copy.svg`), click: () => { return navigator.clipboard.writeText(`https://hitomi.la/galleries/${value.id}.html`); } }
+									].map((value, index) => {
+										return (
+											<button key={index}
+												onClick={() => {
+													return value.click();
+												}}
+												dangerouslySetInnerHTML={{ __html: value.html }}>
+											</button>
+										);
+									})}
+								</section>
 							</section>
 							<section id="lower" class="center-y">
 								<legend id="title" class="eclipse">{value.title}</legend>
