@@ -14,7 +14,7 @@ class Browser extends React.Component<BrowserState> {
 	}
 	public render(): JSX.Element {
 		return (
-			<section id="browser" class="contrast">
+			<section id="browser">
 				<Iterable></Iterable>
 			</section>
 		);

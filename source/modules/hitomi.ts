@@ -70,10 +70,10 @@ class Hitomi_La {
 		block: Record<number, GalleryBlock>,
 		script: Record<number, GalleryJS>;
 	} = {
-			array: {},
-			block: {},
-			script: {}
-		};
+		array: {},
+		block: {},
+		script: {}
+	};
 	constructor() {
 		request.get("https://ltn.hitomi.la/common.js").then((callback) => {
 			Hitomi_La.common_js = callback.encode.split(/function show_loading/)![0];
