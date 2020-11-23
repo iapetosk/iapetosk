@@ -12,7 +12,7 @@
 	},
 	"window": {
 		"frame": false,
-		"min_width": 900,
+		"min_width": 775,
 		"min_height": 565,
 		"position": "center",
 		"icon": "source/assets/icons/icon.png"

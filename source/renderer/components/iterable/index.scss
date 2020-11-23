@@ -29,6 +29,7 @@
 			> #thumbnail {
 				opacity: 50%;
 				transition: opacity var(--transition);
+				will-change: opacity;
 				&.censored {
 					filter: blur(10px);
 				}
