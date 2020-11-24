@@ -40,10 +40,14 @@ class Suggestion {
 		Suggestion.serial++;
 	}
 	public get(query: string): Promise<Suggest> {
-		return this.unknown_0(query);
+		return this.unknown_1(query);
 	}
-
-	private unknown_0(query: string): Promise<Suggest> {
+	// @searchlib.js > hash_term
+	private unknown_0(value: string): Uint8Array {
+		return new Uint8Array(sha256.array(value).slice(0, 4));
+	}
+	// @search.js > get_suggestions_for_query
+	private unknown_1(query: string): Promise<Suggest> {
 		return new Promise<Suggest>((resolve, reject) => {
 			query = query.replace(/_/g, "\u0020");
 
@@ -52,16 +56,25 @@ class Suggestion {
 			const field: string = /:/.test(query) ? query.split(/:/)[0] : "global";
 			const value: string = /:/.test(query) ? query.split(/:/)[1] : query;
 
-			this.unknown_2(field, 0, serial).then((callback_1st) => {
-				this.unknown_4(field, new Uint8Array(sha256.array(value).slice(0, 4)), callback_1st, serial).then((callback_2nd) => {
-					this.unknown_5(field, callback_2nd).then((callback_3rd) => {
-						return resolve(callback_3rd);
+			function condition(): void {
+				if (serial && serial !== Suggestion.serial) {
+					return resolve([]);
+				}
+			}
+			this.unknown_3(field, 0).then((node) => {
+				condition();
+				this.unknown_5(field, this.unknown_0(value), node).then((bytes) => {
+					condition();
+					this.unknown_6(field, bytes).then((suggest) => {
+						condition();
+						return resolve(suggest);
 					});
 				});
 			});
 		});
 	}
-	private unknown_1(bytes: Uint8Array): Node {
+	// @search.js > decode_node
+	private unknown_2(bytes: Uint8Array): Node {
 		const node: Node = {
 			field: [],
 			value: [],
@@ -112,11 +125,9 @@ class Suggestion {
 		}
 		return node;
 	}
-	private unknown_2(field: string, adress: number, serial: number): Promise<Node> {
+	// @search.js > get_node_at_address
+	private unknown_3(field: string, adress: number): Promise<Node> {
 		return new Promise<Node>((resolve, rejects) => {
-			if (serial && serial !== Suggestion.serial) {
-				return rejects();
-			}
 			const URI: string[] = ["https://ltn.hitomi.la/"];
 
 			function recursive(I: Suggestion) {
@@ -146,9 +157,9 @@ class Suggestion {
 								break;
 							}
 						}
-						I.unknown_3(URI.join(""), [adress, adress + 464 - 1]).then((callback) => {
+						I.unknown_4(URI.join(""), [adress, adress + 464 - 1]).then((callback) => {
 							if (callback) {
-								return resolve(I.unknown_1(callback));
+								return resolve(I.unknown_2(callback));
 							} else {
 								return rejects();
 							}
@@ -160,14 +171,16 @@ class Suggestion {
 			return recursive(this);
 		});
 	}
-	private unknown_3(url: string, range: number[]): Promise<Uint8Array> {
+	// @search.js > get_url_at_range
+	private unknown_4(url: string, range: number[]): Promise<Uint8Array> {
 		return new Promise<Uint8Array>((resolve, rejects) => {
 			request.get(url, { encoding: "binary", headers: { "range": `bytes=${range[0]}-${range[1]}` } }).then((callback) => {
 				return resolve(new Uint8Array(new Buffer(callback.encode, "binary")));
 			});
 		});
 	}
-	private unknown_4(field: string, key: Uint8Array, node: Node, serial: number): Promise<[number, number]> {
+	// @search.js > B_search
+	private unknown_5(field: string, key: Uint8Array, node: Node): Promise<[number, number]> {
 		return new Promise<[number, number]>((resolve, rejects) => {
 			function mystery_0(first: Uint8Array, second: Uint8Array): [boolean, boolean] {
 				for (let index: number = 0; index < (first.byteLength < second.byteLength ? first.byteLength : second.byteLength); index++) {
@@ -214,14 +227,15 @@ class Suggestion {
 			if (node.child[index] == 0) {
 				return rejects();
 			}
-			this.unknown_2(field, node.child[index], serial).then((node) => {
-				this.unknown_4(field, key, node, serial).then((node) => {
+			this.unknown_3(field, node.child[index]).then((node) => {
+				this.unknown_5(field, key, node).then((node) => {
 					return resolve(node);
 				});
 			});
 		});
 	}
-	private unknown_5(field: string, bytes: [number, number]): Promise<Suggest> {
+	// @search.js > get_suggestions_from_data
+	private unknown_6(field: string, bytes: [number, number]): Promise<Suggest> {
 		const suggest: Suggest = [];
 		return new Promise<Suggest>((resolve, rejects) => {
 			const [offset, length] = bytes;
@@ -229,7 +243,7 @@ class Suggestion {
 			if (length > 10000 || length <= 0) {
 				return resolve([]);
 			}
-			this.unknown_3(`https://ltn.hitomi.la/tagindex/${field}.${Suggestion.version.tagindex}.data`, [offset, offset + length - 1]).then((callback) => {
+			this.unknown_4(`https://ltn.hitomi.la/tagindex/${field}.${Suggestion.version.tagindex}.data`, [offset, offset + length - 1]).then((callback) => {
 				const binary: Binary = {
 					bytes: new DataView(callback.buffer),
 					index: 0
