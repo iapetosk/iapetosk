@@ -32,7 +32,7 @@ class Query extends React.Component<QueryState> {
 				<input id="input" class="contrast" autoComplete="off"
 					onChange={(event) => {
 						suggest.up();
-						suggest.get((event.target as HTMLInputElement).value.split(new RegExp(/\s+/)).pop()!.replace(/^-/, "")!).then((callback) => {
+						suggest.get((event.target as HTMLInputElement).value.split(/\s+/).pop()!.replace(/^-/, "")!).then((callback) => {
 							console.log(callback);
 						});
 					}}
