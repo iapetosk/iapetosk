@@ -2,7 +2,6 @@ import * as fs from "fs";
 import * as path from "path";
 import * as API from "@/assets/modules.json";
 
-import utility from "@/modules/utility";
 import storage from "@/modules/storage";
 import request from "@/modules/request";
 import worker from "@/scheme/worker";
@@ -64,10 +63,9 @@ export class Download {
 	public max_threads: number;
 	public max_working: number;
 	constructor(max_threads: number, max_working: number) {
-		// <define default properties>
 		this.max_threads = max_threads;
 		this.max_working = max_working;
-		// <exception occured if folder isn't exist>
+		// exception occured if folder isn't exist
 		try {
 			for (const file of fs.readdirSync(Folder.BUNDLES)) {
 				// check if file is .json

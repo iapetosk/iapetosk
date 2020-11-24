@@ -63,8 +63,8 @@ export type GalleryJS = {
 };
 
 class Hitomi_La {
-	private static common_js: string = "";
 	private static index_all: string = "https://ltn.hitomi.la/index-all.nozomi";
+	private static common_js: string = "";
 	private static collection: {
 		array: Record<string, number[]>,
 		block: Record<number, GalleryBlock>,
@@ -189,7 +189,7 @@ class Hitomi_La {
 		});
 	}
 	public block(id: number): Promise<GalleryBlock> {
-		return new Promise<GalleryBlock>(async (resolve, rejects) => {
+		return new Promise<GalleryBlock>((resolve, rejects) => {
 			// assigned
 			if (Hitomi_La.collection.block[id]) {
 				// resolve
@@ -197,7 +197,7 @@ class Hitomi_La {
 			}
 			const object: Record<string, any> = {};
 
-			await request.get(`https://ltn.hitomi.la/galleryblock/${id}.html`).then((callback) => {
+			request.get(`https://ltn.hitomi.la/galleryblock/${id}.html`).then((callback) => {
 				for (const [index, value] of (utility.parse(callback.encode, "td") as string[]).entries()) {
 					if (index % 2) {
 						object[Object.keys(object).pop()!] = utility.unwrap(value.split(/\s\s+/).filter((value) => { return value.length; }));
@@ -222,13 +222,13 @@ class Hitomi_La {
 		});
 	}
 	public script(id: number): Promise<GalleryJS> {
-		return new Promise<GalleryJS>(async (resolve, rejects) => {
+		return new Promise<GalleryJS>((resolve, rejects) => {
 			// assigned
 			if (Hitomi_La.collection.script[id]) {
 				// resolve
 				return resolve(Hitomi_La.collection.script[id]);
 			}
-			async function recursive(script: GalleryJS) {
+			function recursive(script: GalleryJS) {
 				switch (Hitomi_La.common_js.length) {
 					case 0: {
 						setTimeout(() => {
@@ -253,10 +253,10 @@ class Hitomi_La {
 					}
 				}
 			}
-			await request.get(`https://ltn.hitomi.la/galleries/${id}.js`).then((callback) => {
+			request.get(`https://ltn.hitomi.la/galleries/${id}.js`).then((callback) => {
 				switch (callback.status.code) {
 					case 404: {
-						return undefined;
+						return rejects();
 					}
 					default: {
 						return recursive(utility.extract(`${callback.encode};`, "galleryinfo", "object"));

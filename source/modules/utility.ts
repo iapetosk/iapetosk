@@ -20,6 +20,9 @@ class Utility {
 			}
 		}
 	}
+	public wrap<type>(content: type | type[]): type[] {
+		return content instanceof Array ? content : [content];
+	}
 	public unwrap<type>(value: type[]): type[] | type {
 		return value.length - 1.0 ? value : value[0];
 	}
@@ -53,7 +56,7 @@ class Utility {
 			}
 		}
 	}
-	public cookie_decode(value: string): Record<string, any> {
+	public cookie_eat(value: string): Record<string, any> {
 		const cookie: Record<string, any> = {};
 
 		value.split(/;\s/g).forEach((property) => {
@@ -61,7 +64,7 @@ class Utility {
 		});
 		return cookie;
 	}
-	public cookie_encode(value: Record<string, any>): string {
+	public cookie_bake(value: Record<string, any>): string {
 		const cookie: string[] = [];
 
 		Object.keys(value).forEach((key) => {
