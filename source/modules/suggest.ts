@@ -40,28 +40,28 @@ class Suggestion {
 		Suggestion.serial++;
 	}
 	public get(query: string): Promise<Suggest> {
-		return this.get_suggestions_for_query(query);
+		return this.unknown_0(query);
 	}
-	
-	private get_suggestions_for_query(query: string): Promise<Suggest> {
+
+	private unknown_0(query: string): Promise<Suggest> {
 		return new Promise<Suggest>((resolve, reject) => {
 			query = query.replace(/_/g, "\u0020");
 
 			const serial: number = Suggestion.serial;
 
-			const field: string = new RegExp(/:/).test(query) ? query.split(/:/)[0] : "global";
-			const value: string = new RegExp(/:/).test(query) ? query.split(/:/)[1] : query;
+			const field: string = /:/.test(query) ? query.split(/:/)[0] : "global";
+			const value: string = /:/.test(query) ? query.split(/:/)[1] : query;
 
-			this.get_node_at_address(field, 0, serial).then((callback_1st) => {
-				this.B_search(field, new Uint8Array(sha256.array(value).slice(0, 4)), callback_1st, serial).then((callback_2nd) => {
-					this.get_suggestions_from_data(field, callback_2nd).then((callback_3rd) => {
+			this.unknown_2(field, 0, serial).then((callback_1st) => {
+				this.unknown_4(field, new Uint8Array(sha256.array(value).slice(0, 4)), callback_1st, serial).then((callback_2nd) => {
+					this.unknown_5(field, callback_2nd).then((callback_3rd) => {
 						return resolve(callback_3rd);
 					});
 				});
 			});
 		});
 	}
-	private decode_node(bytes: Uint8Array): Node {
+	private unknown_1(bytes: Uint8Array): Node {
 		const node: Node = {
 			field: [],
 			value: [],
@@ -112,7 +112,7 @@ class Suggestion {
 		}
 		return node;
 	}
-	private get_node_at_address(field: string, adress: number, serial: number): Promise<Node> {
+	private unknown_2(field: string, adress: number, serial: number): Promise<Node> {
 		return new Promise<Node>((resolve, rejects) => {
 			if (serial && serial !== Suggestion.serial) {
 				return rejects();
@@ -146,9 +146,9 @@ class Suggestion {
 								break;
 							}
 						}
-						I.get_url_at_range(URI.join(""), [adress, adress + 464 - 1]).then((callback) => {
+						I.unknown_3(URI.join(""), [adress, adress + 464 - 1]).then((callback) => {
 							if (callback) {
-								return resolve(I.decode_node(callback));
+								return resolve(I.unknown_1(callback));
 							} else {
 								return rejects();
 							}
@@ -160,14 +160,14 @@ class Suggestion {
 			return recursive(this);
 		});
 	}
-	private get_url_at_range(url: string, range: number[]): Promise<Uint8Array> {
+	private unknown_3(url: string, range: number[]): Promise<Uint8Array> {
 		return new Promise<Uint8Array>((resolve, rejects) => {
 			request.get(url, { encoding: "binary", headers: { "range": `bytes=${range[0]}-${range[1]}` } }).then((callback) => {
 				return resolve(new Uint8Array(new Buffer(callback.encode, "binary")));
 			});
 		});
 	}
-	private B_search(field: string, key: Uint8Array, node: Node, serial: number): Promise<[number, number]> {
+	private unknown_4(field: string, key: Uint8Array, node: Node, serial: number): Promise<[number, number]> {
 		return new Promise<[number, number]>((resolve, rejects) => {
 			function mystery_0(first: Uint8Array, second: Uint8Array): [boolean, boolean] {
 				for (let index: number = 0; index < (first.byteLength < second.byteLength ? first.byteLength : second.byteLength); index++) {
@@ -180,19 +180,15 @@ class Suggestion {
 				return [true, true];
 			}
 			function mystery_1(key: Uint8Array, node: Node): [boolean, number] {
-				let mystery: [boolean, boolean] = [true, false];
-
-				if (!node.field.length) {
-					return [false, 0];
-				}
-				for (let index: number = 0; index < node.field.length; index++) {
-					mystery = mystery_0(key, node.field[index]);
-
-					if (mystery[0]) {
-						return [mystery[1], index];
+				let value: [boolean, boolean] = [true, false];
+				let index: number = 0;
+				for (; index < node.field.length; index++) {
+					value = mystery_0(key, node.field[index]);
+					if (value[0]) {
+						break;
 					}
 				}
-				throw new Error();
+				return [value[1], index];
 			}
 			function mystery_2(node: Node): boolean {
 				for (let index: number = 0; index < node.child.length; index++) {
@@ -218,14 +214,14 @@ class Suggestion {
 			if (node.child[index] == 0) {
 				return rejects();
 			}
-			this.get_node_at_address(field, node.child[index], serial).then((node) => {
-				this.B_search(field, key, node, serial).then((node) => {
+			this.unknown_2(field, node.child[index], serial).then((node) => {
+				this.unknown_4(field, key, node, serial).then((node) => {
 					return resolve(node);
 				});
 			});
 		});
 	}
-	private get_suggestions_from_data(field: string, bytes: [number, number]): Promise<Suggest> {
+	private unknown_5(field: string, bytes: [number, number]): Promise<Suggest> {
 		const suggest: Suggest = [];
 		return new Promise<Suggest>((resolve, rejects) => {
 			const [offset, length] = bytes;
@@ -233,7 +229,7 @@ class Suggestion {
 			if (length > 10000 || length <= 0) {
 				return resolve([]);
 			}
-			this.get_url_at_range(`https://ltn.hitomi.la/tagindex/${field}.${Suggestion.version.tagindex}.data`, [offset, offset + length - 1]).then((callback) => {
+			this.unknown_3(`https://ltn.hitomi.la/tagindex/${field}.${Suggestion.version.tagindex}.data`, [offset, offset + length - 1]).then((callback) => {
 				const binary: Binary = {
 					bytes: new DataView(callback.buffer),
 					index: 0
