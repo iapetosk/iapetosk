@@ -1,0 +1,18 @@
+#query {
+	display: grid;
+	grid-template-areas:
+	"input";
+	grid-template-rows: var(--query_height);
+	grid-template-columns: 1fr;
+	margin: 15px;
+	> #input {
+		color: var(--colour_6);
+		padding: 10px;
+		background-color: var(--colour_3);
+		transition: border-color var(--transition);
+		&:hover,
+		&:focus {
+			border-color: var(--colour_9);
+		}
+	}
+}
