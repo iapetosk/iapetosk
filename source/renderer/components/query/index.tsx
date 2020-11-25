@@ -2,9 +2,10 @@ import * as React from "react";
 
 import "./index.scss";
 
+import suggest from "@/modules/hitomi/suggest";
+
 import listener from "@/modules/listener";
 import utility from "@/modules/utility";
-import suggest from "@/modules/suggest";
 import query from "@/scheme/query";
 
 import { Scheme } from "@/scheme";

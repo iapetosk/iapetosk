@@ -3,11 +3,11 @@ import * as React from "react";
 import "./index.scss";
 
 import listener from "@/modules/listener";
-import utility from "@/modules/utility";
 import history from "@/scheme/history";
 
 import { Scheme } from "@/scheme";
-import { Action, GalleryBlock } from "@/modules/hitomi";
+import { GalleryBlock } from "@/modules/hitomi/read";
+import { SearchAction } from "@/modules/hitomi/search";
 
 export type IterableState = {};
 
@@ -23,12 +23,12 @@ class Iterable extends React.Component<IterableState> {
 			filter: {
 				"id": [],
 				"type": [],
-				"language": [{ action: Action.POSITIVE, value: "korean" }],
+				"language": [{ action: SearchAction.POSITIVE, value: "korean" }],
 				"character": [],
 				"series": [],
 				"artist": [],
 				"group": [],
-				"tag": [{ action: Action.POSITIVE, value: "uncensored" }],
+				"tag": [{ action: SearchAction.POSITIVE, value: "uncensored" }],
 				"male": [],
 				"female": [],
 				"custom": []
