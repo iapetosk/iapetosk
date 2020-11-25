@@ -27,7 +27,7 @@ class Query extends React.Component<QueryState> {
 			}
 		});
 	}
-	public render(): JSX.Element {
+	public render() {
 		return (
 			<section id="query">
 				<input id="input" class="contrast" autoComplete="off"

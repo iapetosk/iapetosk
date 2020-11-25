@@ -92,8 +92,8 @@ export class Download {
 			// TODO: none
 		}
 	}
-	public create(thread: Thread): Promise<void> {
-		return new Promise<void>((resolve, rejects): void => {
+	public create(thread: Thread) {
+		return new Promise<void>((resolve, rejects) => {
 			// debug
 			console.log(thread);
 
@@ -105,7 +105,7 @@ export class Download {
 
 			// observe thread
 			thread = new Proxy(thread, {
-				set(target: Thread, key: never, value: never): boolean {
+				set(target: Thread, key: never, value: never) {
 					// debug
 					console.log(target);
 					// update property
@@ -118,7 +118,7 @@ export class Download {
 					return true;
 				}
 			});
-			function next(): void {
+			function next() {
 				worker.get(Status.QUEUED).every((value, index) => {
 					if (index) {
 						return resolve();
@@ -127,7 +127,7 @@ export class Download {
 				});
 				return resolve();
 			}
-			function condition(): boolean {
+			function condition() {
 				return !!valid[thread.working] && thread.working - thread.finished < I.max_working;
 			}
 			function recursive(index: number): void {
@@ -150,7 +150,7 @@ export class Download {
 						}
 					},
 					thread.files[valid[index]]
-				).then((): void => {
+				).then(() => {
 					thread.finished++;
 
 					if (!thread) {
@@ -179,7 +179,7 @@ export class Download {
 				return resolve();
 			}
 			// check for incompleted files
-			for (let index: number = 0; index < thread.files.length; index++) {
+			for (let index = 0; index < thread.files.length; index++) {
 				if (thread.files[index].written !== thread.files[index].size) {
 					valid.push(index);
 				}
@@ -199,8 +199,8 @@ export class Download {
 			return recursive(0);
 		});
 	}
-	public remove(id: number): Promise<void> {
-		return new Promise<void>((resolve, rejects): void => {
+	public remove(id: number) {
+		return new Promise<void>((resolve, rejects) => {
 			// delete folder with files within
 			fs.rmdirSync(path.dirname(worker.get(id)[0]?.files[0].path), { recursive: true });
 			// update worker
@@ -211,12 +211,12 @@ export class Download {
 			return resolve();
 		});
 	}
-	public evaluate(link: string): Promise<Thread> {
-		return new Promise<Thread>((resolve, rejects): void => {
+	public evaluate(link: string) {
+		return new Promise<Thread>((resolve, rejects) => {
 			for (const LOADER of Object.keys(API)) {
 				for (const TEST of API[LOADER as never] as string[]) {
 					if (new RegExp(TEST).test(link)) {
-						(require(`@/assets/loaders/${LOADER}`).default as Loader).start(link).then((callback): void => {
+						(require(`@/assets/loaders/${LOADER}`).default as Loader).start(link).then((callback) => {
 							if (callback.links.length) {
 								const files: File[] = [];
 								const folder: string = String(Date.now());
@@ -227,7 +227,7 @@ export class Download {
 								return resolve(new Thread(link, callback.title, files, callback.options));
 							}
 							throw new Error("empty");
-						}).catch((error): void => {
+						}).catch((error) => {
 							fs.mkdirSync(path.join(Folder.DEBUGS), { recursive: true });
 							fs.writeFileSync(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: LOADER, error: error }));
 						});

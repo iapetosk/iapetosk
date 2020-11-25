@@ -3,22 +3,22 @@ import utility from "@/modules/utility";
 import { Scheme, Schema } from "@/scheme";
 
 class Paging extends Schema<{ metre: number, index: number, size: number; }> {
-	public get(): Paging["state"] {
+	public get() {
 		return this.$get();
 	}
-	public set(value: Paging["state"]): void {
+	public set(value: Paging["state"]) {
 		return this.$set({ ...value, index: utility.clamp(value.index, 0, value.size - 1) });
 	}
-	public first(): void {
+	public first() {
 		return this.set({ ...this.get(), index: 0 });
 	}
-	public forward(): void {
+	public forward() {
 		return this.set({ ...this.get(), index: this.get().index + 1 });
 	}
-	public backward(): void {
+	public backward() {
 		return this.set({ ...this.get(), index: this.get().index - 1 });
 	}
-	public last(): void {
+	public last() {
 		return this.set({ ...this.get(), index: this.get().size - 1 });
 	}
 }

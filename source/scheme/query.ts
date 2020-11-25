@@ -1,13 +1,13 @@
 import { Scheme, Schema } from "@/scheme";
 
 class Query extends Schema<string> {
-	public get(): Query["state"] {
+	public get() {
 		return this.$get();
 	}
-	public set(value: Query["state"]): void {
+	public set(value: Query["state"]) {
 		return this.$set(value);
 	}
-	public clear(): void {
+	public clear() {
 		this.set("");
 	}
 }

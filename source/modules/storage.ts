@@ -15,7 +15,7 @@ class Storage {
 	constructor(storage: Storage["container"]) {
 		this.container = storage;
 	}
-	private define(object: Record<string, any>, array: string[], data: any): any {
+	private define(object: Record<string, any>, array: string[], data: any) {
 		for (const [index, value] of array.entries()) {
 			if (index === array.length - 1) {
 				object[value] = data;
@@ -26,7 +26,7 @@ class Storage {
 			object = object[value];
 		}
 	}
-	private delete(object: Record<string, any>, array: string[]): any {
+	private delete(object: Record<string, any>, array: string[]) {
 		for (const [index, value] of array.entries()) {
 			if (index === array.length - 1) {
 				delete object[value];
@@ -37,7 +37,7 @@ class Storage {
 			object = object[value];
 		}
 	}
-	private return(object: Record<string, any>, array: string[]): any {
+	private return(object: Record<string, any>, array: string[]) {
 		for (const [index, value] of array.entries()) {
 			if (index === array.length - 1) {
 				return object[value];
@@ -47,28 +47,28 @@ class Storage {
 			object = object[value];
 		}
 	}
-	public get_path(key: string): StorageState["path"] {
+	public get_path(key: string) {
 		return this.return(this.container, [...key.split(/\./), "path"]);
 	}
-	public set_path(key: string, path: StorageState["path"]): void {
+	public set_path(key: string, path: StorageState["path"]) {
 		this.define(this.container, [...key.split(/\./), "path"], path);
 		this.export(key);
 	}
-	public get_data(key: string): StorageState["data"] {
+	public get_data(key: string) {
 		return this.return(this.container, [...key.split(/\./), "data"]);
 	}
-	public set_data(key: string, data: StorageState["data"]): void {
+	public set_data(key: string, data: StorageState["data"]) {
 		this.define(this.container, [...key.split(/\./), "data"], data);
 		this.export(key);
 	}
-	public register(key: string, path: StorageState["path"], data: StorageState["data"]): void {
+	public register(key: string, path: StorageState["path"], data: StorageState["data"]) {
 		this.define(this.container, [...key.split(/\./)], {
 			path: path,
 			data: data === "@import" ? this.import(path) : {}
 		});
 		this.export(key);
 	}
-	public un_register(key: string): void {
+	public un_register(key: string) {
 		fs.unlinkSync(this.get_path(key));
 		this.delete(this.container, [...key.split(/\./)]);
 	}
@@ -79,11 +79,11 @@ class Storage {
 			return undefined;
 		}
 	}
-	public export(key: string): void {
+	public export(key: string) {
 		fs.mkdirSync(path.dirname(this.get_path(key)), { recursive: true });
 		fs.writeFileSync(this.get_path(key), JSON.stringify(this.get_data(key)));
 	}
-	public exist(key: string): boolean {
+	public exist(key: string) {
 		return !!this.return(this.container, [...key.split(/\./)]);
 	}
 }

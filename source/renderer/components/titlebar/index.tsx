@@ -14,10 +14,10 @@ class TitleBar extends React.Component<TitleBarState> {
 		super(properties);
 		this.state = { ...properties };
 	}
-	static getDerivedStateFromProps($new: TitleBarState, $old: TitleBarState): TitleBarState {
+	static getDerivedStateFromProps($new: TitleBarState, $old: TitleBarState) {
 		return $new;
 	}
-	public render(): JSX.Element {
+	public render() {
 		return (
 			<section id="titlebar" class="contrast draggable">
 				<area id="occupy"></area>
