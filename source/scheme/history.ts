@@ -1,22 +1,26 @@
-import hitomi from "@/modules/hitomi";
+
+import read from "@/modules/hitomi/read";
+import search from "@/modules/hitomi/search";
+
 import utility from "@/modules/utility";
 
 import { Scheme, Schema } from "@/scheme";
-import { Filter, GalleryBlock } from "@/modules/hitomi";
+import { GalleryBlock } from "@/modules/hitomi/read";
+import { SearchQuery } from "@/modules/hitomi/search";
 
 export type Session = {
 	history: {
-		filter: Filter,
+		filter: SearchQuery,
 		index: number;
 	}[],
 	index: number;
 };
 
 class History extends Schema<Session> {
-	public get(): { filter: Filter, index: number; } {
+	public get(): { filter: SearchQuery, index: number; } {
 		return this.$get().history[this.$get().index] || { filter: [], index: 0 };
 	}
-	public set(value: { filter: Filter, index: number; }): void {
+	public set(value: { filter: SearchQuery, index: number; }): void {
 		const history = [...this.$get().history.slice(0, this.$get().index), value];
 
 		this.$set({ history: history, index: utility.clamp(this.$get().index + 1, 0, history.length - 1) });
@@ -30,11 +34,11 @@ class History extends Schema<Session> {
 	public iterable(): Promise<GalleryBlock[]> {
 		return new Promise<GalleryBlock[]>((resolve, rejects) => {
 			// size and index only matters if SINGULAR equals true
-			hitomi.search(this.get().filter, { size: 25, index: this.get().index }).then((archive) => {
+			search.get(this.get().filter, { size: 25, index: this.get().index }).then((archive) => {
 				const array: Array<GalleryBlock> = new Array(Math.min(archive.array.length, 25));
 				// loop 25 or less times
 				for (let index: number = 0; index < array.length; index++) {
-					hitomi.block(archive.array[index + (archive.singular ? 0 : 25 * this.get().index)]).then((block) => {
+					read.block(archive.array[index + (archive.singular ? 0 : 25 * this.get().index)]).then((block) => {
 						// assign
 						array[index] = block;
 						// none-async resolve

@@ -1,18 +1,18 @@
-import request from "./request";
+import request from "../request";
 
 import { sha256 } from "js-sha256";
 
-export type Suggest = {
-	field: string,
+export type SuggestResponse = {
+	index: string,
 	value: string,
 	count: number;
 }[];
-export type Binary = {
-	bytes: DataView,
-	index: number;
+export type SearchBinary = {
+	index: number,
+	bytes: DataView;
 };
-export type Node = {
-	field: Uint8Array[],
+export type SearchBundle = {
+	index: Uint8Array[],
 	value: [number, number][],
 	child: number[];
 };
@@ -26,44 +26,44 @@ DataView.prototype.getUint64 = function (offset: number, little_endian: boolean)
 	return little_endian ? bytes[0] + 2 ** 32 * bytes[1] : 2 ** 32 * bytes[0] + bytes[1];
 };
 
-class Suggestion {
+class Suggest {
 	private static version: Record<"tagindex" | "galleries" | "languages" | "nozomiurl", string> = { tagindex: "", galleries: "", languages: "", nozomiurl: "" };
 	private static serial: number = 0;
 	constructor() {
 		for (const namespace of ["tagindex"]) {
 			request.get(`https://ltn.hitomi.la/${namespace}/version?_=${new Date().getTime()}`).then((callback) => {
-				Suggestion.version[namespace as "tagindex" | "galleries" | "languages" | "nozomiurl"] = callback.encode;
+				Suggest.version[namespace as "tagindex" | "galleries" | "languages" | "nozomiurl"] = callback.encode;
 			});
 		}
 	}
 	public up(): void {
-		Suggestion.serial++;
+		Suggest.serial++;
 	}
-	public get(query: string): Promise<Suggest> {
+	public get(query: string): Promise<SuggestResponse> {
 		return this.unknown_1(query);
 	}
-	// @searchlib.js > hash_term
+	// @see searchlib.js > hash_term
 	private unknown_0(value: string): Uint8Array {
 		return new Uint8Array(sha256.array(value).slice(0, 4));
 	}
-	// @search.js > get_suggestions_for_query
-	private unknown_1(query: string): Promise<Suggest> {
-		return new Promise<Suggest>((resolve, reject) => {
+	// @see search.js > get_suggestions_for_query
+	private unknown_1(query: string): Promise<SuggestResponse> {
+		return new Promise<SuggestResponse>((resolve, reject) => {
 			query = query.replace(/_/g, "\u0020");
 
-			const serial: number = Suggestion.serial;
+			const serial: number = Suggest.serial;
 
 			const field: string = /:/.test(query) ? query.split(/:/)[0] : "global";
 			const value: string = /:/.test(query) ? query.split(/:/)[1] : query;
 
 			function condition(): void {
-				if (serial && serial !== Suggestion.serial) {
+				if (serial && serial !== Suggest.serial) {
 					return resolve([]);
 				}
 			}
-			this.unknown_3(field, 0).then((node) => {
+			this.unknown_3(field, 0).then((bundle) => {
 				condition();
-				this.unknown_5(field, this.unknown_0(value), node).then((bytes) => {
+				this.unknown_5(field, this.unknown_0(value), bundle).then((bytes) => {
 					condition();
 					this.unknown_6(field, bytes).then((suggest) => {
 						condition();
@@ -73,14 +73,14 @@ class Suggestion {
 			});
 		});
 	}
-	// @search.js > decode_node
-	private unknown_2(bytes: Uint8Array): Node {
-		const node: Node = {
-			field: [],
+	// @see search.js > decode_node
+	private unknown_2(bytes: Uint8Array): SearchBundle {
+		const bundle: SearchBundle = {
+			index: [],
 			value: [],
 			child: []
 		};
-		const binary: Binary = {
+		const binary: SearchBinary = {
 			bytes: new DataView(bytes.buffer),
 			index: 0
 		};
@@ -96,7 +96,7 @@ class Suggestion {
 			}
 			binary.index += 4;
 
-			node.field.push(bytes.slice(binary.index, binary.index + key_size));
+			bundle.index.push(bytes.slice(binary.index, binary.index + key_size));
 
 			binary.index += key_size;
 		}
@@ -114,24 +114,24 @@ class Suggestion {
 
 			binary.index += 4;
 
-			node.value.push([offset, length]);
+			bundle.value.push([offset, length]);
 		}
 
 		for (let index: number = 0; index < 17; index++) {
 			// @ts-ignore
-			node.child.push(binary.bytes.getUint64(binary.index, false));
+			bundle.child.push(binary.bytes.getUint64(binary.index, false));
 
 			binary.index += 8;
 		}
-		return node;
+		return bundle;
 	}
-	// @search.js > get_node_at_address
-	private unknown_3(field: string, adress: number): Promise<Node> {
-		return new Promise<Node>((resolve, rejects) => {
+	// @see search.js > get_node_at_address
+	private unknown_3(field: string, adress: number): Promise<SearchBundle> {
+		return new Promise<SearchBundle>((resolve, rejects) => {
 			const URI: string[] = ["https://ltn.hitomi.la/"];
 
-			function recursive(I: Suggestion) {
-				switch (Suggestion.version.tagindex.length) {
+			function recursive(I: Suggest) {
+				switch (Suggest.version.tagindex.length) {
 					case 0: {
 						setTimeout(() => {
 							return recursive(I);
@@ -141,19 +141,19 @@ class Suggestion {
 					default: {
 						switch (field) {
 							case "galleries": {
-								URI.push("galleriesindex", "/galleries.", Suggestion.version.galleries, ".index");
+								URI.push("galleriesindex", "/galleries.", Suggest.version.galleries, ".index");
 								break;
 							}
 							case "languages": {
-								URI.push("languagesindex", "/languages.", Suggestion.version.languages, ".index");
+								URI.push("languagesindex", "/languages.", Suggest.version.languages, ".index");
 								break;
 							}
 							case "noromiurl": {
-								URI.push("nozomiurlindex", "/nozomiurl.", Suggestion.version.nozomiurl, ".index");
+								URI.push("nozomiurlindex", "/nozomiurl.", Suggest.version.nozomiurl, ".index");
 								break;
 							}
 							default: {
-								URI.push("tagindex", `/${field}.`, Suggestion.version.tagindex, ".index");
+								URI.push("tagindex", `/${field}.`, Suggest.version.tagindex, ".index");
 								break;
 							}
 						}
@@ -171,7 +171,7 @@ class Suggestion {
 			return recursive(this);
 		});
 	}
-	// @search.js > get_url_at_range
+	// @see search.js > get_url_at_range
 	private unknown_4(url: string, range: number[]): Promise<Uint8Array> {
 		return new Promise<Uint8Array>((resolve, rejects) => {
 			request.get(url, { encoding: "binary", headers: { "range": `bytes=${range[0]}-${range[1]}` } }).then((callback) => {
@@ -179,8 +179,8 @@ class Suggestion {
 			});
 		});
 	}
-	// @search.js > B_search
-	private unknown_5(field: string, key: Uint8Array, node: Node): Promise<[number, number]> {
+	// @see search.js > B_search
+	private unknown_5(field: string, key: Uint8Array, bundle: SearchBundle): Promise<[number, number]> {
 		return new Promise<[number, number]>((resolve, rejects) => {
 			function mystery_0(first: Uint8Array, second: Uint8Array): [boolean, boolean] {
 				for (let index: number = 0; index < (first.byteLength < second.byteLength ? first.byteLength : second.byteLength); index++) {
@@ -192,59 +192,62 @@ class Suggestion {
 				}
 				return [true, true];
 			}
-			function mystery_1(key: Uint8Array, node: Node): [boolean, number] {
+			function mystery_1(key: Uint8Array, bundle: SearchBundle): [boolean, number] {
 				let value: [boolean, boolean] = [true, false];
-				let index: number = 0;
-				for (; index < node.field.length; index++) {
-					value = mystery_0(key, node.field[index]);
+
+				for (let index: number = 0; index < bundle.index.length; index++) {
+					value = mystery_0(key, bundle.index[index]);
 					if (value[0]) {
-						break;
+						return [value[1], index];
 					}
 				}
-				return [value[1], index];
+				if (bundle.index.length) {
+					return [value[1], bundle.index.length];
+				}
+				return [true, 0];
 			}
-			function mystery_2(node: Node): boolean {
-				for (let index: number = 0; index < node.child.length; index++) {
-					if (node.child[index]) {
+			function mystery_2(bundle: SearchBundle): boolean {
+				for (let index: number = 0; index < bundle.child.length; index++) {
+					if (bundle.child[index]) {
 						return false;
 					}
 				}
 				return true;
 			}
-			if (!node) {
+			if (!bundle) {
 				return rejects();
 			}
-			if (!node.field.length) {
+			if (!bundle.index.length) {
 				return rejects();
 			}
-			const [exist, index] = mystery_1(key, node);
+			const [exist, index] = mystery_1(key, bundle);
 
 			if (exist) {
-				return resolve(node.value[index]);
-			} else if (mystery_2(node)) {
+				return resolve(bundle.value[index]);
+			} else if (mystery_2(bundle)) {
 				return rejects();
 			}
-			if (node.child[index] == 0) {
+			if (bundle.child[index] == 0) {
 				return rejects();
 			}
-			this.unknown_3(field, node.child[index]).then((node) => {
-				this.unknown_5(field, key, node).then((node) => {
-					return resolve(node);
+			this.unknown_3(field, bundle.child[index]).then((bundle) => {
+				this.unknown_5(field, key, bundle).then((bundle) => {
+					return resolve(bundle);
 				});
 			});
 		});
 	}
-	// @search.js > get_suggestions_from_data
-	private unknown_6(field: string, bytes: [number, number]): Promise<Suggest> {
-		const suggest: Suggest = [];
-		return new Promise<Suggest>((resolve, rejects) => {
+	// @see search.js > get_suggestions_from_data
+	private unknown_6(field: string, bytes: [number, number]): Promise<SuggestResponse> {
+		const suggest: SuggestResponse = [];
+		return new Promise<SuggestResponse>((resolve, rejects) => {
 			const [offset, length] = bytes;
 
 			if (length > 10000 || length <= 0) {
 				return resolve([]);
 			}
-			this.unknown_4(`https://ltn.hitomi.la/tagindex/${field}.${Suggestion.version.tagindex}.data`, [offset, offset + length - 1]).then((callback) => {
-				const binary: Binary = {
+			this.unknown_4(`https://ltn.hitomi.la/tagindex/${field}.${Suggest.version.tagindex}.data`, [offset, offset + length - 1]).then((callback) => {
+				const binary: SearchBinary = {
 					bytes: new DataView(callback.buffer),
 					index: 0
 				};
@@ -257,7 +260,7 @@ class Suggestion {
 				}
 				for (let index: number = 0; index < suggests_size; index++) {
 					suggest[index] = ({
-						field: "",
+						index: "",
 						value: "",
 						count: 0
 					});
@@ -268,7 +271,7 @@ class Suggestion {
 
 					for (let $index: number = 0; $index < field_size; $index++) {
 						// @ts-ignore
-						suggest[index].field += String.fromCharCode(binary.bytes.getUint8(binary.index, false));
+						suggest[index].index += String.fromCharCode(binary.bytes.getUint8(binary.index, false));
 
 						binary.index += 1;
 					}
@@ -291,4 +294,4 @@ class Suggestion {
 		});
 	}
 }
-export default (new Suggestion());
+export default (new Suggest());

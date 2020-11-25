@@ -1,11 +1,11 @@
-import hitomi from "@/modules/hitomi";
+import read from "@/modules/hitomi/read";
 
 import { Loaded } from "@/modules/download";
 
 class Hitomi_La {
 	public start(url: string): Promise<Loaded> {
 		return new Promise<Loaded>(async (resolve, rejects) => {
-			hitomi.script(this.ID(url)).then((script) => {
+			read.script(this.ID(url)).then((script) => {
 				return resolve({
 					title: script.title,
 					links: script.files.map((value, index) => { return value.url; }),
