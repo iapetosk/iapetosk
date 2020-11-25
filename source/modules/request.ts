@@ -30,7 +30,7 @@ export type RequestResponse = {
 	headers: Record<string, string | string[] | undefined>;
 };
 class Request {
-	readonly agent: https.Agent = new https.Agent({});
+	readonly agent = new https.Agent({});
 	private max_redirects: number;
 	constructor(max_redirects: number) {
 		// <define default properties>
@@ -40,10 +40,10 @@ class Request {
 			return tls.connect({ ...options, servername: undefined }, callback);
 		};
 	}
-	public async send(options: RequestOptions, file?: File): Promise<RequestResponse> {
+	public async send(options: RequestOptions, file?: File) {
 		const I: Request = this;
 		return new Promise<RequestResponse>((resolve, rejects) => {
-			function recursive(options: RequestOptions, file?: File): void {
+			function recursive(options: RequestOptions, file?: File) {
 				// content
 				const chunks: Buffer[] = [];
 				// send request
@@ -63,7 +63,7 @@ class Request {
 						} = {
 							changed: 0,
 							options: new Proxy({ ...options }, {
-								set(target: RequestOptions, key: never, value: never): boolean {
+								set(target: RequestOptions, key: never, value: never) {
 									// is changed!
 									override.changed++;
 									// update property
@@ -160,26 +160,26 @@ class Request {
 			return recursive(options, file);
 		});
 	};
-	public async get(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
+	public async get(url: string, options: PartialOptions = {}, file?: File) {
 		return this.send({ url: url, method: "GET", ...options }, file);
 	}
-	public async put(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
+	public async put(url: string, options: PartialOptions = {}, file?: File) {
 		return this.send({ url: url, method: "PUT", ...options }, file);
 	}
-	public async post(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
+	public async post(url: string, options: PartialOptions = {}, file?: File) {
 		return this.send({ url: url, method: "POST", ...options }, file);
 	}
-	public async delete(url: string, options: PartialOptions = {}, file?: File): Promise<RequestResponse> {
+	public async delete(url: string, options: PartialOptions = {}, file?: File) {
 		return this.send({ url: url, method: "DELETE", ...options }, file);
 	}
-	public parse(url: string): { host: string, path: string; } {
+	public parse(url: string) {
 		const component: string[] = (url === decodeURI(url) ? encodeURI(url) : url).replace(/https?:\/\//, "").split(/\//);
 		return {
 			host: component[0],
 			path: ["", ...component.slice(1)].join("/")
 		};
 	}
-	public SSL(url: string): boolean {
+	public SSL(url: string) {
 		return /^https/.test(url);
 	}
 }

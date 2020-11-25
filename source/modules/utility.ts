@@ -1,16 +1,16 @@
 class Utility {
-	public index_of<type>(array: (type | RegExp)[], value: type): number {
-		for (let index: number = 0; index < array.length; index++) {
+	public index_of<type>(array: (type | RegExp)[], value: type) {
+		for (let index = 0; index < array.length; index++) {
 			if (array[index] instanceof RegExp ? (array[index] as RegExp).test(String(value)) : array[index] === value) {
 				return index;
 			}
 		}
 		return NaN;
 	}
-	public clamp(value: number, minimum: number, maximum: number): number {
+	public clamp(value: number, minimum: number, maximum: number) {
 		return Math.min(Math.max(value, minimum), maximum);
 	}
-	public random(minimum: number, maximum: number, type: "integer" | "double" = "integer"): number {
+	public random(minimum: number, maximum: number, type: "integer" | "double" = "integer") {
 		switch (type) {
 			case "integer": {
 				return Math.floor(Math.random() * (maximum - minimum + 1.0)) + minimum;
@@ -20,13 +20,13 @@ class Utility {
 			}
 		}
 	}
-	public wrap<type>(content: type | type[]): type[] {
+	public wrap<type>(content: type | type[]) {
 		return content instanceof Array ? content : [content];
 	}
-	public unwrap<type>(value: type[]): type[] | type {
+	public unwrap<type>(value: type[]) {
 		return value.length - 1.0 ? value : value[0];
 	}
-	public parse(value: string, path: string, attribute?: string): string[] | string {
+	public parse(value: string, path: string, attribute?: string) {
 		const array: string[] = [];
 
 		new DOMParser().parseFromString(value, "text/html").querySelectorAll(path).forEach((element, index) => {
@@ -35,7 +35,7 @@ class Utility {
 
 		return this.unwrap(array);
 	}
-	public extract(value: string, path: string, type: "string" | "number" | "array" | "object"): any {
+	public extract(value: string, path: string, type: "string" | "number" | "array" | "object") {
 		const capture: string = new RegExp(`var ${path} = (.+?)(?=;)`).exec(value)![1];
 
 		switch (type) {
@@ -56,7 +56,7 @@ class Utility {
 			}
 		}
 	}
-	public cookie_eat(value: string): Record<string, any> {
+	public cookie_eat(value: string) {
 		const cookie: Record<string, any> = {};
 
 		value.split(/;\s/g).forEach((property) => {
@@ -64,7 +64,7 @@ class Utility {
 		});
 		return cookie;
 	}
-	public cookie_bake(value: Record<string, any>): string {
+	public cookie_bake(value: Record<string, any>) {
 		const cookie: string[] = [];
 
 		Object.keys(value).forEach((key) => {
@@ -72,7 +72,7 @@ class Utility {
 		});
 		return cookie.join(";\u0020");
 	}
-	public inline(value: Record<string, boolean>): string {
+	public inline(value: Record<string, boolean>) {
 		const array: string[] = [];
 
 		for (const key in value) {
@@ -82,14 +82,14 @@ class Utility {
 		}
 		return array.join("\u0020");
 	}
-	public devide(text: string, index: number): string[] {
+	public devide(text: string, index: number) {
 		return [text.substring(0, index), text.substring(index)];
 	}
-	public referer(referer?: string): void {
+	public referer(referer?: string) {
 		chrome.webRequest.onBeforeSendHeaders.addListener((response: any) => {
-			let socket: number = NaN;
+			let socket = NaN;
 
-			for (let index: number = 0; index < response.requestHeaders.length; index++) {
+			for (let index = 0; index < response.requestHeaders.length; index++) {
 				switch (response.requestHeaders[index].name) {
 					case "Referer": {
 						socket = index;

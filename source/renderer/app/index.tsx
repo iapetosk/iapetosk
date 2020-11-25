@@ -53,7 +53,7 @@ class App extends React.Component<AppState> {
 			this.setState({ ...this.state, fullscreen: true });
 		});
 	}
-	public render(): JSX.Element {
+	public render() {
 		return (
 			<main id="container">
 				{(() => {

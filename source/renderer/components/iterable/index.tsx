@@ -36,7 +36,7 @@ class Iterable extends React.Component<IterableState> {
 			index: 0
 		});
 
-		function update(I: Iterable): void {
+		function update(I: Iterable) {
 			history.iterable().then((iterable) => {
 				// debug
 				console.log(iterable);
@@ -53,7 +53,7 @@ class Iterable extends React.Component<IterableState> {
 			update(this);
 		});
 	}
-	public render(): JSX.Element {
+	public render() {
 		return (
 			<section id="iterable">
 				{this.array.map((value, index) => {

@@ -14,10 +14,10 @@ export class Schema<state> {
 		this.state = state;
 		this.event = event;
 	}
-	protected $get(): state {
+	protected $get() {
 		return this.state;
 	}
-	protected $set(value: state): void {
+	protected $set(value: state) {
 		if (value !== this.$get()) {
 			// listener (new, old)
 			listener.emit(this.event, value, this.$get());
