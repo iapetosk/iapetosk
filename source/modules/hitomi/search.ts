@@ -2,7 +2,7 @@ import request from "@/modules/request";
 
 import { RequestResponse } from "@/modules/request";
 
-export type SearchResponse = {
+export type SearchResults = {
 	size: number,
 	array: number[],
 	singular: boolean;
@@ -50,7 +50,7 @@ class Search {
 			[SearchAction.POSITIVE]: [],
 			[SearchAction.NEGATIVE]: []
 		};
-		return new Promise<SearchResponse>((resolve, rejects) => {
+		return new Promise<SearchResults>((resolve, rejects) => {
 			for (const type of Object.keys(filter)) {
 				switch (type) {
 					case "language": {

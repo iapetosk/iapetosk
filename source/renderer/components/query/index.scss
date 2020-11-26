@@ -1,18 +1,49 @@
 #query {
+	position: relative;
 	display: grid;
-	grid-template-areas:
-	"input";
+	margin: 15px;
 	grid-template-rows: var(--query_height);
 	grid-template-columns: 1fr;
-	margin: 15px;
-	> #input {
-		color: var(--colour_6);
-		padding: 10px;
+	> * {
 		background-color: var(--colour_3);
+	}
+	.contrast {
 		transition: border-color var(--transition);
 		&:hover,
 		&:focus {
 			border-color: var(--colour_9);
+		}
+	}
+	> #input {
+		color: var(--colour_success);
+		padding-left: 10px;
+	}
+	> #dropdown {
+		position: absolute;
+		z-index: 99;
+		width: 100%;
+		top: var(--query_height);
+		margin-top: 5px;
+		border-color: var(--colour_9);
+		transition: opacity var(--transition);
+		will-change: opacity;
+		&.contrast {
+			pointer-events: all;
+			opacity: 100%;
+		}
+		&:not(.contrast) {
+			pointer-events: none;
+			opacity: 0%;
+		}
+		> option {
+			color: var(--colour_6);
+			height: var(--query_height);
+			padding-left: 10px;
+			transition: color var(--transition), background-color var(--transition);
+			&:hover {
+				color: var(--colour_success);
+				background-color: var(--colour_4);
+			}
 		}
 	}
 }

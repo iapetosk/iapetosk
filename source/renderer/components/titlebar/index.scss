@@ -2,8 +2,8 @@
 	display: grid;
 	grid-template-areas:
 	". focus restore close";
-	grid-template-rows: 1fr auto auto auto;
-	grid-template-columns: 1fr;
+	grid-template-rows: 1fr;
+	grid-template-columns: 1fr auto auto auto;
 	background-color: var(--colour_1);
 	> * {
 		width: 45px;
