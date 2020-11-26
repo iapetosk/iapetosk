@@ -20,7 +20,6 @@ class TitleBar extends React.Component<TitleBarState> {
 	public render() {
 		return (
 			<section id="titlebar" class="contrast draggable">
-				<area id="occupy"></area>
 				<button id="focus" class="un_draggable"
 					onClick={() => {
 						return nw.Window.get().minimize();

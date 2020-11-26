@@ -16,8 +16,8 @@ class Browser extends React.Component<BrowserState> {
 	public render(): JSX.Element {
 		return (
 			<section id="browser">
-				<Query></Query>
-				<Iterable></Iterable>
+				<Query focus={false} suggests={[]}></Query>
+				<Iterable blocks={[]}></Iterable>
 			</section>
 		);
 	}

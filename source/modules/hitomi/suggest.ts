@@ -2,7 +2,7 @@ import request from "../request";
 
 import { sha256 } from "js-sha256";
 
-export type SuggestResponse = {
+export type Suggestion = {
 	index: string,
 	value: string,
 	count: number;
@@ -48,7 +48,7 @@ class Suggest {
 	}
 	// @see search.js > get_suggestions_for_query
 	private unknown_1(query: string) {
-		return new Promise<SuggestResponse>((resolve, reject) => {
+		return new Promise<Suggestion>((resolve, reject) => {
 			query = query.replace(/_/g, "\u0020");
 
 			const serial: number = this.serial;
@@ -239,8 +239,8 @@ class Suggest {
 	}
 	// @see search.js > get_suggestions_from_data
 	private unknown_6(field: string, bytes: [number, number]) {
-		const suggest: SuggestResponse = [];
-		return new Promise<SuggestResponse>((resolve, rejects) => {
+		const suggest: Suggestion = [];
+		return new Promise<Suggestion>((resolve, rejects) => {
 			const [offset, length] = bytes;
 
 			if (length > 10000 || length <= 0) {

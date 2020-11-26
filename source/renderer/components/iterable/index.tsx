@@ -9,10 +9,11 @@ import { Scheme } from "@/scheme";
 import { GalleryBlock } from "@/modules/hitomi/read";
 import { SearchAction } from "@/modules/hitomi/search";
 
-export type IterableState = {};
+export type IterableState = {
+	blocks: GalleryBlock[]
+};
 
 class Iterable extends React.Component<IterableState> {
-	public array: GalleryBlock[] = [];
 	public state: IterableState;
 	constructor(properties: IterableState) {
 		super(properties);
@@ -41,7 +42,7 @@ class Iterable extends React.Component<IterableState> {
 				// debug
 				console.log(iterable);
 				// assgin
-				I.array = iterable;
+				I.setState({ ...I.state, blocks: iterable });
 				// update
 				I.forceUpdate();
 			});
@@ -56,7 +57,7 @@ class Iterable extends React.Component<IterableState> {
 	public render() {
 		return (
 			<section id="iterable">
-				{this.array.map((value, index) => {
+				{this.state.blocks.map((value, index) => {
 					return (
 						<section id="gallery" class="contrast" key={index}>
 							<section id="upper" class="contrast">

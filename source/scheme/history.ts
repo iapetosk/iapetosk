@@ -31,7 +31,7 @@ class History extends Schema<{ history: Session[], index: number; }> {
 	public iterable() {
 		return new Promise<GalleryBlock[]>((resolve, rejects) => {
 			// size and index only matters if SINGULAR equals true
-			search.get(this.get().filter, { size: 25, index: this.get().index }).then((archive) => {
+			search.get(this.get().filter, 25, this.get().index).then((archive) => {
 				const array: Array<GalleryBlock> = new Array(Math.min(archive.array.length, 25));
 				// loop 25 or less times
 				for (let index = 0; index < array.length; index++) {

@@ -9,8 +9,12 @@ import utility from "@/modules/utility";
 import query from "@/scheme/query";
 
 import { Scheme } from "@/scheme";
+import { Suggestion } from "@/modules/hitomi/suggest";
 
-export type QueryState = {};
+export type QueryState = {
+	focus: boolean,
+	suggests: Suggestion;
+};
 
 class Query extends React.Component<QueryState> {
 	public state: QueryState;
@@ -31,19 +35,30 @@ class Query extends React.Component<QueryState> {
 		return (
 			<section id="query">
 				<input id="input" class="contrast" autoComplete="off"
+					onFocus={(event) => {
+						this.setState({ ...this.state, focus: true });
+					}}
+					onBlur={(event) => {
+						this.setState({ ...this.state, focus: false });
+					}}
 					onChange={(event) => {
+						// reset
+						this.setState({ ...this.state, suggests: [] });
+						// increase
 						suggest.up();
+						// suggest
 						suggest.get((event.target as HTMLInputElement).value.split(/\s+/).pop()!.replace(/^-/, "")!).then((callback) => {
-							console.log(callback);
+							this.setState({ ...this.state, suggests: callback });
 						});
 					}}
-					onPaste={(event) => {
-						const target = (event.target as HTMLInputElement);
-						target.value = [utility.devide(target.value, target.selectionStart!)[0], event.clipboardData!.getData("text"), utility.devide(target.value, target.selectionEnd!).pop()].join("");
-
-						return event.preventDefault();
-					}}>
-				</input>
+				></input>
+				<section id="dropdown" class={utility.inline({ "contrast": this.state.focus && this.state.suggests.length > 0 })}>
+					{this.state.suggests.map((value, index) => {
+						return (
+							<option class="center-y" key={index}>{value.index}:{value.value} ({value.count})</option>
+						);
+					})}
+				</section>
 			</section>
 		);
 	}
