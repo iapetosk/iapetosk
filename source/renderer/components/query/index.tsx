@@ -47,15 +47,28 @@ class Query extends React.Component<QueryState> {
 						// increase
 						suggest.up();
 						// suggest
-						suggest.get((event.target as HTMLInputElement).value.split(/\s+/).pop()!.replace(/^-/, "")!).then((callback) => {
+						suggest.get((event.target as HTMLInputElement).value.split(/\s+/).pop()!.replace(/^-/, "").toLowerCase()).then((callback) => {
 							this.setState({ ...this.state, suggests: callback });
 						});
 					}}
 				></input>
-				<section id="dropdown" class={utility.inline({ "contrast": this.state.focus && this.state.suggests.length > 0 })}>
+				<section id="dropdown" class={utility.inline({ "contrast": true, "active": this.state.focus && this.state.suggests.length > 0 })}>
 					{this.state.suggests.map((value, index) => {
+						// input value
+						const input = (document.getElementById("input")! as HTMLInputElement).value.split(/\s+/).pop()!.replace(/^-/, "").toLowerCase();
+						// render
 						return (
-							<option class="center-y" key={index}>{value.index}:{value.value} ({value.count})</option>
+							<legend key={index} class="center-y" data-count={value.count}>
+								{value.index}:
+								{[...value.value.split(input)].map(($value, $index, $array) => {
+									return (
+										<>
+											{$value}
+											{$index < $array.length - 1 ? <strong>{input}</strong> : undefined}
+										</>
+									);
+								})}
+							</legend>
 						);
 					})}
 				</section>
