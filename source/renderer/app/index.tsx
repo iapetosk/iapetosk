@@ -55,7 +55,7 @@ class App extends React.Component<AppState> {
 	}
 	public render() {
 		return (
-			<main id="container">
+			<>
 				{(() => {
 					switch (this.state.fullscreen) {
 						case true: {
@@ -91,7 +91,7 @@ class App extends React.Component<AppState> {
 						}
 					}
 				})()}
-			</main>
+			</>
 		);
 	}
 }

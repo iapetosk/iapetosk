@@ -4,19 +4,16 @@
 	margin: 15px;
 	grid-template-rows: var(--query_height);
 	grid-template-columns: 1fr;
-	> * {
-		background-color: var(--colour_3);
-	}
-	.contrast {
-		transition: border-color var(--transition);
-		&:hover,
-		&:focus {
-			border-color: var(--colour_9);
-		}
-	}
 	> #input {
 		color: var(--colour_success);
 		padding-left: 10px;
+		background-color: var(--colour_3);
+		transition: border-color var(--transition), background-color var(--transition);
+		&:hover,
+		&:focus {
+			border-color: var(--colour_9);
+			background-color: var(--colour_4);
+		}
 	}
 	> #dropdown {
 		position: absolute;
@@ -26,23 +23,32 @@
 		margin-top: 5px;
 		border-color: var(--colour_9);
 		transition: opacity var(--transition);
+		background-color: var(--colour_4);
 		will-change: opacity;
-		&.contrast {
+		&.active {
 			pointer-events: all;
 			opacity: 100%;
 		}
-		&:not(.contrast) {
+		&:not(.active) {
 			pointer-events: none;
 			opacity: 0%;
 		}
-		> option {
-			color: var(--colour_6);
+		> legend {
+			color: var(--colour_9);
 			height: var(--query_height);
 			padding-left: 10px;
-			transition: color var(--transition), background-color var(--transition);
+			transition: background-color var(--transition);
 			&:hover {
+				background-color: var(--colour_3);
+			}
+			&:after {
+				position: absolute;
+				content: attr(data-count);
 				color: var(--colour_success);
-				background-color: var(--colour_4);
+				right: 10px;
+			}
+			> strong {
+				color: var(--colour_success);
 			}
 		}
 	}
