@@ -61,12 +61,10 @@ class Query extends React.Component<QueryState> {
 							<legend key={index} class="center-y" data-count={value.count}>
 								{value.index}:
 								{[...value.value.split(input)].map(($value, $index, $array) => {
-									return (
-										<>
-											{$value}
-											{$index < $array.length - 1 ? <strong>{input}</strong> : undefined}
-										</>
-									);
+									return ([
+										$value,
+										$index < $array.length - 1 ? <strong key={$index}>{input}</strong> : undefined
+									]);
 								})}
 							</legend>
 						);
