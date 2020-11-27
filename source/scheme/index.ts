@@ -17,12 +17,23 @@ export class Schema<state> {
 	protected $get() {
 		return this.state;
 	}
-	protected $set(value: state) {
-		if (value !== this.$get()) {
-			// listener (new, old)
-			listener.emit(this.event, value, this.$get());
-			// override
-			this.state = value;
+	protected $set($new: state) {
+		// backup
+		const $old = this.$get();
+		
+		switch ($new) {
+			case $old: {
+				break;
+			}
+			default: {
+				// assign
+				this.state = $new;
+				// debug
+				console.log(this.event, $new, $old);
+				// listener ($new, $old)
+				listener.emit(this.event, $new, $old);
+				break
+			}
 		}
 	}
 }

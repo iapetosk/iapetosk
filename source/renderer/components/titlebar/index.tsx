@@ -22,23 +22,23 @@ class TitleBar extends React.Component<TitleBarState> {
 			<section id="titlebar" class="contrast draggable">
 				<button id="focus" class="un_draggable"
 					onClick={() => {
-						return nw.Window.get().minimize();
+						nw.Window.get().minimize();
 					}}
 					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/focus.svg`) }}>
 				</button>
 				<button id="restore" class="un_draggable"
 					onClick={() => {
 						if (!this.state.restore) {
-							return nw.Window.get().maximize();
+							nw.Window.get().maximize();
 						} else if (this.state.focus && !this.state.fullscreen) {
-							return nw.Window.get().restore();
+							nw.Window.get().restore();
 						}
 					}}
 					dangerouslySetInnerHTML={{ __html: require(this.state.restore ? "!html-loader!@/assets/icons/minimize.svg" : "!html-loader!@/assets/icons/maximize.svg") }}>
 				</button>
 				<button id="close" class="un_draggable"
 					onClick={() => {
-						return nw.Window.get().close();
+						nw.Window.get().close();
 					}}
 					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/close.svg`) }}>
 				</button>

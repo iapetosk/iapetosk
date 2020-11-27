@@ -2,10 +2,10 @@ import * as React from "react";
 
 import "./index.scss";
 
-import paging from "@/scheme/paging";
-
 import listener from "@/modules/listener";
 import utility from "@/modules/utility";
+import history from "@/scheme/history";
+import paging from "@/scheme/paging";
 
 import { Scheme } from "@/scheme";
 
@@ -18,6 +18,7 @@ class Paging extends React.Component<PagingState> {
 		this.state = { ...properties };
 
 		listener.on(Scheme.PAGING, () => {
+			// render
 			this.forceUpdate();
 		});
 		window.addEventListener("keydown", (event) => {
@@ -33,6 +34,7 @@ class Paging extends React.Component<PagingState> {
 						break;
 					}
 				}
+				history.set_session({ ...history.get_session(), index: paging.get().index });
 				// for reason unknown, DOM don't update correctly despite Scheme.PAGING is triggered.
 				this.forceUpdate();
 			}
@@ -51,13 +53,15 @@ class Paging extends React.Component<PagingState> {
 			<section id="paging" class="contrast center">
 				<button id="first" class={utility.inline({ "un_draggable": true, "disable": paging.get().index === 0 })}
 					onClick={() => {
-						return paging.first();
+						paging.first();
+						history.set_session({ ...history.get_session(), index: paging.get().index });
 					}}
 					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/first.svg") }}>
 				</button>
 				<button id="backward" class={utility.inline({ "un_draggable": true, "disable": paging.get().index === 0 })}
 					onClick={() => {
-						return paging.backward();
+						paging.backward();
+						history.set_session({ ...history.get_session(), index: paging.get().index });
 					}}
 					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/backward.svg") }}>
 				</button>
@@ -65,20 +69,23 @@ class Paging extends React.Component<PagingState> {
 					return (
 						<button class={utility.inline({ "un_draggable": true, "active": paging.get().index === this.offset(index) })} key={index}
 							onClick={() => {
-								return paging.set({ ...paging.get(), index: this.offset(index) });
+								paging.set({ ...paging.get(), index: this.offset(index) });
+								history.set_session({ ...history.get_session(), index: paging.get().index });
 							}}
 						>{this.offset(index) + 1}</button>
 					);
 				})}
 				<button id="forward" class={utility.inline({ "un_draggable": true, "disable": paging.get().index === paging.get().size - 1 })}
 					onClick={() => {
-						return paging.forward();
+						paging.forward();
+						history.set_session({ ...history.get_session(), index: paging.get().index });
 					}}
 					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/forward.svg") }}>
 				</button>
 				<button id="last" class={utility.inline({ "un_draggable": true, "disable": paging.get().index === paging.get().size - 1 })}
 					onClick={() => {
-						return paging.last();
+						paging.last();
+						history.set_session({ ...history.get_session(), index: paging.get().index });
 					}}
 					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/last.svg") }}>
 				</button>
