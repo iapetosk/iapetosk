@@ -97,13 +97,13 @@ class Search {
 					});
 				}
 			};
-			for (let index = 0; index < URLs[Prefix.POSITIVE].length + URLs[Prefix.NEGATIVE].length; index++) {
+			for (let $index = 0; $index < URLs[Prefix.POSITIVE].length + URLs[Prefix.NEGATIVE].length; $index++) {
 				const shortcut: {
 					prefix: Prefix,
 					url: string;
 				} = {
 					prefix: Prefix.POSITIVE,
-					url: [...URLs[Prefix.POSITIVE], ...URLs[Prefix.NEGATIVE]][index]
+					url: [...URLs[Prefix.POSITIVE], ...URLs[Prefix.NEGATIVE]][$index]
 				};
 
 				if (SINGULAR || !this.collection[shortcut.url]) {
