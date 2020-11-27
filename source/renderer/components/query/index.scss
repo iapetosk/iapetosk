@@ -22,15 +22,15 @@
 		top: var(--query_height);
 		margin-top: 5px;
 		border-color: var(--colour_9);
-		transition: opacity var(--transition);
 		background-color: var(--colour_4);
-		will-change: opacity;
+		transition: visibility var(--transition), opacity var(--transition);
+		will-change: visibility, opacity;
 		&.active {
-			pointer-events: all;
+			visibility: visible;
 			opacity: 100%;
 		}
 		&:not(.active) {
-			pointer-events: none;
+			visibility: hidden;
 			opacity: 0%;
 		}
 		> legend {
