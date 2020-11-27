@@ -38,7 +38,7 @@ class Filter {
 			"female": [],
 			"custom": []
 		};
-		for (const keyword of input.split(/\s+/)) {
+		for (const keyword of input.toLowerCase().split(/\s+/)) {
 			if (Filter.RegExp.test(keyword)) {
 				/*
 				[0] = string

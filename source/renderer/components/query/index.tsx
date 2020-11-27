@@ -8,6 +8,7 @@ import suggest from "@/modules/hitomi/suggest";
 import listener from "@/modules/listener";
 import utility from "@/modules/utility";
 import history from "@/scheme/history";
+import paging from "@/scheme/paging";
 import query from "@/scheme/query";
 
 import { Scheme } from "@/scheme";
@@ -25,29 +26,21 @@ class Query extends React.Component<QueryState> {
 		this.state = { ...properties };
 
 		listener.on(Scheme.QUERY, ($new: string) => {
-			if ($new.length) {
-				// history
-				history.set_session({
-					filter: filter.get(this.input().value),
-					index: 0
-				});
-				// clear QUERY data
-				query.clear();
-				// clear HTML input
-				this.input().value = "";
-			} else {
-				// reset
-				this.setState({ ...this.state, suggests: [] });
-				// outdate
-				suggest.up();
-			}
+			// reset SUGGESTS
+			this.setState({ ...this.state, suggests: [] });
+			// outdate
+			suggest.up();
+			// reset SCROLL
+			paging.set({ ...paging.get(), index: 0, size: 0 });
+			// write SESSION
+			history.set_session({ filter: filter.get(this.input().value), index: 0 });
 		});
 	}
 	public input() {
 		return document.getElementById("input") as HTMLInputElement;
 	}
 	public query() {
-		return this.input().value.split(/\s+/).pop()!.replace(/^-/, "").toLowerCase();
+		return this.input().value.toLowerCase().split(/\s+/).pop()!.split(/:/).pop()!;
 	}
 	public render() {
 		return (
