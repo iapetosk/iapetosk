@@ -8,7 +8,6 @@ import paging from "@/scheme/paging";
 
 import { Scheme } from "@/scheme";
 import { GalleryBlock } from "@/modules/hitomi/read";
-import { match } from "assert";
 
 export type IterableState = {
 	blocks: GalleryBlock[];
