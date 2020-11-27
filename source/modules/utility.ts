@@ -82,7 +82,7 @@ class Utility {
 		}
 		return array.join("\u0020");
 	}
-	public devide(text: string, index: number) {
+	public devide(text: string, index: number): [string, string] {
 		return [text.substring(0, index), text.substring(index)];
 	}
 	public referer(referer?: string) {

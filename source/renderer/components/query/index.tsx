@@ -27,9 +27,15 @@ class Query extends React.Component<QueryState> {
 				// clear QUERY data
 				query.clear();
 				// clear HTML input
-				(document.getElementById("input")! as HTMLInputElement).value = "";
+				this.input().value = "";
 			}
 		});
+	}
+	public input() {
+		return document.getElementById("input") as HTMLInputElement;
+	}
+	public query() {
+		return this.input().value.split(/\s+/).pop()!.replace(/^-/, "").toLowerCase();
 	}
 	public render() {
 		return (
@@ -47,23 +53,27 @@ class Query extends React.Component<QueryState> {
 						// increase
 						suggest.up();
 						// suggest
-						suggest.get((event.target as HTMLInputElement).value.split(/\s+/).pop()!.replace(/^-/, "").toLowerCase()).then((callback) => {
+						suggest.get(this.query()).then((callback) => {
 							this.setState({ ...this.state, suggests: callback });
 						});
 					}}
 				></input>
 				<section id="dropdown" class={utility.inline({ "contrast": true, "active": this.state.focus && this.state.suggests.length > 0 })}>
 					{this.state.suggests.map((value, index) => {
-						// input value
-						const input = (document.getElementById("input")! as HTMLInputElement).value.split(/\s+/).pop()!.replace(/^-/, "").toLowerCase();
-						// render
 						return (
-							<legend key={index} class="center-y" data-count={value.count}>
+							<legend key={index} class="center-y" data-count={value.count}
+								onClick={(event) => {
+									this.input().value = [
+										utility.devide(this.input().value, (this.input().selectionStart! - this.query().length) + (this.input().value.length - this.input().selectionEnd!))[0],
+										`${value.index}:${value.value.replace(/\s+/g, "_")}`
+									].join("");
+								}}
+							>
 								{value.index}:
-								{[...value.value.split(input)].map(($value, $index, $array) => {
+								{[...value.value.split(this.query())].map(($value, $index, $array) => {
 									return ([
 										$value,
-										$index < $array.length - 1 ? <strong key={$index}>{input}</strong> : undefined
+										$index < $array.length - 1 ? <strong key={$index}>{this.query()}</strong> : undefined
 									]);
 								})}
 							</legend>
