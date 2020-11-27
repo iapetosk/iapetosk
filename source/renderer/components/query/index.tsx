@@ -25,7 +25,7 @@ class Query extends React.Component<QueryState> {
 		super(properties);
 		this.state = { ...properties };
 
-		listener.on(Scheme.QUERY, ($new: string) => {
+		listener.on(Scheme.QUERY, () => {
 			// reset SUGGESTS
 			this.setState({ ...this.state, suggests: [] });
 			// outdate
