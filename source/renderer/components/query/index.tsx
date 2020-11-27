@@ -2,10 +2,12 @@ import * as React from "react";
 
 import "./index.scss";
 
+import filter from "@/modules/hitomi/filter";
 import suggest from "@/modules/hitomi/suggest";
 
 import listener from "@/modules/listener";
 import utility from "@/modules/utility";
+import history from "@/scheme/history";
 import query from "@/scheme/query";
 
 import { Scheme } from "@/scheme";
@@ -24,10 +26,20 @@ class Query extends React.Component<QueryState> {
 
 		listener.on(Scheme.QUERY, ($new: string) => {
 			if ($new.length) {
+				// history
+				history.set_session({
+					filter: filter.get(this.input().value),
+					index: 0
+				});
 				// clear QUERY data
 				query.clear();
 				// clear HTML input
 				this.input().value = "";
+			} else {
+				// reset
+				this.setState({ ...this.state, suggests: [] });
+				// outdate
+				suggest.up();
 			}
 		});
 	}
@@ -50,12 +62,20 @@ class Query extends React.Component<QueryState> {
 					onChange={(event) => {
 						// reset
 						this.setState({ ...this.state, suggests: [] });
-						// increase
+						// outdate
 						suggest.up();
 						// suggest
 						suggest.get(this.query()).then((callback) => {
 							this.setState({ ...this.state, suggests: callback });
 						});
+					}}
+					onKeyDown={(event) => {
+						switch (event.key) {
+							case "Enter": {
+								query.set(this.input().value);
+								break;
+							}
+						}
 					}}
 				></input>
 				<section id="dropdown" class={utility.inline({ "contrast": true, "active": this.state.focus && this.state.suggests.length > 0 })}>
@@ -63,10 +83,14 @@ class Query extends React.Component<QueryState> {
 						return (
 							<legend key={index} class="center-y" data-count={value.count}
 								onClick={(event) => {
-									this.input().value = [
-										utility.devide(this.input().value, (this.input().selectionStart! - this.query().length) + (this.input().value.length - this.input().selectionEnd!))[0],
-										`${value.index}:${value.value.replace(/\s+/g, "_")}`
-									].join("");
+									// reset
+									this.setState({ ...this.state, suggests: [] });
+									// outdate
+									suggest.up();
+									// apply
+									this.input().value = this.input().value.split(/\s+/).map(($value, $index, $array) => {
+										return $index < $array.length - 1 ? $value : `${value.index}:${value.value.replace(/\s+/g, "_")}`;
+									}).join("\u0020");
 								}}
 							>
 								{value.index}:

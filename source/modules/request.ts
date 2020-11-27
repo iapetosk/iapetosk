@@ -128,7 +128,8 @@ class Request {
 						}
 						const buffer: Buffer = Buffer.concat(chunks);
 
-						//debug
+						// debug
+						/*
 						console.log({
 							// addition
 							options: options,
@@ -140,6 +141,7 @@ class Request {
 							},
 							headers: response.headers
 						});
+						*/
 						return resolve({
 							encode: buffer.toString(options.encoding),
 							status: {

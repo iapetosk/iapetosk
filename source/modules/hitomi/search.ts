@@ -1,32 +1,12 @@
 import request from "@/modules/request";
 
 import { RequestResponse } from "@/modules/request";
+import { Prefix, Tag, Term } from "@/modules/hitomi/filter";
 
-export type SearchResults = {
+export type GalleryList = {
 	size: number,
 	array: number[],
 	singular: boolean;
-};
-export type SearchQuery = Record<SearchType, {
-	action: SearchAction,
-	value: string;
-}[]>;
-export type SearchType = (
-	"id"		|
-	"type"		|
-	"character"	|
-	"language"	|
-	"series"	|
-	"artist"	|
-	"group"		|
-	"tag"		|
-	"male"		|
-	"female"	|
-	"custom"
-);
-export enum SearchAction {
-	POSITIVE,
-	NEGATIVE
 };
 
 class Search {
@@ -35,10 +15,10 @@ class Search {
 	constructor() {
 		// TODO: none
 	}
-	public get(filter: SearchQuery, size: number, index: number) {
+	public get(filter: Term, size: number, index: number) {
 		return this.unknown_0(filter, size, index);
 	}
-	public unknown_0(filter: SearchQuery, size: number, index: number) {
+	public unknown_0(filter: Term, size: number, index: number) {
 		// array of gallery IDs
 		let IDs: number[] = [];
 		// length of gallery IDs
@@ -46,45 +26,47 @@ class Search {
 		// request counts
 		let COUNT: number = 0;
 		// request adresses
-		let URLs: Record<SearchAction, string[]> = {
-			[SearchAction.POSITIVE]: [],
-			[SearchAction.NEGATIVE]: []
+		let URLs: Record<Prefix, string[]> = {
+			[Prefix.POSITIVE]: [],
+			[Prefix.NEGATIVE]: []
 		};
-		return new Promise<SearchResults>((resolve, rejects) => {
-			for (const type of Object.keys(filter)) {
-				switch (type) {
+		return new Promise<GalleryList>((resolve, rejects) => {
+			for (const tag of Object.keys(filter)) {
+				switch (tag) {
 					case "language": {
 						if (Object.values(filter).map((value) => { return value.length; }).reduce(($old, $new) => { return $old + $new; }, 0) - filter.language.length > 0) {
 							break;
 						}
-						for (let index = 0; index < filter[type as SearchType].length; index++) {
-							URLs[filter[type as SearchType][index].action].push(`https://ltn.hitomi.la/index-${filter[type as SearchType][index].value}.nozomi`);
+						for (let index = 0; index < filter[tag as Tag].length; index++) {
+							URLs[filter[tag as Tag][index].prefix].push(`https://ltn.hitomi.la/index-${filter[tag as Tag][index].value}.nozomi`);
 						}
 						break;
 					}
 					default: {
-						for (let index = 0; index < filter[type as SearchType].length; index++) {
-							for (const language of filter.language.length ? filter.language : [{ action: SearchAction.POSITIVE, value: "all" }]) {
-								URLs[filter[type as SearchType][index].action].push(`https://ltn.hitomi.la/${type === "male" || type === "female" ? "tag" : type}/${type === "male" || type === "female" ? `${type}:${filter[type as SearchType][index].value}` : filter[type as SearchType][index].value}-${filter[type as SearchType][index].action === SearchAction.POSITIVE && language.action === SearchAction.POSITIVE ? language.value : "all"}.nozomi`);
+						for (let index = 0; index < filter[tag as Tag].length; index++) {
+							for (const language of filter.language.length ? filter.language : [{ prefix: Prefix.POSITIVE, value: "all" }]) {
+								URLs[filter[tag as Tag][index].prefix].push(`https://ltn.hitomi.la/${tag === "male" || tag === "female" ? "tag" : tag}/${tag === "male" || tag === "female" ? `${tag}:${filter[tag as Tag][index].value}` : filter[tag as Tag][index].value}-${filter[tag as Tag][index].prefix === Prefix.POSITIVE && language.prefix === Prefix.POSITIVE ? language.value : "all"}.nozomi`);
 							}
 						}
 						break;
 					}
 				}
 			}
-			if (URLs[SearchAction.POSITIVE].length === 0) {
-				URLs[SearchAction.POSITIVE].unshift(this.index_all);
+			if (URLs[Prefix.POSITIVE].length === 0) {
+				URLs[Prefix.POSITIVE].unshift(this.index_all);
 			}
 
-			const SINGULAR: boolean = URLs[SearchAction.POSITIVE].length === 1 && URLs[SearchAction.NEGATIVE].length === 0 && URLs[SearchAction.POSITIVE][0] === this.index_all;
+			console.log(URLs);
 
-			function $(action: SearchAction, array: number[]) {
+			const SINGULAR: boolean = URLs[Prefix.POSITIVE].length === 1 && URLs[Prefix.NEGATIVE].length === 0 && URLs[Prefix.POSITIVE][0] === this.index_all;
+
+			function $(prefix: Prefix, array: number[]) {
 				const collection: Set<number> = new Set(array);
 				// increase slot
 				COUNT++;
-				// determine action
-				switch (action) {
-					case SearchAction.POSITIVE: {
+				// determine prefix
+				switch (prefix) {
+					case Prefix.POSITIVE: {
 						if (IDs.length) {
 							const LENGTH: number = IDs.length;
 							IDs = IDs.filter((id) => collection.has(id));
@@ -94,17 +76,17 @@ class Search {
 						}
 						break;
 					}
-					case SearchAction.NEGATIVE: {
+					case Prefix.NEGATIVE: {
 						IDs = IDs.filter((id) => !collection.has(id));
 						break;
 					}
 				}
 				// none-async resolve
-				if (COUNT === URLs[SearchAction.POSITIVE].length + URLs[SearchAction.NEGATIVE].length) {
+				if (COUNT === URLs[Prefix.POSITIVE].length + URLs[Prefix.NEGATIVE].length) {
 					// debug
 					console.table({
-						positive: URLs[SearchAction.POSITIVE],
-						negative: URLs[SearchAction.NEGATIVE],
+						positive: URLs[Prefix.POSITIVE],
+						negative: URLs[Prefix.NEGATIVE],
 						singular: SINGULAR
 					});
 					// return
@@ -115,13 +97,13 @@ class Search {
 					});
 				}
 			};
-			for (let index = 0; index < URLs[SearchAction.POSITIVE].length + URLs[SearchAction.NEGATIVE].length; index++) {
+			for (let index = 0; index < URLs[Prefix.POSITIVE].length + URLs[Prefix.NEGATIVE].length; index++) {
 				const shortcut: {
-					action: SearchAction,
+					prefix: Prefix,
 					url: string;
 				} = {
-					action: SearchAction.POSITIVE,
-					url: [...URLs[SearchAction.POSITIVE], ...URLs[SearchAction.NEGATIVE]][index]
+					prefix: Prefix.POSITIVE,
+					url: [...URLs[Prefix.POSITIVE], ...URLs[Prefix.NEGATIVE]][index]
 				};
 
 				if (SINGULAR || !this.collection[shortcut.url]) {
@@ -136,13 +118,13 @@ class Search {
 								} else {
 									this.collection[shortcut.url] = array;
 								}
-								$(shortcut.action, array);
+								$(shortcut.prefix, array);
 								break;
 							}
 						}
 					});
 				} else {
-					$(shortcut.action, this.collection[shortcut.url]);
+					$(shortcut.prefix, this.collection[shortcut.url]);
 				}
 			}
 		});

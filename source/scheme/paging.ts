@@ -2,7 +2,9 @@ import utility from "@/modules/utility";
 
 import { Scheme, Schema } from "@/scheme";
 
-class Paging extends Schema<{ metre: number, index: number, size: number; }> {
+export type Pagination = Record<"metre" | "index" | "size", number>;
+
+class Paging extends Schema<Pagination> {
 	public get() {
 		return this.$get();
 	}
@@ -22,4 +24,4 @@ class Paging extends Schema<{ metre: number, index: number, size: number; }> {
 		return this.set({ ...this.get(), index: this.get().size - 1 });
 	}
 }
-export default (new Paging({ metre: 5, index: 0, size: 10 }, Scheme.PAGING));
+export default (new Paging({ metre: 0, index: 0, size: 0 }, Scheme.PAGING));

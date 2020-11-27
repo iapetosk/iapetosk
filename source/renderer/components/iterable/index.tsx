@@ -4,13 +4,14 @@ import "./index.scss";
 
 import listener from "@/modules/listener";
 import history from "@/scheme/history";
+import paging from "@/scheme/paging";
 
 import { Scheme } from "@/scheme";
 import { GalleryBlock } from "@/modules/hitomi/read";
-import { SearchAction } from "@/modules/hitomi/search";
+import { match } from "assert";
 
 export type IterableState = {
-	blocks: GalleryBlock[]
+	blocks: GalleryBlock[];
 };
 
 class Iterable extends React.Component<IterableState> {
@@ -19,39 +20,23 @@ class Iterable extends React.Component<IterableState> {
 		super(properties);
 		this.state = { ...properties };
 
-		// debug
-		history.set({
-			filter: {
-				"id": [],
-				"type": [],
-				"language": [{ action: SearchAction.POSITIVE, value: "korean" }],
-				"character": [],
-				"series": [],
-				"artist": [],
-				"group": [],
-				"tag": [{ action: SearchAction.POSITIVE, value: "uncensored" }],
-				"male": [],
-				"female": [],
-				"custom": []
-			},
-			index: 0
-		});
-
-		function update(I: Iterable) {
-			history.iterable().then((iterable) => {
-				// debug
-				console.log(iterable);
-				// assgin
-				I.setState({ ...I.state, blocks: iterable });
-				// update
-				I.forceUpdate();
-			});
-		}
 		// initial
-		update(this);
-
+		this.update();
 		listener.on(Scheme.HISTORY, () => {
-			update(this);
+			// reset
+			this.setState({ ...this.state, blocks: [] });
+			// update
+			this.update();
+		});
+	}
+	public update() {
+		history.iterable().then((iterable) => {
+			// paging
+			paging.set({ metre: 10, index: paging.get().index, size: Math.ceil(iterable.size / 25) });
+			// assgin
+			this.setState({ ...this.state, blocks: iterable.blocks });
+			// render
+			this.forceUpdate();
 		});
 	}
 	public render() {
