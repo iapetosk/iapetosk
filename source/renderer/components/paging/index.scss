@@ -1,5 +1,14 @@
 #paging {
 	background-color: var(--colour_1);
+	&.disable {
+		pointer-events: none;
+		> * {
+			color: var(--colour_2);
+			> svg {
+				fill: var(--colour_2);
+			}
+		}
+	}
 	> * {
 		height: 100%;
 		width: 45px;

@@ -1,7 +1,7 @@
 import request from "@/modules/request";
 
 import { RequestResponse } from "@/modules/request";
-import { Prefix, Tag, Term } from "@/modules/hitomi/filter";
+import { Prefix, Tag, Keyword } from "@/modules/hitomi/filter";
 
 export type GalleryList = {
 	size: number,
@@ -15,10 +15,10 @@ class Search {
 	constructor() {
 		// TODO: none
 	}
-	public get(filter: Term, size: number, index: number) {
+	public get(filter: Keyword, size: number, index: number) {
 		return this.unknown_0(filter, size, index);
 	}
-	public unknown_0(filter: Term, size: number, index: number) {
+	public unknown_0(filter: Keyword, size: number, index: number) {
 		// array of gallery IDs
 		let IDs: number[] = [];
 		// length of gallery IDs

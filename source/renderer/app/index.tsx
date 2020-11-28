@@ -87,7 +87,7 @@ class App extends React.Component<AppState> {
 							return undefined;
 						}
 						default: {
-							return <Paging></Paging>;
+							return <Paging disable={true}></Paging>;
 						}
 					}
 				})()}

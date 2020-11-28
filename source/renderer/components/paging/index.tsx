@@ -8,8 +8,11 @@ import history from "@/scheme/history";
 import paging from "@/scheme/paging";
 
 import { Scheme } from "@/scheme";
+import { GalleryBlock } from "@/modules/hitomi/read";
 
-export type PagingState = {};
+export type PagingState = {
+	disable: boolean;
+};
 
 class Paging extends React.Component<PagingState> {
 	public state: PagingState;
@@ -20,6 +23,9 @@ class Paging extends React.Component<PagingState> {
 		listener.on(Scheme.PAGING, () => {
 			// render
 			this.forceUpdate();
+		});
+		listener.on(Scheme.GALLERY, ($new: { blocks: GalleryBlock[], size: number; }) => {
+			this.setState({ ...this.state, disable: !($new.blocks.length && $new.size) });
 		});
 		window.addEventListener("keydown", (event) => {
 			// check for focused input
@@ -50,7 +56,7 @@ class Paging extends React.Component<PagingState> {
 	}
 	public render() {
 		return (
-			<section id="paging" class="contrast center">
+			<section id="paging" class={utility.inline({ "contrast": true, "center": true, "disable": this.state.disable })}>
 				<button id="first" class={utility.inline({ "un_draggable": true, "disable": paging.get().index === 0 })}
 					onClick={() => {
 						paging.first();

@@ -15,7 +15,7 @@ export type Tag = (
 	"female"	|
 	"custom"
 );
-export type Term = {
+export type Keyword = {
 	[key in Tag]: {
 		prefix: Prefix,
 		value: string
@@ -25,7 +25,7 @@ export type Term = {
 class Filter {
 	private static readonly RegExp = /^([-])*(id|type|language|character|series|artist|group|tag|male|female|custom):([a-zA-Z0-9_]+)$/; 
 	public get(input: string) {
-		const output: Term = {
+		const output: Keyword = {
 			"id": [],
 			"type": [],
 			"language": [],
