@@ -25,11 +25,11 @@ class Paging extends React.Component<PagingState> {
 			this.forceUpdate();
 		});
 		listener.on(Scheme.GALLERY, ($new: { blocks: GalleryBlock[], size: number; }) => {
-			this.setState({ ...this.state, disable: !($new.blocks.length && $new.size) });
+			this.setState({ ...this.state, disable: !$new.blocks.length && !$new.size });
 		});
 		window.addEventListener("keydown", (event) => {
 			// check for focused input
-			if (!document.querySelectorAll("input:focus").length) {
+			if (!document.querySelectorAll("input:focus").length && !this.state.disable) {
 				switch (event.key) {
 					case "ArrowLeft": {
 						paging.backward();
@@ -38,6 +38,9 @@ class Paging extends React.Component<PagingState> {
 					case "ArrowRight": {
 						paging.forward();
 						break;
+					}
+					default: {
+						return;
 					}
 				}
 				history.set_session({ ...history.get_session(), index: paging.get().index });
