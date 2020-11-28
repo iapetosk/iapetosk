@@ -4,6 +4,7 @@ import "./index.scss";
 
 import listener from "@/modules/listener";
 import history from "@/scheme/history";
+import gallery from "@/scheme/gallery";
 import paging from "@/scheme/paging";
 
 import { Scheme } from "@/scheme";
@@ -20,20 +21,19 @@ class Iterable extends React.Component<IterableState> {
 		this.state = { ...properties };
 
 		// initial
-		this.update();
+		gallery.set(history.get_session());
+
 		listener.on(Scheme.HISTORY, () => {
-			// reset
-			this.setState({ ...this.state, blocks: [] });
 			// update
-			this.update();
+			gallery.set(history.get_session());
 		});
-	}
-	public update() {
-		history.iterable().then((iterable) => {
-			// paging
-			paging.set({ metre: 10, index: paging.get().index, size: Math.ceil(iterable.size / 25) });
-			// assgin
-			this.setState({ ...this.state, blocks: iterable.blocks });
+		listener.on(Scheme.GALLERY, ($new: { blocks: GalleryBlock[], size: number; }) => {
+			if ($new.blocks.length && $new.size) {
+				// paging
+				paging.set({ metre: 10, index: paging.get().index, size: Math.ceil($new.size / 25) });
+			}
+			// reset
+			this.setState({ ...this.state, blocks: $new.blocks });
 			// render
 			this.forceUpdate();
 		});

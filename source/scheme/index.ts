@@ -5,7 +5,8 @@ export enum Scheme {
 	ROUTER = "route",
 	WORKER = "worker",
 	PAGING = "paging",
-	HISTORY = "history"
+	HISTORY = "history",
+	GALLERY = "gallery"
 };
 export class Schema<state> {
 	private state: state;
