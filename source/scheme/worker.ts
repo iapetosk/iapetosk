@@ -1,28 +1,38 @@
+import listener from "@/modules/listener";
+
 import { Scheme, Schema } from "@/scheme";
-import { Thread, Status } from "@/modules/download";
+import { Thread } from "@/modules/download";
 
-class Worker extends Schema<Thread[]> {
-	public get(condition?: number | Status) {
-		return condition ? this.$get().filter((value) => { return typeof condition === typeof Status ? value.status === condition : value.id === condition; }) : this.$get();
-	}
-	public set(value: Worker["state"]) {
-		return this.$set(value);
-	}
-	public index(id: number, thread?: Thread) {
-		let index = this.get().length;
+class Worker extends Schema<Record<string, Thread>> {
 
-		for (const [$index, value] of this.get().entries()) {
-			switch (value.id) {
-				case id: {
-					index = $index;
-					break;
+	public get(key: number) {
+		return this["state"][key];
+	}
+	public set($index: number, $new: Thread | undefined) {
+		// backup
+		const $old = this["state"][$index];
+
+		switch ($new) {
+			case $old: {
+				break;
+			}
+			default: {
+				// assign
+				if ($new) {
+					this["state"][$index] = $new;
+				} else {
+					delete this["state"][$index];
 				}
-				default: {
-					break;
-				}
+				// debug
+				console.log(this["event"], $index, $new, $old);
+				// listener ($index, $new, $old)
+				listener.emit(this["event"], $index, $new, $old);
+				break;
 			}
 		}
-		this.set([...this.get().slice(0, index), ...(thread ? [thread] : []), ...this.get().slice(index + 1)]);
+	}
+	public filter(condition?: { key: "id" | "from" | "title" | "files" | "status" | "options" | "working" | "finished", value: any; }) {
+		return condition ? Object.values(this["state"]).filter((thread) => { return thread[condition.key] == condition.value; }) : Object.values(this["state"]);
 	}
 }
-export default (new Worker([], Scheme.WORKER));
+export default (new Worker({}, Scheme.WORKER));

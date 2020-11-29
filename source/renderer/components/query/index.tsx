@@ -26,13 +26,10 @@ class Query extends React.Component<QueryState> {
 		this.state = { ...properties };
 
 		listener.on(Scheme.QUERY, () => {
-			// reset SUGGESTS
 			this.setState({ ...this.state, suggests: [] });
-			// outdate
+
 			suggest.up();
-			// reset SCROLL
 			paging.set({ ...paging.get(), index: 0, size: 0 });
-			// write SESSION
 			history.set_session({ filter: filter.get(this.input().value), index: 0 });
 		});
 	}
@@ -53,13 +50,11 @@ class Query extends React.Component<QueryState> {
 						this.setState({ ...this.state, focus: false });
 					}}
 					onChange={(event) => {
-						// reset
 						this.setState({ ...this.state, suggests: [] });
-						// outdate
+
 						suggest.up();
-						// suggest
-						suggest.get(this.query()).then((callback) => {
-							this.setState({ ...this.state, suggests: callback });
+						suggest.get(this.query()).then((suggestion) => {
+							this.setState({ ...this.state, suggests: suggestion });
 						});
 					}}
 					onKeyDown={(event) => {
@@ -72,25 +67,23 @@ class Query extends React.Component<QueryState> {
 					}}
 				></input>
 				<section id="dropdown" class={utility.inline({ "contrast": true, "active": this.state.focus && this.state.suggests.length > 0 })}>
-					{this.state.suggests.map((value, index) => {
+					{this.state.suggests.map((suggestion, index) => {
 						return (
-							<legend key={index} class="center-y" data-count={value.count}
+							<legend key={index} class="center-y" data-count={suggestion.count}
 								onClick={(event) => {
-									// reset
 									this.setState({ ...this.state, suggests: [] });
-									// outdate
+
 									suggest.up();
-									// apply
-									this.input().value = this.input().value.split(/\s+/).map(($value, $index, $array) => {
-										return $index < $array.length - 1 ? $value : `${value.index}:${value.value.replace(/\s+/g, "_")}`;
+									this.input().value = this.input().value.split(/\s+/).map((value, index, array) => {
+										return index < array.length - 1 ? value : `${suggestion.index}:${suggestion.value.replace(/\s+/g, "_")}`;
 									}).join("\u0020");
 								}}
 							>
-								{value.index}:
-								{[...value.value.split(this.query())].map(($value, $index, $array) => {
+								{suggestion.index}:
+								{[...suggestion.value.split(this.query())].map((value, index, array) => {
 									return ([
-										$value,
-										$index < $array.length - 1 ? <strong key={$index}>{this.query()}</strong> : undefined
+										value,
+										index < array.length - 1 ? <strong key={index}>{this.query()}</strong> : undefined
 									]);
 								})}
 							</legend>

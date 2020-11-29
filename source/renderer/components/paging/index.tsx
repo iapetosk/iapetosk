@@ -21,7 +21,6 @@ class Paging extends React.Component<PagingState> {
 		this.state = { ...properties };
 
 		listener.on(Scheme.PAGING, () => {
-			// render
 			this.forceUpdate();
 		});
 		listener.on(Scheme.GALLERY, ($new: { blocks: GalleryBlock[], size: number; }) => {

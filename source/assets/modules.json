@@ -1,6 +1,0 @@
-{
-	"hitomi": [
-		"^https?:\\\/\\\/hitomi.la\\\/galleries\\\/([\\d]+).html$",
-		"^https?:\\\/\\\/hitomi.la\\\/(manga|doujinshi|gamecg|cg|reader)\\\/([\\D\\d]+)-([\\D\\d]+)-([\\d]+).html$"
-	]
-}

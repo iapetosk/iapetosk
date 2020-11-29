@@ -16,10 +16,10 @@ class History extends Schema<{ history: Session[], index: number; }> {
 		this.$set({ history: [...this.$get().history.slice(0, this.$get().index + 1), value], index: this.$get().history.length });
 	}
 	public forward() {
-		return this.$set({ ...this.$get(), index: this.$get().index + 1 });
+		this.$set({ ...this.$get(), index: this.$get().index + 1 });
 	}
 	public backward() {
-		return this.$set({ ...this.$get(), index: this.$get().index - 1 });
+		this.$set({ ...this.$get(), index: this.$get().index - 1 });
 	}
 }
 export default (new History({ history: [{ filter: filter.get(""), index: 0 }], index: 0 }, Scheme.HISTORY));

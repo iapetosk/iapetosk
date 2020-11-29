@@ -107,14 +107,14 @@ class Search {
 				};
 
 				if (SINGULAR || !this.collection[shortcut.url]) {
-					request.get(shortcut.url, { encoding: "binary", headers: SINGULAR ? { "range": `bytes=${index * size * 4}-${index * size * 4 + size * 4 - 1}` } : {} }).then((callback) => {
-						switch (callback.status.code) {
+					request.get(shortcut.url, { encoding: "binary", headers: SINGULAR ? { "range": `bytes=${index * size * 4}-${index * size * 4 + size * 4 - 1}` } : {} }).then((response) => {
+						switch (response.status.code) {
 							case 200:
 							case 206: {
-								const array = this.unknown_1(callback);
+								const array = this.unknown_1(response);
 								// if only INDEX_ALL assigned
 								if (SINGULAR) {
-									SIZE += Number((callback.headers["content-range"]! as string).replace(/^bytes\s[0-9]+-[0-9]+\//, "")) / 4;
+									SIZE += Number((response.headers["content-range"]! as string).replace(/^bytes\s[0-9]+-[0-9]+\//, "")) / 4;
 								} else {
 									this.collection[shortcut.url] = array;
 								}

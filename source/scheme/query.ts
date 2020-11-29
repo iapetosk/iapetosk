@@ -5,7 +5,7 @@ class Query extends Schema<string> {
 		return this.$get();
 	}
 	public set(value: Query["state"]) {
-		return this.$set(value);
+		this.$set(value);
 	}
 	public clear() {
 		this.set("");

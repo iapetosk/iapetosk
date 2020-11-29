@@ -1,11 +1,14 @@
 import * as fs from "fs";
 import * as path from "path";
-import * as API from "@/assets/modules.json";
 
+import read from "@/modules/hitomi/read";
+
+import listener from "@/modules/listener";
 import storage from "@/modules/storage";
 import request from "@/modules/request";
 import worker from "@/scheme/worker";
 
+import { Scheme } from "@/scheme";
 import { PartialOptions } from "@/modules/request";
 
 export enum Folder {
@@ -31,12 +34,12 @@ export type Loaded = {
 	readonly placeholders?: Record<string, any>;
 };
 export class File {
-	public link: string;
+	public url: string;
 	public path: string;
 	public size: number;
 	public written: number;
-	constructor(link: string, path: string, size: number = NaN, written: number = 0) {
-		this.link = link;
+	constructor(url: string, path: string, size: number = NaN, written: number = 0) {
+		this.url = url;
 		this.path = path;
 		this.size = size;
 		this.written = written;
@@ -82,7 +85,7 @@ export class Download {
 							break;
 						}
 						default: {
-							worker.index(thread.id, thread);
+							worker.set(thread.id, thread);
 							break;
 						}
 					}
@@ -96,97 +99,101 @@ export class Download {
 		return new Promise<void>((resolve, rejects) => {
 			// debug
 			console.log(thread);
-
-			const I: Download = this;
-			const valid: number[] = [];
+			
+			const state = {
+				EXIT: false
+			};
+			const files: number[] = [
+				// TODO: none
+			];
 
 			// update thread
-			worker.index(thread.id, thread);
+			worker.set(thread.id, thread);
 
-			// observe thread
-			thread = new Proxy(thread, {
-				set(target: Thread, key: never, value: never) {
-					// debug
-					console.log(target);
-					// update property
-					target[key] = value;
-					// update storage
-					storage.set_data(String(target.id), target);
-					// update worker
-					worker.index(target.id, target);
-					// approve
-					return true;
+			listener.on(Scheme.WORKER, ($index: number, $new: Thread | undefined) => {
+				if ($index === thread.id && !$new) {
+					state.EXIT = true;
+					fs.rmdir(path.join(Folder.DOWNLOADS, String(thread.id)), { recursive: true }, () => {
+						// TODO: none
+					});
 				}
 			});
-			function next() {
-				worker.get(Status.QUEUED).every((value, index) => {
-					if (index) {
-						return resolve();
-					}
-					I.create(value);
-				});
+			function next(I: Download) {
+				for (const queued of worker.filter({ key: "status", value: Status.QUEUED })) {
+					I.create(queued);
+				}
 				return resolve();
 			}
-			function condition() {
-				return !!valid[thread.working] && thread.working - thread.finished < I.max_working;
+			function update(I: Download, key: "id" | "from" | "title" | "files" | "status" | "options" | "working" | "finished", value: any) {
+				switch (state.EXIT) {
+					case true: {
+						return next(I);
+					}
+					case false: {
+						// update thread
+						thread = { ...thread, [key]: value as never };
+						// update worker
+						worker.set(thread.id, thread);
+						// update storage
+						storage.set_data(String(thread.id), thread);
+						break;
+					}
+				}
 			}
-			function recursive(index: number): void {
-				if (!thread) {
-					return next();
-				}
+			function condition(I: Download) {
+				return !!files[thread.working] && thread.working - thread.finished < I.max_working;
+			}
+			function recursive(I: Download, index: number): void {
 				if (thread.status !== Status.WORKING) {
-					return resolve();
+					return next(I);
 				}
-				thread.working++;
+				update(I, "working", thread.working + 1);
 				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
 				request.get(
-					thread.files[valid[index]].link,
+					thread.files[files[index]].url,
 					{
 						...thread.options,
 						headers: {
 							...thread.options.headers,
 							// resume from partitally downloaded chunk
-							...thread.files[valid[index]].written ? { "content-range": `bytes=${thread.files[valid[index]].written}-` } : {}
+							...thread.files[files[index]].written ? { "content-range": `bytes=${thread.files[files[index]].written}-` } : {}
 						}
 					},
-					thread.files[valid[index]]
+					thread.files[files[index]]
 				).then(() => {
-					thread.finished++;
-
-					if (!thread) {
-						return next();
-					}
-					if (valid.length === thread.finished) {
-						thread.status = Status.FINISHED;
-						return next();
-					}
 					if (thread.status !== Status.WORKING) {
-						return resolve();
+						return next(I);
 					}
-					if (condition()) {
-						return recursive(thread.working);
+					update(I, "finished", thread.finished + 1);
+
+					if (files.length === thread.finished) {
+						update(I, "status", Status.FINISHED);
+						return next(I);
+					}
+					if (condition(I)) {
+						return recursive(I, thread.working);
 					}
 				}).catch((error) => {
 					// TODO: handle error
 				});
-				if (condition()) {
-					return recursive(thread.working);
+				if (condition(I)) {
+					return recursive(I, thread.working);
 				}
 			}
 			// maximum thread exceeded
-			if (this.max_threads <= worker.get(Status.WORKING).length) {
-				thread.status = Status.QUEUED;
+			if (this.max_threads <= worker.filter({ key: "status", value: Status.WORKING }).length) {
+				update(this, "status", Status.QUEUED);
 				return resolve();
 			}
 			// check for incompleted files
 			for (let index = 0; index < thread.files.length; index++) {
 				if (thread.files[index].written !== thread.files[index].size) {
-					valid.push(index);
+					files.push(index);
 				}
 			}
 			// thread files are downloaded
-			if (!valid.length) {
-				thread.status = Status.FINISHED;
+			if (!files.length) {
+				update(this, "status", Status.FINISHED);
 				return resolve();
 			}
 			// register storage
@@ -194,47 +201,49 @@ export class Download {
 				storage.register(String(thread.id), path.join(Folder.BUNDLES, String(thread.id) + ".json"), thread);
 			}
 			// update status
-			thread.status = Status.WORKING;
+			update(this, "status", Status.WORKING);
 			// recursivly download
-			return recursive(0);
+			return recursive(this, 0);
 		});
 	}
 	public remove(id: number) {
 		return new Promise<void>((resolve, rejects) => {
-			// delete folder with files within
-			fs.rmdirSync(path.dirname(worker.get(id)[0]?.files[0].path), { recursive: true });
-			// update worker
-			worker.index(id, undefined);
-			// update storage
-			storage.un_register(String(id));
-
-			return resolve();
+			try {
+				// remove worker
+				worker.set(id, undefined);
+				// remove storage
+				storage.un_register(String(id));
+				fs.rmdir(path.join(Folder.DOWNLOADS, String(id)), { recursive: true }, () => {
+					return resolve();
+				});
+			} catch {
+				// TODO: none
+			}
 		});
 	}
-	public evaluate(link: string) {
+	public evaluate(url: string) {
 		return new Promise<Thread>((resolve, rejects) => {
-			for (const LOADER of Object.keys(API)) {
-				for (const TEST of API[LOADER as never] as string[]) {
-					if (new RegExp(TEST).test(link)) {
-						(require(`@/assets/loaders/${LOADER}`).default as Loader).start(link).then((callback) => {
-							if (callback.links.length) {
-								const files: File[] = [];
-								const folder: string = String(Date.now());
-
-								callback.links.forEach((link, $index) => {
-									files[$index] = new File(link, path.join(Folder.DOWNLOADS, LOADER, folder, `${$index}${path.extname(link)}`));
-								});
-								return resolve(new Thread(link, callback.title, files, callback.options));
-							}
-							throw new Error("empty");
-						}).catch((error) => {
-							fs.mkdirSync(path.join(Folder.DEBUGS), { recursive: true });
-							fs.writeFileSync(path.join(Folder.DEBUGS, `${Date.now()}.log`), JSON.stringify({ from: link, loader: LOADER, error: error }));
+			for (const RegExp of [/^https?:\/\/hitomi.la\/galleries\/([\d]+).html$/, /^https?:\/\/hitomi.la\/(reader|manga|doujinshi|gamecg|cg)\/([\D\d]+)-([\D\d]+)-([\d]+).html$/]) {
+				switch (RegExp.test(url)) {
+					case true: {
+						return read.script(Number(/([0-9]+).html$/.exec(url)![1])).then((script) => {
+							return resolve(
+								new Thread(url, script.title, script.files.map((value, index) => {
+									return new File(value.url, path.join(Folder.DOWNLOADS, String(script.id), `${index}.${value.url.split(/\./).pop()}`));
+								}), {
+									headers: {
+										"referer": "https://hitomi.la"
+									}
+								}, script.id)
+							);
 						});
+					}
+					case false: {
+						return rejects();
 					}
 				}
 			}
 		});
 	}
 }
-export default (new Download(10, 10));
+export default (new Download(5, 5));
