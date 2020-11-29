@@ -68,7 +68,7 @@ class App extends React.Component<AppState> {
 				})()}
 				<code id="content" class="contrast">
 					{(() => {
-						switch (router.index()) {
+						switch (router.get()) {
 							case "browser": {
 								return (<Browser></Browser>);
 							}

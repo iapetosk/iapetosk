@@ -13,11 +13,11 @@ const compiler = webpack({
 	mode: process.env.NODE_ENV
 }, (error, stats) => {
 	compiler.close(() => {
-		request("nwjs.io", "/versions.json").then((callback) => {
+		request("nwjs.io", "/versions.json").then((response) => {
 			const options = {
 				archive: {
 					flavor: "nwjs",
-					version: JSON.parse(callback.toString())["stable"],
+					version: JSON.parse(response.toString())["stable"],
 					platform: "win",
 					architecture: "x64",
 				},
@@ -63,12 +63,12 @@ async function build(options) {
 			}
 		}
 		// fetch binaries
-		request("dl.nwjs.io", `/${options.archive.version}/${options.archive.flavor}-${options.archive.version}-${options.archive.platform}-${options.archive.architecture}.zip`).then((callback) => {
+		request("dl.nwjs.io", `/${options.archive.version}/${options.archive.flavor}-${options.archive.version}-${options.archive.platform}-${options.archive.architecture}.zip`).then((response) => {
 			// write files
 			for (const file of [
 				{
 					name: "archive.zip",
-					data: callback
+					data: response
 				},
 				{
 					name: "package.json",

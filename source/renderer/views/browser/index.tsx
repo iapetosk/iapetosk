@@ -17,7 +17,7 @@ class Browser extends React.Component<BrowserState> {
 		return (
 			<section id="browser">
 				<Query focus={false} suggests={[]}></Query>
-				<Iterable blocks={[]}></Iterable>
+				<Iterable status={{}} blocks={[]}></Iterable>
 			</section>
 		);
 	}

@@ -31,8 +31,8 @@ class Suggest {
 	private serial = 0;
 	constructor() {
 		for (const namespace of ["tagindex"]) {
-			request.get(`https://ltn.hitomi.la/${namespace}/version?_=${new Date().getTime()}`).then((callback) => {
-				this.version[namespace as "tagindex" | "galleries" | "languages" | "nozomiurl"] = callback.encode;
+			request.get(`https://ltn.hitomi.la/${namespace}/version?_=${new Date().getTime()}`).then((response) => {
+				this.version[namespace as "tagindex" | "galleries" | "languages" | "nozomiurl"] = response.encode;
 			});
 		}
 	}
@@ -174,8 +174,8 @@ class Suggest {
 	// @see search.js > get_url_at_range
 	private unknown_4(url: string, range: number[]) {
 		return new Promise<Uint8Array>((resolve, rejects) => {
-			request.get(url, { encoding: "binary", headers: { "range": `bytes=${range[0]}-${range[1]}` } }).then((callback) => {
-				return resolve(new Uint8Array(new Buffer(callback.encode, "binary")));
+			request.get(url, { encoding: "binary", headers: { "range": `bytes=${range[0]}-${range[1]}` } }).then((response) => {
+				return resolve(new Uint8Array(new Buffer(response.encode, "binary")));
 			});
 		});
 	}
@@ -246,9 +246,9 @@ class Suggest {
 			if (length > 10000 || length <= 0) {
 				return resolve([]);
 			}
-			this.unknown_4(`https://ltn.hitomi.la/tagindex/${field}.${this.version.tagindex}.data`, [offset, offset + length - 1]).then((callback) => {
+			this.unknown_4(`https://ltn.hitomi.la/tagindex/${field}.${this.version.tagindex}.data`, [offset, offset + length - 1]).then((response) => {
 				const binary: SearchBinary = {
-					bytes: new DataView(callback.buffer),
+					bytes: new DataView(response.buffer),
 					index: 0
 				};
 				const suggests_size = binary.bytes.getInt32(binary.index, false);
