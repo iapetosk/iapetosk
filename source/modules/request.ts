@@ -42,7 +42,7 @@ class Request {
 	}
 	public async send(options: RequestOptions, file?: File) {
 		const I: Request = this;
-		return new Promise<RequestResponse>((resolve, rejects) => {
+		return new Promise<RequestResponse>((resolve, reject) => {
 			function recursive(options: RequestOptions, file?: File) {
 				// content
 				const chunks: Buffer[] = [];
@@ -154,8 +154,8 @@ class Request {
 					response.on("error", (error) => {
 						// print ERROR
 						console.log(error);
-						// rejects ERROR
-						return rejects(error);
+						// reject ERROR
+						return reject(error);
 					});
 				}).end();
 			}

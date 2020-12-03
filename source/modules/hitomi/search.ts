@@ -30,7 +30,7 @@ class Search {
 			[Prefix.POSITIVE]: [],
 			[Prefix.NEGATIVE]: []
 		};
-		return new Promise<GalleryList>((resolve, rejects) => {
+		return new Promise<GalleryList>((resolve, reject) => {
 			for (const tag of Object.keys(filter)) {
 				switch (tag) {
 					case "language": {
