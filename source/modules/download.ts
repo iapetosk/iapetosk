@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
+import * as events from "events";
 
 import read from "@/modules/hitomi/read";
-
 import listener from "@/modules/listener";
 import storage from "@/modules/storage";
 import request from "@/modules/request";
@@ -24,15 +24,6 @@ export enum Status {
 	PAUSED,
 	ERROR
 };
-export type Loader = {
-	start(url: string): Promise<Loaded>;
-};
-export type Loaded = {
-	readonly title: string,
-	readonly links: string[],
-	readonly options?: PartialOptions,
-	readonly placeholders?: Record<string, any>;
-};
 export class File {
 	public url: string;
 	public path: string;
@@ -45,7 +36,7 @@ export class File {
 		this.written = written;
 	}
 }
-export class Thread {
+export class Task {
 	public id: number;
 	public from: string;
 	public title: string;
@@ -73,19 +64,19 @@ export class Download {
 			for (const file of fs.readdirSync(Folder.BUNDLES)) {
 				// check if file is .json
 				if (fs.statSync(path.join(Folder.BUNDLES, file)).isFile() && path.extname(file) === ".json") {
-					// read thread from .json
+					// read task from .json
 					storage.register(file.split(/\./)[0], path.join(Folder.BUNDLES, file), "@import");
 
-					const thread: Thread = storage.get_data(file.split(/\./)[0]);
+					const task: Task = storage.get_data(file.split(/\./)[0]);
 
-					switch (thread.status) {
+					switch (task.status) {
 						case Status.NONE:
 						case Status.WORKING: {
-							this.create(thread);
+							this.create(task);
 							break;
 						}
 						default: {
-							worker.set(thread.id, thread);
+							worker.set(task.id, task);
 							break;
 						}
 					}
@@ -95,140 +86,102 @@ export class Download {
 			// TODO: none
 		}
 	}
-	public create(thread: Thread) {
-		return new Promise<void>((resolve, rejects) => {
-			// debug
-			console.log(thread);
-			
-			const state = {
-				EXIT: false
-			};
-			const files: number[] = [
-				// TODO: none
-			];
+	public create(task: Task) {
+		const observe = new events.EventEmitter, files: number[] = [];
+		return new Promise<void>((resolve, reject) => {
+			function update(key: "id" | "from" | "title" | "files" | "status" | "options" | "working" | "finished", value: any) {
+				if (storage.exist(String(task.id))) {
+					// update task
+					task = { ...task, [key]: value as never };
+					// update worker
+					worker.set(task.id, task);
+					// update storage
+					storage.set_data(String(task.id), task);
+				}
+			}
+			observe.on("start", (index: number) => {
+				if (task.status !== Status.WORKING) {
+					return observe.emit("end");
+				}
+				update("working", task.working + 1);
+				request.get(task.files[files[index]].url, { ...task.options, headers: { ...task.options.headers, ...task.files[files[index]].written ? { "content-range": `bytes=${task.files[files[index]].written}-` } : {} } }, task.files[files[index]]).then(() => {
+					if (task.status !== Status.WORKING) {
+						return observe.emit("end");
+					}
+					update("finished", task.finished + 1);
 
-			// update thread
-			worker.set(thread.id, thread);
-
-			listener.on(Scheme.WORKER, ($index: number, $new: Thread | undefined) => {
-				if ($index === thread.id && !$new) {
-					state.EXIT = true;
-					fs.rmdir(path.join(Folder.DOWNLOADS, String(thread.id)), { recursive: true }, () => {
-						// TODO: none
-					});
+					if (!!files[task.working] && task.working - task.finished < this.max_working) {
+						return observe.emit("start", task.working);
+					}
+					if (task.finished === files.length) {
+						update("status", Status.FINISHED);
+						return observe.emit("end");
+					}
+				});
+				if (!!files[task.working] && task.working - task.finished < this.max_working) {
+					return observe.emit("start", task.working);
 				}
 			});
-			function next(I: Download) {
+			observe.on("end", () => {
 				for (const queued of worker.filter({ key: "status", value: Status.QUEUED })) {
-					I.create(queued);
+					this.create(queued);
+					break;
 				}
 				return resolve();
-			}
-			function update(I: Download, key: "id" | "from" | "title" | "files" | "status" | "options" | "working" | "finished", value: any) {
-				switch (state.EXIT) {
-					case true: {
-						return next(I);
-					}
-					case false: {
-						// update thread
-						thread = { ...thread, [key]: value as never };
-						// update worker
-						worker.set(thread.id, thread);
-						// update storage
-						storage.set_data(String(thread.id), thread);
-						break;
-					}
+			});
+			listener.on(Scheme.WORKER, ($index: number, $new: Task | undefined, $old: Task | undefined) => {
+				if ($index === task.id && !$new) {
+					// remove listeners
+					observe.removeAllListeners();
+					// remove
+					this.remove(task.id);
 				}
-			}
-			function condition(I: Download) {
-				return !!files[thread.working] && thread.working - thread.finished < I.max_working;
-			}
-			function recursive(I: Download, index: number): void {
-				if (thread.status !== Status.WORKING) {
-					return next(I);
-				}
-				update(I, "working", thread.working + 1);
-				// https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range
-				request.get(
-					thread.files[files[index]].url,
-					{
-						...thread.options,
-						headers: {
-							...thread.options.headers,
-							// resume from partitally downloaded chunk
-							...thread.files[files[index]].written ? { "content-range": `bytes=${thread.files[files[index]].written}-` } : {}
-						}
-					},
-					thread.files[files[index]]
-				).then(() => {
-					if (thread.status !== Status.WORKING) {
-						return next(I);
-					}
-					update(I, "finished", thread.finished + 1);
-
-					if (files.length === thread.finished) {
-						update(I, "status", Status.FINISHED);
-						return next(I);
-					}
-					if (condition(I)) {
-						return recursive(I, thread.working);
-					}
-				}).catch((error) => {
-					// TODO: handle error
-				});
-				if (condition(I)) {
-					return recursive(I, thread.working);
-				}
-			}
-			// maximum thread exceeded
+			});
+			// task counts reached its limit
 			if (this.max_threads <= worker.filter({ key: "status", value: Status.WORKING }).length) {
-				update(this, "status", Status.QUEUED);
-				return resolve();
+				update("status", Status.QUEUED);
+				return observe.emit("end");
 			}
-			// check for incompleted files
-			for (let index = 0; index < thread.files.length; index++) {
-				if (thread.files[index].written !== thread.files[index].size) {
+			// scan unfinished files
+			for (let index = 0; index < task.files.length; index++) {
+				if (task.files[index].written !== task.files[index].size) {
 					files.push(index);
 				}
 			}
-			// thread files are downloaded
+			// task is finished
 			if (!files.length) {
-				update(this, "status", Status.FINISHED);
-				return resolve();
+				update("status", Status.FINISHED);
+				return observe.emit("end");
 			}
 			// register storage
-			if (!storage.exist(String(thread.id))) {
-				storage.register(String(thread.id), path.join(Folder.BUNDLES, String(thread.id) + ".json"), thread);
+			if (!storage.exist(String(task.id))) {
+				storage.register(String(task.id), path.join(Folder.BUNDLES, String(task.id) + ".json"), task);
 			}
 			// update status
-			update(this, "status", Status.WORKING);
-			// recursivly download
-			return recursive(this, 0);
+			update("status", Status.WORKING);
+			// download recursivly
+			return observe.emit("start", 0);
 		});
 	}
 	public remove(id: number) {
-		return new Promise<void>((resolve, rejects) => {
-			try {
-				// remove worker
-				worker.set(id, undefined);
-				// remove storage
-				storage.un_register(String(id));
-				fs.rmdir(path.join(Folder.DOWNLOADS, String(id)), { recursive: true }, () => {
-					return resolve();
-				});
-			} catch {
-				// TODO: none
-			}
+		return new Promise<void>((resolve, reject) => {
+			// remove worker
+			worker.set(id, undefined);
+			// remove storage
+			storage.un_register(String(id));
+			fs.rmdir(path.join(Folder.DOWNLOADS, String(id)), { recursive: true }, () => {
+				return resolve();
+			});
 		});
 	}
 	public evaluate(url: string) {
-		return new Promise<Thread>((resolve, rejects) => {
+		return new Promise<Task>((resolve, reject) => {
 			for (const RegExp of [/^https?:\/\/hitomi.la\/galleries\/([\d]+).html$/, /^https?:\/\/hitomi.la\/(reader|manga|doujinshi|gamecg|cg)\/([\D\d]+)-([\D\d]+)-([\d]+).html$/]) {
 				switch (RegExp.test(url)) {
 					case true: {
 						return read.script(Number(/([0-9]+).html$/.exec(url)![1])).then((script) => {
 							return resolve(
-								new Thread(url, script.title, script.files.map((value, index) => {
+								new Task(url, script.title, script.files.map((value, index) => {
 									return new File(value.url, path.join(Folder.DOWNLOADS, String(script.id), `${index}.${value.url.split(/\./).pop()}`));
 								}), {
 									headers: {
@@ -239,7 +192,7 @@ export class Download {
 						});
 					}
 					case false: {
-						return rejects();
+						return reject();
 					}
 				}
 			}

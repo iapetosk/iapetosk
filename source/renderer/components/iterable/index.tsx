@@ -9,7 +9,7 @@ import gallery from "@/scheme/gallery";
 import paging from "@/scheme/paging";
 
 import { Scheme } from "@/scheme";
-import { Status, Thread } from "@/modules/download";
+import { Status } from "@/modules/download";
 import { GalleryBlock } from "@/modules/hitomi/read";
 
 export type IterableState = {
@@ -38,7 +38,7 @@ class Iterable extends React.Component<IterableState> {
 			this.forceUpdate();
 		});
 		/*
-		listener.on(Scheme.WORKER, ($index: number, $new: Thread | undefined) => {
+		listener.on(Scheme.WORKER, ($index: number, $new: Task | undefined) => {
 			switch ($new?.status) {
 				case this.state.status[$index]?.thread_status: {
 					break;
@@ -68,32 +68,31 @@ class Iterable extends React.Component<IterableState> {
 											}
 										},
 										...(this.state.status[gallery.id]?.thread_status ? [
-											{
-												HTML: require(`!html-loader!@/assets/icons/delete.svg`),
-												click: () => {
-													download.remove(gallery.id).then(() => {
+										{
+											HTML: require(`!html-loader!@/assets/icons/delete.svg`),
+											click: () => {
+												download.remove(gallery.id).then(() => {
+													// TODO: none
+												});
+												this.setState({ ...this.state, status: { ...this.state.status, [gallery.id]: { ...this.state.status[gallery.id], thread_status: Status.NONE } } });
+											}
+										},
+										{
+											HTML: require(`!html-loader!@/assets/icons/open.svg`),
+											click: () => {
+												// TODO: open
+										}}] : [
+										{
+											HTML: require(`!html-loader!@/assets/icons/download.svg`),
+											click: () => {
+												download.evaluate(`https://hitomi.la/galleries/${gallery.id}.html`).then((task) => {
+													download.create(task).then(() => {
 														// TODO: none
 													});
-													this.setState({ ...this.state, status: { ...this.state.status, [gallery.id]: { ...this.state.status[gallery.id], thread_status: Status.NONE } } });
-												}
-											},
-											{
-												HTML: require(`!html-loader!@/assets/icons/open.svg`),
-												click: () => {
-													// TODO: open
-												}
-											}] : [
-												{
-													HTML: require(`!html-loader!@/assets/icons/download.svg`),
-													click: () => {
-														download.evaluate(`https://hitomi.la/galleries/${gallery.id}.html`).then((thread) => {
-															download.create(thread).then(() => {
-																// TODO: none
-															});
-															this.setState({ ...this.state, status: { ...this.state.status, [gallery.id]: { ...this.state.status[gallery.id], thread_status: Status.WORKING } } });
-														});
-													}
-												}]),
+													this.setState({ ...this.state, status: { ...this.state.status, [gallery.id]: { ...this.state.status[gallery.id], thread_status: Status.WORKING } } });
+												});
+											}
+										}]),
 										{
 											HTML: require(`!html-loader!@/assets/icons/copy.svg`),
 											click: () => {

@@ -47,7 +47,7 @@ export type GalleryJS = Merge<{
 
 class Read {
 	public block(id: number) {
-		return new Promise<GalleryBlock>((resolve, rejects) => {
+		return new Promise<GalleryBlock>((resolve, reject) => {
 			const object: Record<string, any> = {};
 
 			request.get(`https://ltn.hitomi.la/galleryblock/${id}.html`).then((response) => {
@@ -73,11 +73,11 @@ class Read {
 		});
 	}
 	public script(id: number) {
-		return new Promise<GalleryJS>((resolve, rejects) => {
+		return new Promise<GalleryJS>((resolve, reject) => {
 			request.get(`https://ltn.hitomi.la/galleries/${id}.js`).then((response) => {
 				switch (response.status.code) {
 					case 404: {
-						return rejects();
+						return reject();
 					}
 					default: {
 						const script: GalleryJS = utility.extract(`${response.encode};`, "galleryinfo", "object");

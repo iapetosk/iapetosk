@@ -36,7 +36,7 @@ const compiler = webpack({
 });
 async function request(host, path) {
 	const chunks = [];
-	return new Promise((resolve, rejects) => {
+	return new Promise((resolve, reject) => {
 		require("https").get({
 			host: host,
 			path: path,
@@ -53,7 +53,7 @@ async function request(host, path) {
 	});
 }
 async function build(options) {
-	return new Promise((resolve, rejects) => {
+	return new Promise((resolve, reject) => {
 		// clean directory
 		for (const file of fs.readdirSync(path.resolve(options.output.path))) {
 			if (fs.statSync(path.resolve(options.output.path, file)).isFile()) {

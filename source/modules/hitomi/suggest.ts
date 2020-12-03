@@ -127,7 +127,7 @@ class Suggest {
 	}
 	// @see search.js > get_node_at_address
 	private unknown_3(field: string, adress: number) {
-		return new Promise<SearchBundle>((resolve, rejects) => {
+		return new Promise<SearchBundle>((resolve, reject) => {
 			const URI = ["https://ltn.hitomi.la/"];
 
 			function recursive(I: Suggest) {
@@ -161,7 +161,7 @@ class Suggest {
 							if (callback) {
 								return resolve(I.unknown_2(callback));
 							} else {
-								return rejects();
+								return reject();
 							}
 						});
 						break;
@@ -173,7 +173,7 @@ class Suggest {
 	}
 	// @see search.js > get_url_at_range
 	private unknown_4(url: string, range: number[]) {
-		return new Promise<Uint8Array>((resolve, rejects) => {
+		return new Promise<Uint8Array>((resolve, reject) => {
 			request.get(url, { encoding: "binary", headers: { "range": `bytes=${range[0]}-${range[1]}` } }).then((response) => {
 				return resolve(new Uint8Array(new Buffer(response.encode, "binary")));
 			});
@@ -181,7 +181,7 @@ class Suggest {
 	}
 	// @see search.js > B_search
 	private unknown_5(field: string, key: Uint8Array, bundle: SearchBundle) {
-		return new Promise<[number, number]>((resolve, rejects) => {
+		return new Promise<[number, number]>((resolve, reject) => {
 			function mystery_0(first: Uint8Array, second: Uint8Array): [boolean, boolean] {
 				for (let index = 0; index < (first.byteLength < second.byteLength ? first.byteLength : second.byteLength); index++) {
 					if (first[index] < second[index]) {
@@ -215,20 +215,20 @@ class Suggest {
 				return true;
 			}
 			if (!bundle) {
-				return rejects();
+				return reject();
 			}
 			if (!bundle.index.length) {
-				return rejects();
+				return reject();
 			}
 			const [exist, index] = mystery_1(key, bundle);
 
 			if (exist) {
 				return resolve(bundle.value[index]);
 			} else if (mystery_2(bundle)) {
-				return rejects();
+				return reject();
 			}
 			if (bundle.child[index] == 0) {
-				return rejects();
+				return reject();
 			}
 			this.unknown_3(field, bundle.child[index]).then((bundle) => {
 				this.unknown_5(field, key, bundle).then((bundle) => {
@@ -240,7 +240,7 @@ class Suggest {
 	// @see search.js > get_suggestions_from_data
 	private unknown_6(field: string, bytes: [number, number]) {
 		const suggest: Suggestion = [];
-		return new Promise<Suggestion>((resolve, rejects) => {
+		return new Promise<Suggestion>((resolve, reject) => {
 			const [offset, length] = bytes;
 
 			if (length > 10000 || length <= 0) {
