@@ -1,5 +1,6 @@
 #paging {
 	background-color: var(--colour_1);
+	will-change: display;
 	&.disable {
 		pointer-events: none;
 		> * {
@@ -21,5 +22,8 @@
 				fill: var(--colour_2);
 			}
 		}
+	}
+	&:not(.visible) {
+		display: none;
 	}
 }

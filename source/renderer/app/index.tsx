@@ -65,30 +65,12 @@ class App extends React.Component<AppState> {
 	public render() {
 		return (
 			<>
-				{(() => {
-					switch (this.state.fullscreen) {
-						case true: {
-							return undefined;
-						}
-						default: {
-							return <TitleBar focus={this.state.focus} restore={this.state.restore} fullscreen={this.state.fullscreen}></TitleBar>;
-						}
-					}
-				})()}
-				<code id="content" class="contrast">
+				<TitleBar visible={!this.state.fullscreen} focus={this.state.focus} restore={this.state.restore} fullscreen={this.state.fullscreen}></TitleBar>
+				<section id="content" class="contrast">
 					<Browser disable={this.state.view !== "browser"}></Browser>
 					<Reader disable={this.state.view !== "reader"}></Reader>
-				</code>
-				{(() => {
-					switch (this.state.fullscreen || this.state.view !== "browser") {
-						case true: {
-							return undefined;
-						}
-						default: {
-							return <Paging disable={true}></Paging>;
-						}
-					}
-				})()}
+				</section>
+				<Paging visible={!this.state.fullscreen && this.state.view !== "reader"} disable={false}></Paging>
 			</>
 		);
 	}

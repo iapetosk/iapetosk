@@ -11,6 +11,7 @@ import { Scheme } from "@/scheme";
 import { GalleryBlock } from "@/modules/hitomi/read";
 
 export type PagingState = {
+	visible: boolean,
 	disable: boolean;
 };
 
@@ -48,6 +49,9 @@ class Paging extends React.Component<PagingState> {
 			}
 		});
 	}
+	static getDerivedStateFromProps($new: PagingState, $old: PagingState) {
+		return $new;
+	}
 	public offset(value: number) {
 		const breakpoint = ~~(paging.get().metre / 2);
 		const undeflow = (paging.get().size > paging.get().metre);
@@ -58,7 +62,7 @@ class Paging extends React.Component<PagingState> {
 	}
 	public render() {
 		return (
-			<section id="paging" class={utility.inline({ "contrast": true, "center": true, "disable": this.state.disable })}>
+			<section id="paging" class={utility.inline({ "contrast": true, "center": true, "visible": this.state.visible, "disable": this.state.disable })}>
 				<button id="first" class={utility.inline({ "un_draggable": true, "disable": paging.get().index === 0 })}
 					onClick={() => {
 						paging.first();
