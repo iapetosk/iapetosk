@@ -29,7 +29,7 @@ class Paging extends React.Component<PagingState> {
 		});
 		window.addEventListener("keydown", (event) => {
 			// check for focused input
-			if (!document.querySelectorAll("input:focus").length && !this.state.disable) {
+			if (!document.querySelectorAll("input:focus").length && this.state.visible && !this.state.disable) {
 				switch (event.key) {
 					case "ArrowLeft": {
 						paging.backward();
@@ -50,7 +50,7 @@ class Paging extends React.Component<PagingState> {
 		});
 	}
 	static getDerivedStateFromProps($new: PagingState, $old: PagingState) {
-		return $new;
+		return { ...$new, disable: $old.disable };
 	}
 	public offset(value: number) {
 		const breakpoint = ~~(paging.get().metre / 2);
