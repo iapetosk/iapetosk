@@ -90,7 +90,7 @@ export class Download {
 		const observe = new events.EventEmitter, files: number[] = [];
 		return new Promise<void>((resolve, reject) => {
 			function update(key: "id" | "from" | "title" | "files" | "status" | "options" | "working" | "finished", value: any) {
-				if (storage.exist(String(task.id))) {
+				if (storage.get_data(String(task.id))) {
 					// update task
 					task = { ...task, [key]: value as never };
 					// update worker
