@@ -55,7 +55,6 @@ class Search {
 			if (URLs[Prefix.POSITIVE].length === 0) {
 				URLs[Prefix.POSITIVE].unshift(this.index_all);
 			}
-
 			console.log(URLs);
 
 			const SINGULAR: boolean = URLs[Prefix.POSITIVE].length === 1 && URLs[Prefix.NEGATIVE].length === 0 && URLs[Prefix.POSITIVE][0] === this.index_all;
@@ -106,7 +105,10 @@ class Search {
 					url: [...URLs[Prefix.POSITIVE], ...URLs[Prefix.NEGATIVE]][$index]
 				};
 
-				if (SINGULAR || !this.collection[shortcut.url]) {
+				if (/id\/([0-9]+)/.test(shortcut.url)) {
+					$(shortcut.prefix, [Number(/id\/([0-9]+)/.exec(shortcut.url)![1])]);
+				}
+				else if (SINGULAR || !this.collection[shortcut.url]) {
 					request.get(shortcut.url, { encoding: "binary", headers: SINGULAR ? { "range": `bytes=${index * size * 4}-${index * size * 4 + size * 4 - 1}` } : {} }).then((response) => {
 						switch (response.status.code) {
 							case 200:
