@@ -97,6 +97,10 @@ export class Download {
 					worker.set(task.id, task);
 					// update storage
 					storage.set_data(String(task.id), task);
+				} else {
+					fs.rmdir(path.join(Folder.DOWNLOADS, String(task.id)), { recursive: true }, () => {
+						// TODO: none
+					});
 				}
 			}
 			observe.on("start", (index: number) => {
@@ -131,8 +135,6 @@ export class Download {
 			});
 			listener.on(Scheme.WORKER, ($index: number, $new: Task | undefined, $old: Task | undefined) => {
 				if ($index === task.id && !$new) {
-					// remove listeners
-					observe.removeAllListeners();
 					// remove
 					this.remove(task.id);
 				}
