@@ -66,7 +66,7 @@ class Media extends React.Component<MediaState> {
 				<section id="scrollable">
 					{this.state.script?.files.map((value, index) => {
 						return (
-							<img src={value.url} key={index}
+							<img src={value.url} loading="lazy" key={index}
 								onError={(event) => {
 									(event.target as HTMLElement).style.display = "none";
 								}}>
