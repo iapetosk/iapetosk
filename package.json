@@ -1,6 +1,6 @@
 {
 	"name": "waifu-material",
-	"version": "1.0.0-alpha",
+	"version": "1.0.0",
 	"description": "WIP",
 	"main": "http://localhost:8080",
 	"node-remote": "*://localhost/*",
