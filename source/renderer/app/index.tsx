@@ -10,9 +10,9 @@ import Reader from "@/renderer/views/reader";
 
 import listener from "@/modules/listener";
 import utility from "@/modules/utility";
-import router from "@/scheme/router";
 
 import { Scheme } from "@/scheme";
+import { Layer } from "@/scheme/router";
 
 export type AppState = {
 	view: string,
@@ -43,8 +43,8 @@ class App extends React.Component<AppState> {
 		listener.on("reload", () => {
 			window.location.reload();
 		});
-		listener.on(Scheme.ROUTER, () => {
-			this.setState({ ...this.state, view: router.get().view });
+		listener.on(Scheme.ROUTER, ($new: Layer) => {
+			this.setState({ ...this.state, view: $new.view });
 		});
 		nw.Window.get().on("focus", () => {
 			this.setState({ ...this.state, focus: true });

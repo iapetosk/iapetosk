@@ -1,7 +1,7 @@
 
 # Instruction
 
-*Waifu Material* is highly module driven *Reader / Downloader*, built upon *Imouto-Material*, written in *typescript*, and powered by *nw.js*.<br>
+*Waifu Material* is highly module driven *Downloader / Reader*, built upon *Imouto-Material*, written in *typescript*, and powered by *nw.js*.<br>
 It's motivated by how my previous project lack in downloader features.<br>
 
 # Installation
@@ -15,4 +15,5 @@ npm run serve
 
 # Documentation
 
-WIP
+[ENGLISH instruction (영어 설명서)](./documents/readme_english.md)<br>
+[KOREAN instruction	(한국어 설명서)](./documents/readme_korean.md)<br>

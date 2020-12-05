@@ -58,7 +58,7 @@ class Iterable extends React.Component<IterableState> {
 					return (
 						<section id="gallery" class="contrast" key={index}>
 							<section id="upper" class="contrast">
-								<canvas id="thumbnail" class="censored" style={{ background: `url(${gallery.thumbnail[0]}) no-repeat center / cover` }}></canvas>
+								<canvas id="thumbnail" style={{ background: `url(${gallery.thumbnail[0]}) no-repeat center / cover` }}></canvas>
 								<section id="interacts" class="contrast center">
 									{[
 										{
