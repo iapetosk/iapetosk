@@ -5,6 +5,7 @@ import "./index.scss";
 import listener from "@/modules/listener";
 import utility from "@/modules/utility";
 import history from "@/scheme/history";
+import router from "@/scheme/router";
 import paging from "@/scheme/paging";
 
 import { Scheme } from "@/scheme";
@@ -29,7 +30,7 @@ class Paging extends React.Component<PagingState> {
 		});
 		window.addEventListener("keydown", (event) => {
 			// check for focused input
-			if (!document.querySelectorAll("input:focus").length && this.state.visible && !this.state.disable) {
+			if (router.get().view === "browser" && !document.querySelectorAll("input:focus").length && !this.state.disable) {
 				switch (event.key) {
 					case "ArrowLeft": {
 						paging.backward();
