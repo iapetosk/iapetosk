@@ -2,7 +2,10 @@ import * as React from "react";
 
 import "./index.scss";
 
+import utility from "@/modules/utility";
+
 export type TitleBarState = {
+	visible: boolean,
 	focus: boolean,
 	restore: boolean,
 	fullscreen: boolean;
@@ -19,7 +22,7 @@ class TitleBar extends React.Component<TitleBarState> {
 	}
 	public render() {
 		return (
-			<section id="titlebar" class="contrast draggable">
+			<section id="titlebar" class={utility.inline({ "draggable": true, "contrast": true, "visible": this.state.visible })}>
 				<button id="focus" class="un_draggable"
 					onClick={() => {
 						nw.Window.get().minimize();

@@ -5,6 +5,7 @@
 	grid-template-rows: 1fr;
 	grid-template-columns: 1fr auto auto auto;
 	background-color: var(--colour_1);
+	will-change: display;
 	> * {
 		width: 45px;
 	}
@@ -19,5 +20,8 @@
 		&:hover {
 			background-color: var(--colour_error);
 		}
+	}
+	&:not(.visible) {
+		display: none;
 	}
 }
