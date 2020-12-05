@@ -12,7 +12,10 @@ import listener from "@/modules/listener";
 import utility from "@/modules/utility";
 import router from "@/scheme/router";
 
+import { Scheme } from "@/scheme";
+
 export type AppState = {
+	view: string,
 	focus: boolean,
 	restore: boolean,
 	fullscreen: boolean;
@@ -31,11 +34,17 @@ class App extends React.Component<AppState> {
 			// @ts-ignore
 			{ key: "ESCAPE", active: () => { if (this.state.fullscreen) { nw.Window.get().leaveFullscreen(); } } }
 		));
-		if (process.env.NODE_ENV === "development") {
-			nw.Window.get().showDevTools();	
+		switch (process.env.NODE_ENV) {
+			case "development": {
+				nw.Window.get().showDevTools();
+				break;
+			}
 		}
 		listener.on("reload", () => {
 			window.location.reload();
+		});
+		listener.on(Scheme.ROUTER, () => {
+			this.setState({ ...this.state, view: router.get().view });
 		});
 		nw.Window.get().on("focus", () => {
 			this.setState({ ...this.state, focus: true });
@@ -67,22 +76,11 @@ class App extends React.Component<AppState> {
 					}
 				})()}
 				<code id="content" class="contrast">
-					{(() => {
-						switch (router.get()) {
-							case "browser": {
-								return (<Browser></Browser>);
-							}
-							case "reader": {
-								return (<Reader></Reader>);
-							}
-							default: {
-								return undefined;
-							}
-						}
-					})()}
+					<Browser disable={this.state.view !== "browser"}></Browser>
+					<Reader disable={this.state.view !== "reader"}></Reader>
 				</code>
 				{(() => {
-					switch (this.state.fullscreen) {
+					switch (this.state.fullscreen || this.state.view !== "browser") {
 						case true: {
 							return undefined;
 						}

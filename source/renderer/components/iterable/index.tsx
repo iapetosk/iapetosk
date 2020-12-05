@@ -6,6 +6,7 @@ import listener from "@/modules/listener";
 import download from "@/modules/download";
 import history from "@/scheme/history";
 import gallery from "@/scheme/gallery";
+import router from "@/scheme/router";
 import paging from "@/scheme/paging";
 
 import { Scheme } from "@/scheme";
@@ -35,7 +36,6 @@ class Iterable extends React.Component<IterableState> {
 				paging.set({ metre: 10, index: paging.get().index, size: Math.ceil($new.size / 25) });
 			}
 			this.setState({ ...this.state, blocks: $new.blocks });
-			this.forceUpdate();
 		});
 		/*
 		listener.on(Scheme.WORKER, ($index: number, $new: Task | undefined) => {
@@ -58,13 +58,13 @@ class Iterable extends React.Component<IterableState> {
 					return (
 						<section id="gallery" class="contrast" key={index}>
 							<section id="upper" class="contrast">
-								<legend id="thumbnail" class="censored" style={{ background: `url(${gallery.thumbnail[0]}) no-repeat center / cover` }}></legend>
+								<canvas id="thumbnail" class="censored" style={{ background: `url(${gallery.thumbnail[0]}) no-repeat center / cover` }}></canvas>
 								<section id="interacts" class="contrast center">
 									{[
 										{
 											HTML: require(`!html-loader!@/assets/icons/read.svg`),
 											click: () => {
-												// TODO: read
+												router.set({ view: "reader", options: gallery.id });
 											}
 										},
 										...(this.state.status[gallery.id]?.thread_status ? [

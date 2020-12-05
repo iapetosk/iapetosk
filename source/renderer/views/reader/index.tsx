@@ -1,7 +1,14 @@
 import * as React from "react";
 
 import "./index.scss";
-export type ReaderState = {};
+
+import utility from "@/modules/utility";
+
+import Media from "@/renderer/components/media";
+
+export type ReaderState = {
+	disable: boolean;
+};
 
 class Reader extends React.Component<ReaderState> {
 	public state: ReaderState;
@@ -9,9 +16,13 @@ class Reader extends React.Component<ReaderState> {
 		super(properties);
 		this.state = { ...properties };
 	}
-	public render(): JSX.Element {
+	static getDerivedStateFromProps($new: ReaderState, $old: ReaderState) {
+		return $new;
+	}
+	public render() {
 		return (
-			<section id="reader">
+			<section id="reader" class={utility.inline({ "disable": this.state.disable, "right": true })}>
+				<Media></Media>
 			</section>
 		);
 	}
