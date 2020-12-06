@@ -87,7 +87,7 @@ export class Download {
 		}
 	}
 	public create(task: Task) {
-		const observe = new events.EventEmitter, files: number[] = [];
+		const observer = new events.EventEmitter, files: number[] = [];
 		return new Promise<void>((resolve, reject) => {
 			function update(key: "id" | "from" | "title" | "files" | "status" | "options" | "working" | "finished", value: any) {
 				if (storage.get_data(String(task.id))) {
@@ -103,30 +103,30 @@ export class Download {
 					});
 				}
 			}
-			observe.on("start", (index: number) => {
+			observer.on("start", (index: number) => {
 				if (task.status !== Status.WORKING) {
-					return observe.emit("end");
+					return observer.emit("end");
 				}
 				update("working", task.working + 1);
 				request.get(task.files[files[index]].url, { ...task.options, headers: { ...task.options.headers, ...task.files[files[index]].written ? { "content-range": `bytes=${task.files[files[index]].written}-` } : {} } }, task.files[files[index]]).then(() => {
 					if (task.status !== Status.WORKING) {
-						return observe.emit("end");
+						return observer.emit("end");
 					}
 					update("finished", task.finished + 1);
 
 					if (!!files[task.working] && task.working - task.finished < this.max_working) {
-						return observe.emit("start", task.working);
+						return observer.emit("start", task.working);
 					}
 					if (task.finished === files.length) {
 						update("status", Status.FINISHED);
-						return observe.emit("end");
+						return observer.emit("end");
 					}
 				});
 				if (!!files[task.working] && task.working - task.finished < this.max_working) {
-					return observe.emit("start", task.working);
+					return observer.emit("start", task.working);
 				}
 			});
-			observe.on("end", () => {
+			observer.on("end", () => {
 				for (const queued of worker.filter({ key: "status", value: Status.QUEUED })) {
 					this.create(queued);
 					break;
@@ -142,7 +142,7 @@ export class Download {
 			// task counts reached its limit
 			if (this.max_threads <= worker.filter({ key: "status", value: Status.WORKING }).length) {
 				update("status", Status.QUEUED);
-				return observe.emit("end");
+				return observer.emit("end");
 			}
 			// scan unfinished files
 			for (let index = 0; index < task.files.length; index++) {
@@ -153,7 +153,7 @@ export class Download {
 			// task is finished
 			if (!files.length) {
 				update("status", Status.FINISHED);
-				return observe.emit("end");
+				return observer.emit("end");
 			}
 			// register storage
 			if (!storage.exist(String(task.id))) {
@@ -162,7 +162,7 @@ export class Download {
 			// update status
 			update("status", Status.WORKING);
 			// download recursivly
-			return observe.emit("start", 0);
+			return observer.emit("start", 0);
 		});
 	}
 	public remove(id: number) {

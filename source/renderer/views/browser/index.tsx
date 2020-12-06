@@ -8,8 +8,6 @@ import worker from "@/scheme/worker";
 import Query from "@/renderer/components/query";
 import Iterable from "@/renderer/components/iterable";
 
-import { Task } from "@/modules/download";
-
 export type BrowserState = {
 	disable: boolean;
 };
@@ -27,7 +25,7 @@ class Browser extends React.Component<BrowserState> {
 		return (
 			<section id="browser" class={utility.inline({ "disable": this.state.disable, "left": true })}>
 				<Query focus={false} suggests={[]}></Query>
-				<Iterable status={Object.assign({}, ...Object.values(worker.get() as Record<string, Task>).map((task, index) => { return { [task.id]: { task_status: task.status } }; }))} blocks={[]}></Iterable>
+				<Iterable status={Object.assign({}, ...Object.values(worker.get()).map((task, index) => { return { [task.id]: { task_status: task.status } }; }))} blocks={[]}></Iterable>
 			</section>
 		);
 	}

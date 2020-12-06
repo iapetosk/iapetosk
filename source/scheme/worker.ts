@@ -5,8 +5,8 @@ import { Task } from "@/modules/download";
 
 class Worker extends Schema<Record<string, Task>> {
 
-	public get(key?: number) {
-		return key ? this["state"][key] : this["state"];
+	public get() {
+		return this["state"];
 	}
 	public set($index: number, $new: Task | undefined) {
 		// backup
