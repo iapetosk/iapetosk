@@ -41,6 +41,5 @@
 		"webpack": "5.10.0",
 		"webpack-dev-server": "3.11.0"
 	},
-	"author": "Sombian",
-	"license": "ISC"
+	"author": "Sombian"
 }

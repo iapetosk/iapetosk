@@ -2,6 +2,9 @@ import * as React from "react";
 
 import "./index.scss";
 
+import * as path from "path";
+import * as process from "child_process";
+
 import listener from "@/modules/listener";
 import download from "@/modules/download";
 import history from "@/scheme/history";
@@ -10,12 +13,12 @@ import router from "@/scheme/router";
 import paging from "@/scheme/paging";
 
 import { Scheme } from "@/scheme";
-import { Status } from "@/modules/download";
 import { GalleryBlock } from "@/modules/hitomi/read";
+import { Folder, Status } from "@/modules/download";
 
 export type IterableState = {
 	status: Record<number, {
-		thread_status: Status;
+		task_status: Status;
 	}>,
 	blocks: GalleryBlock[];
 };
@@ -40,11 +43,11 @@ class Iterable extends React.Component<IterableState> {
 		/*
 		listener.on(Scheme.WORKER, ($index: number, $new: Task | undefined) => {
 			switch ($new?.status) {
-				case this.state.status[$index]?.thread_status: {
+				case this.state.status[$index]?.task_status: {
 					break;
 				}
 				default: {
-					this.setState({ ...this.state, status: { ...this.state.status, [$index]: { ...this.state.status[$index], thread_status: $new ? $new.status : Status.NONE } } });
+					this.setState({ ...this.state, status: { ...this.state.status, [$index]: { ...this.state.status[$index], task_status: $new ? $new.status : Status.NONE } } });
 					break;
 				}
 			}
@@ -67,21 +70,22 @@ class Iterable extends React.Component<IterableState> {
 												router.set({ view: "reader", options: gallery.id });
 											}
 										},
-										...(this.state.status[gallery.id]?.thread_status ? [
+										...(this.state.status[gallery.id]?.task_status ? [
 										{
 											HTML: require(`!html-loader!@/assets/icons/delete.svg`),
 											click: () => {
 												download.remove(gallery.id).then(() => {
 													// TODO: none
 												});
-												this.setState({ ...this.state, status: { ...this.state.status, [gallery.id]: { ...this.state.status[gallery.id], thread_status: Status.NONE } } });
+												this.setState({ ...this.state, status: { ...this.state.status, [gallery.id]: { ...this.state.status[gallery.id], task_status: Status.NONE } } });
 											}
 										},
 										{
 											HTML: require(`!html-loader!@/assets/icons/open.svg`),
 											click: () => {
-												// TODO: open
-										}}] : [
+												process.exec(`start "" "${path.join(Folder.DOWNLOADS, String(gallery.id))}"`);
+											}
+										}] : [
 										{
 											HTML: require(`!html-loader!@/assets/icons/download.svg`),
 											click: () => {
@@ -89,7 +93,7 @@ class Iterable extends React.Component<IterableState> {
 													download.create(task).then(() => {
 														// TODO: none
 													});
-													this.setState({ ...this.state, status: { ...this.state.status, [gallery.id]: { ...this.state.status[gallery.id], thread_status: Status.WORKING } } });
+													this.setState({ ...this.state, status: { ...this.state.status, [gallery.id]: { ...this.state.status[gallery.id], task_status: Status.WORKING } } });
 												});
 											}
 										}]),
@@ -105,13 +109,13 @@ class Iterable extends React.Component<IterableState> {
 												// TODO: info
 											}
 										}
-									].map((value, index) => {
+									].map((button, index) => {
 										return (
 											<button key={index}
 												onClick={() => {
-													value.click();
+													button.click();
 												}}
-												dangerouslySetInnerHTML={{ __html: value.HTML }}>
+												dangerouslySetInnerHTML={{ __html: button.HTML }}>
 											</button>
 										);
 									})}

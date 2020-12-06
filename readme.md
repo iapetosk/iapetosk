@@ -16,4 +16,4 @@ npm run serve
 # Documentation
 
 [ENGLISH instruction (영어 설명서)](./documents/readme_english.md)<br>
-[KOREAN instruction	(한국어 설명서)](./documents/readme_korean.md)<br>
+[KOREAN instruction (한국어 설명서)](./documents/readme_korean.md)<br>
