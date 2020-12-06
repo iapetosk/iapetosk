@@ -40,21 +40,12 @@ class Suggest {
 		this.serial++;
 	}
 	public get(query: string) {
-		return this.unknown_1(query);
-	}
-	// @see searchlib.js > hash_term
-	private unknown_0(value: string) {
-		return new Uint8Array(sha256.array(value).slice(0, 4));
+		return this.unknown_0(query.replace(/_/g, "\u0020"));
 	}
 	// @see search.js > get_suggestions_for_query
-	private unknown_1(query: string) {
+	private unknown_0(query: string) {
 		return new Promise<Suggestion>((resolve, reject) => {
-			query = query.replace(/_/g, "\u0020");
-
-			const serial: number = this.serial;
-
-			const field: string = /:/.test(query) ? query.split(/:/)[0] : "global";
-			const value: string = /:/.test(query) ? query.split(/:/)[1] : query;
+			const [field, value] = /:/.test(query) ? query.split(/:/) : ["global", query], serial: number = this.serial;
 
 			function condition(I: Suggest) {
 				if (serial && serial !== I.serial) {
@@ -63,7 +54,7 @@ class Suggest {
 			}
 			this.unknown_3(field, 0).then((bundle) => {
 				condition(this);
-				this.unknown_5(field, this.unknown_0(value), bundle).then((bytes) => {
+				this.unknown_5(field, this.unknown_1(value), bundle).then((bytes) => {
 					condition(this);
 					this.unknown_6(field, bytes).then((suggest) => {
 						condition(this);
@@ -72,6 +63,10 @@ class Suggest {
 				});
 			});
 		});
+	}
+	// @see searchlib.js > hash_term
+	private unknown_1(value: string) {
+		return new Uint8Array(sha256.array(value).slice(0, 4));
 	}
 	// @see search.js > decode_node
 	private unknown_2(bytes: Uint8Array) {

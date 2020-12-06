@@ -12,9 +12,7 @@
 		},
 		"strict": true,
 		"allowJs": true,
-		"importHelpers": true,
-		"resolveJsonModule": true,
-		"experimentalDecorators": true
+		"importHelpers": true
 	},
 	"lib": [
 		"dom",

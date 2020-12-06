@@ -67,11 +67,35 @@ class Media extends React.Component<MediaState> {
 				<section id="scrollable">
 					{this.state.script?.files.map((file, index) => {
 						return (
-							<img src={file.url} loading="lazy" key={index}
+							<img src={"data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA="} width={file.width} height={file.height} loading="lazy" key={index}
+								onLoad={(event) => {
+									// @ts-ignore HTMLImageElement
+									switch (event.target.src) {
+										case file.url: {
+											break;
+										}
+										default: {
+											const observer = new IntersectionObserver((entries) => {
+												for (const entry of entries) {
+													// target is within view
+													if (entry.isIntersecting) {
+														// @ts-ignore
+														event.target.src = file.url;
+														// stop observe
+														observer.disconnect();
+													}
+												}
+											});
+											observer.observe(event.target as Element);
+											break;
+										}
+									}
+								}}
 								onError={(event) => {
-									(event.target as HTMLElement).style.display = "none";
-								}}>
-							</img>
+									// @ts-ignore
+									event.target.style.display = "none";
+								}}
+							></img>
 						);
 					})}
 				</section>
