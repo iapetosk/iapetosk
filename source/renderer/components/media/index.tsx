@@ -22,11 +22,6 @@ class Media extends React.Component<MediaState> {
 		this.state = { ...properties };
 
 		listener.on(Scheme.ROUTER, ($new: Layer) => {
-			/*
-			setTimeout(() => {
-				this.setState({ ...this.state, script: undefined });
-			}, $new.view === "reader" ? 0 : 500);
-			*/
 			switch ($new.view) {
 				case "reader": {
 					this.setState({ ...this.state, script: undefined });
@@ -51,22 +46,28 @@ class Media extends React.Component<MediaState> {
 							click: () => {
 								router.set({ view: "browser", options: undefined });
 							}
+						},
+						{
+							HTML: require(`!html-loader!@/assets/icons/copy.svg`),
+							click: () => {
+								navigator.clipboard.writeText(`https://hitomi.la/galleries/${this.state.script?.id}.html`);
+							}
 						}
-					].map((value, index) => {
+					].map((button, index) => {
 						return (
 							<button key={index}
 								onClick={() => {
-									value.click();
+									button.click();
 								}}
-								dangerouslySetInnerHTML={{ __html: value.HTML }}>
+								dangerouslySetInnerHTML={{ __html: button.HTML }}>
 							</button>
 						);
 					})}
 				</section>
 				<section id="scrollable">
-					{this.state.script?.files.map((value, index) => {
+					{this.state.script?.files.map((file, index) => {
 						return (
-							<img src={value.url} loading="lazy" key={index}
+							<img src={file.url} loading="lazy" key={index}
 								onError={(event) => {
 									(event.target as HTMLElement).style.display = "none";
 								}}>
