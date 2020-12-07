@@ -3,15 +3,15 @@ import storage from "@/modules/storage";
 import { StoragePreset } from "@/modules/storage";
 
 export type Configure = {
+	query: {
+		input: string;
+	},
 	browser: {
 		resolution: "low" | "medium" | "high",
 		censor: boolean;
 	},
-	reader: {
-		lazy: boolean;
-	},
 	paging: {
-		size: number;
+		metre: number;
 	},
 	hitomi: {
 		per_page: number;
@@ -27,15 +27,15 @@ export type Configure = {
 	};
 };
 const boilerplate: Configure = {
+	query: {
+		input: ""
+	},
 	browser: {
 		resolution: "low",
 		censor: true
 	},
-	reader: {
-		lazy: true
-	},
 	paging: {
-		size: 10,
+		metre: 10,
 	},
 	hitomi: {
 		per_page: 25
@@ -49,4 +49,31 @@ const boilerplate: Configure = {
 		max_threads: 5,
 		max_working: 5
 	}
-};
+},
+settings: Configure = storage.get_data(StoragePreset.SETTINGS);
+
+function recursive($new: Record<string, any>, $old: Record<string, any>) {
+	for (const key of Object.keys($new)) {
+		if ($old[key] === undefined) {
+			if ($new[key].constructor.name === "Object") {
+				$old[key] = {};
+			} else {
+				$old[key] = $new[key];
+			}
+		} if ($old[key].constructor.name === "Object") {
+			recursive($new[key], $old[key]);
+		}
+	}
+}
+recursive(boilerplate, settings);
+
+export default new Proxy(settings, {
+	set(target: Configure, key: never, value: never) {
+		// update property
+		target[key] = value;
+		// update storage
+		storage.set_data(StoragePreset.SETTINGS, target);
+		// approve
+		return true;
+	}
+});

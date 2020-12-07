@@ -1,3 +1,5 @@
+import settings from "@/modules/configure";
+
 import utility from "@/modules/utility";
 
 import { Scheme, Schema } from "@/scheme";
@@ -24,4 +26,4 @@ class Paging extends Schema<Pagination> {
 		this.set({ ...this.get(), index: this.get().size - 1 });
 	}
 }
-export default (new Paging({ metre: 0, index: 0, size: 0 }, Scheme.PAGING));
+export default (new Paging({ metre: settings.paging.metre, index: 0, size: 0 }, Scheme.PAGING));

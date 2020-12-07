@@ -2,8 +2,10 @@ import * as React from "react";
 
 import "./index.scss";
 
-import filter from "@/modules/hitomi/filter";
+import settings from "@/modules/configure";
+
 import suggest from "@/modules/hitomi/suggest";
+import filter from "@/modules/hitomi/filter";
 
 import listener from "@/modules/listener";
 import utility from "@/modules/utility";
@@ -24,13 +26,18 @@ class Query extends React.Component<QueryState> {
 	constructor(properties: QueryState) {
 		super(properties);
 		this.state = { ...properties };
-
-		listener.on(Scheme.QUERY, () => {
+		
+		listener.on(Scheme.QUERY, ($new: string) => {
+			// suggest reset
 			this.setState({ ...this.state, suggests: [] });
-
+			// suggest outdate
 			suggest.up();
+			// paging reset
 			paging.set({ ...paging.get(), index: 0, size: 0 });
-			history.set_session({ filter: filter.get(this.input().value), index: 0 });
+			// history create
+			history.set_session({ filter: filter.get($new), index: 0 });
+			// settings update
+			settings.query = { ...settings.query, input: $new };
 		});
 	}
 	public input() {
@@ -42,7 +49,7 @@ class Query extends React.Component<QueryState> {
 	public render() {
 		return (
 			<section id="query">
-				<input id="input" class="contrast" autoComplete="off"
+				<input id="input" class="contrast" placeholder={query.get()} autoComplete="off"
 					onFocus={(event) => {
 						this.setState({ ...this.state, focus: true });
 					}}
@@ -50,9 +57,11 @@ class Query extends React.Component<QueryState> {
 						this.setState({ ...this.state, focus: false });
 					}}
 					onChange={(event) => {
+						// suggest reset
 						this.setState({ ...this.state, suggests: [] });
-
+						// suggest outdate
 						suggest.up();
+						// suggest request
 						suggest.get(this.query()).then((suggestion) => {
 							this.setState({ ...this.state, suggests: suggestion });
 						});

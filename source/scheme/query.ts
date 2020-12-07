@@ -1,3 +1,5 @@
+import settings from "@/modules/configure";
+
 import { Scheme, Schema } from "@/scheme";
 
 class Query extends Schema<string> {
@@ -11,4 +13,4 @@ class Query extends Schema<string> {
 		this.set("");
 	}
 }
-export default (new Query("", Scheme.QUERY));
+export default (new Query(settings.query.input, Scheme.QUERY));

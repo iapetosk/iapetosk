@@ -1,3 +1,4 @@
+import query from "@/scheme/query";
 import filter from "@/modules/hitomi/filter";
 
 import { Scheme, Schema } from "@/scheme";
@@ -22,4 +23,4 @@ class History extends Schema<{ history: Session[], index: number; }> {
 		this.$set({ ...this.$get(), index: this.$get().index - 1 });
 	}
 }
-export default (new History({ history: [{ filter: filter.get(""), index: 0 }], index: 0 }, Scheme.HISTORY));
+export default (new History({ history: [{ filter: filter.get(query.get()), index: 0 }], index: 0 }, Scheme.HISTORY));

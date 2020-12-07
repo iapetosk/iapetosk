@@ -1,3 +1,5 @@
+import settings from "@/modules/configure";
+
 import read from "@/modules/hitomi/read";
 import search from "@/modules/hitomi/search";
 
@@ -12,12 +14,12 @@ class Gallery extends Schema<{ blocks: GalleryBlock[], size: number; }> {
 	public set(value: Session) {
 		// reset
 		this.$set({ blocks: [], size: 0 });
-		search.get(value.filter, 25, value.index).then(({ array, size, singular }) => {
+		search.get(value.filter, settings.hitomi.per_page, value.index).then(({ array, size, singular }) => {
 			// static length
-			const blocks: GalleryBlock[] = new Array(Math.min(size - 25 * value.index, 25));
+			const blocks: GalleryBlock[] = new Array(Math.min(size - settings.hitomi.per_page * value.index, settings.hitomi.per_page));
 
 			for (let index = 0; index < blocks.length; index++) {
-				read.block(array[index + (singular ? 0 : 25 * value.index)]).then((block) => {
+				read.block(array[index + (singular ? 0 : settings.hitomi.per_page * value.index)]).then((block) => {
 					// assign
 					blocks[index] = block;
 					// none-async resolve

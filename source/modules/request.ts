@@ -4,7 +4,7 @@ import * as path from "path";
 import * as http from "http";
 import * as https from "https";
 
-import utility from "@/modules/utility";
+import settings from "@/modules/configure";
 
 import { File } from "@/modules/download";
 
@@ -185,4 +185,4 @@ class Request {
 		return /^https/.test(url);
 	}
 }
-export default (new Request(10));
+export default (new Request(settings.request.max_redirects));
