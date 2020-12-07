@@ -2,6 +2,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as events from "events";
 
+import settings from "@/modules/configure";
+
 import read from "@/modules/hitomi/read";
 import listener from "@/modules/listener";
 import storage from "@/modules/storage";
@@ -201,4 +203,4 @@ export class Download {
 		});
 	}
 }
-export default (new Download(5, 5));
+export default (new Download(settings.download.max_threads, settings.download.max_working));

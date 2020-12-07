@@ -38,7 +38,7 @@ class Iterable extends React.Component<IterableState> {
 		});
 		listener.on(Scheme.GALLERY, ($new: { blocks: GalleryBlock[], size: number; }) => {
 			if ($new.blocks.length && $new.size) {
-				paging.set({ metre: 10, index: paging.get().index, size: Math.ceil($new.size / 25) });
+				paging.set({ ...paging.get(), index: paging.get().index, size: Math.ceil($new.size / 25) });
 			}
 			this.setState({ ...this.state, blocks: $new.blocks });
 		});

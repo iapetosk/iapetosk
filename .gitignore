@@ -1,10 +1,11 @@
 # node.js
 /node_modules
 /package-lock.json
-# program
+# app
 /debugs
 /bundles
 /downloads
+/settings.json
 # nw.js
 /build
 /releases

@@ -13,7 +13,9 @@ class Storage {
 		Record<string, StorageState>
 	) = {};
 	constructor(storage: Storage["container"]) {
-		this.container = storage;
+		for (const key of Object.keys(storage)) {
+			this.register(key, storage[key].path, storage[key].data);
+		}
 	}
 	private define(object: Record<string, any>, array: string[], data: any) {
 		for (const [index, value] of array.entries()) {
@@ -76,7 +78,7 @@ class Storage {
 		try {
 			return JSON.parse(fs.readFileSync(this.get_path(key) || key, "utf8"));
 		} catch {
-			return undefined;
+			return {};
 		}
 	}
 	public export(key: string) {
