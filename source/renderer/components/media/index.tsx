@@ -3,13 +3,14 @@ import * as React from "react";
 import "./index.scss";
 
 import read from "@/modules/hitomi/read";
-
 import listener from "@/modules/listener";
 import router from "@/scheme/router";
 
 import { Scheme } from "@/scheme";
 import { Layer } from "@/scheme/router";
 import { GalleryJS } from "@/modules/hitomi/read";
+
+import LazyLoad from "@/renderer/components/lazyload";
 
 export type MediaState = {
 	script?: GalleryJS;
@@ -67,35 +68,7 @@ class Media extends React.Component<MediaState> {
 				<section id="scrollable">
 					{this.state.script?.files.map((file, index) => {
 						return (
-							<img src={"data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA="} width={file.width} height={file.height} loading="lazy" key={index}
-								onLoad={(event) => {
-									// @ts-ignore HTMLImageElement
-									switch (event.target.src) {
-										case file.url: {
-											break;
-										}
-										default: {
-											const observer = new IntersectionObserver((entries) => {
-												for (const entry of entries) {
-													// target is within view
-													if (entry.isIntersecting) {
-														// @ts-ignore
-														event.target.src = file.url;
-														// stop observe
-														observer.disconnect();
-													}
-												}
-											});
-											observer.observe(event.target as Element);
-											break;
-										}
-									}
-								}}
-								onError={(event) => {
-									// @ts-ignore
-									event.target.style.display = "none";
-								}}
-							></img>
+							<LazyLoad src={file.url} width={file.width} height={file.height} key={index}></LazyLoad>
 						);
 					})}
 				</section>

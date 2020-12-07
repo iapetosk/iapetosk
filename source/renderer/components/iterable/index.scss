@@ -26,8 +26,9 @@
 				height: 100%;
 				background-color: var(--colour_4);
 			}
-			> #thumbnail {
+			> img {
 				opacity: 50%;
+				object-fit: cover;
 				transition: opacity var(--transition);
 				will-change: opacity;
 				&.censored {

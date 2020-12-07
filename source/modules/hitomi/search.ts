@@ -15,18 +15,18 @@ class Search {
 	constructor() {
 		// TODO: none
 	}
-	public get(filter: Keyword, size: number, index: number) {
-		return this.unknown_0(filter, size, index);
+	public get(filter: Keyword, per_page: number, index: number) {
+		return this.unknown_0(filter, per_page, index);
 	}
-	public unknown_0(filter: Keyword, size: number, index: number) {
-		// array of gallery IDs
-		let IDs: number[] = [];
-		// length of gallery IDs
-		let SIZE: number = 0;
+	public unknown_0(filter: Keyword, per_page: number, index: number) {
+		// array of gallery array
+		let array: number[] = [];
+		// length of gallery array
+		let size: number = 0;
 		// request counts
-		let COUNT: number = 0;
+		let count: number = 0;
 		// request adresses
-		let URLs: Record<Prefix, string[]> = {
+		const URL: Record<Prefix, string[]> = {
 			[Prefix.POSITIVE]: [],
 			[Prefix.NEGATIVE]: []
 		};
@@ -38,85 +38,79 @@ class Search {
 							break;
 						}
 						for (let index = 0; index < filter[tag as Tag].length; index++) {
-							URLs[filter[tag as Tag][index].prefix].push(`https://ltn.hitomi.la/index-${filter[tag as Tag][index].value}.nozomi`);
+							URL[filter[tag as Tag][index].prefix].push(`https://ltn.hitomi.la/index-${filter[tag as Tag][index].value}.nozomi`);
 						}
 						break;
 					}
 					default: {
 						for (let index = 0; index < filter[tag as Tag].length; index++) {
 							for (const language of filter.language.length ? filter.language : [{ prefix: Prefix.POSITIVE, value: "all" }]) {
-								URLs[filter[tag as Tag][index].prefix].push(`https://ltn.hitomi.la/${tag === "male" || tag === "female" ? "tag" : tag}/${tag === "male" || tag === "female" ? `${tag}:${filter[tag as Tag][index].value}` : filter[tag as Tag][index].value}-${filter[tag as Tag][index].prefix === Prefix.POSITIVE && language.prefix === Prefix.POSITIVE ? language.value : "all"}.nozomi`);
+								URL[filter[tag as Tag][index].prefix].push(`https://ltn.hitomi.la/${tag === "male" || tag === "female" ? "tag" : tag}/${tag === "male" || tag === "female" ? `${tag}:${filter[tag as Tag][index].value}` : filter[tag as Tag][index].value}-${filter[tag as Tag][index].prefix === Prefix.POSITIVE && language.prefix === Prefix.POSITIVE ? language.value : "all"}.nozomi`);
 							}
 						}
 						break;
 					}
 				}
 			}
-			if (URLs[Prefix.POSITIVE].length === 0) {
-				URLs[Prefix.POSITIVE].unshift(this.index_all);
+			if (URL[Prefix.POSITIVE].length === 0) {
+				URL[Prefix.POSITIVE].unshift(this.index_all);
 			}
-			console.log(URLs);
+			console.log(URL);
 
-			const SINGULAR: boolean = URLs[Prefix.POSITIVE].length === 1 && URLs[Prefix.NEGATIVE].length === 0 && URLs[Prefix.POSITIVE][0] === this.index_all;
+			const SINGULAR: boolean = URL[Prefix.POSITIVE].length === 1 && URL[Prefix.NEGATIVE].length === 0 && URL[Prefix.POSITIVE][0] === this.index_all;
 
-			function $(prefix: Prefix, array: number[]) {
-				const collection: Set<number> = new Set(array);
+			function $(prefix: Prefix, $array: number[]) {
+				const collection: Set<number> = new Set($array);
 				// increase slot
-				COUNT++;
+				count++;
 				// determine prefix
 				switch (prefix) {
 					case Prefix.POSITIVE: {
-						if (IDs.length) {
-							const LENGTH: number = IDs.length;
-							IDs = IDs.filter((id) => collection.has(id));
-							SIZE -= SINGULAR ? LENGTH - IDs.length : 0;
+						if (array.length) {
+							const $size: number = array.length;
+							array = array.filter((id) => collection.has(id));
+							size -= SINGULAR ? $size - array.length : 0;
 						} else {
-							IDs = array;
+							array = $array;
 						}
 						break;
 					}
 					case Prefix.NEGATIVE: {
-						IDs = IDs.filter((id) => !collection.has(id));
+						array = array.filter((id) => !collection.has(id));
 						break;
 					}
 				}
 				// none-async resolve
-				if (COUNT === URLs[Prefix.POSITIVE].length + URLs[Prefix.NEGATIVE].length) {
+				if (count === URL[Prefix.POSITIVE].length + URL[Prefix.NEGATIVE].length) {
 					// debug
 					console.table({
-						positive: URLs[Prefix.POSITIVE],
-						negative: URLs[Prefix.NEGATIVE],
+						positive: URL[Prefix.POSITIVE],
+						negative: URL[Prefix.NEGATIVE],
 						singular: SINGULAR
 					});
 					// return
 					return resolve({
-						size: SIZE + (SINGULAR ? 0 : IDs.length),
-						array: IDs,
+						size: size + (SINGULAR ? 0 : array.length),
+						array: array,
 						singular: SINGULAR
 					});
 				}
 			};
-			for (let $index = 0; $index < URLs[Prefix.POSITIVE].length + URLs[Prefix.NEGATIVE].length; $index++) {
-				const shortcut: {
-					prefix: Prefix,
-					url: string;
-				} = {
-					prefix: Prefix.POSITIVE,
-					url: [...URLs[Prefix.POSITIVE], ...URLs[Prefix.NEGATIVE]][$index]
-				};
+			for (let $index = 0; $index < URL[Prefix.POSITIVE].length + URL[Prefix.NEGATIVE].length; $index++) {
+				const shortcut = { prefix: Prefix.POSITIVE, url: [...URL[Prefix.POSITIVE], ...URL[Prefix.NEGATIVE]][$index] };
 
-				if (/id\/([0-9]+)/.test(shortcut.url)) {
-					$(shortcut.prefix, [Number(/id\/([0-9]+)/.exec(shortcut.url)![1])]);
+				if (/^https:\/\/ltn.hitomi.la\/id\/([0-9]+)-[a-z]+\.nozomi$/.test(shortcut.url)) {
+					$(shortcut.prefix, [Number(/^https:\/\/ltn.hitomi.la\/id\/([0-9]+)-[a-z]+\.nozomi$/.exec(shortcut.url)![1])]);
 				}
 				else if (SINGULAR || !this.collection[shortcut.url]) {
-					request.get(shortcut.url, { encoding: "binary", headers: SINGULAR ? { "range": `bytes=${index * size * 4}-${index * size * 4 + size * 4 - 1}` } : {} }).then((response) => {
+					request.get(shortcut.url, { encoding: "binary", headers: SINGULAR ? { "range": `bytes=${index * per_page * 4}-${index * per_page * 4 + per_page * 4 - 1}` } : {} }).then((response) => {
 						switch (response.status.code) {
 							case 200:
 							case 206: {
 								const array = this.unknown_1(response);
 								// if only INDEX_ALL assigned
 								if (SINGULAR) {
-									SIZE += Number((response.headers["content-range"]! as string).replace(/^bytes\s[0-9]+-[0-9]+\//, "")) / 4;
+									size += Number((response.headers["content-range"]! as string).replace(/^bytes\s[0-9]+-[0-9]+\//, "")) / 4;
 								} else {
 									this.collection[shortcut.url] = array;
 								}
