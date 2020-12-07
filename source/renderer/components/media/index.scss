@@ -21,8 +21,13 @@
 		> img {
 			display: block;
 			margin: auto;
-			width: auto !important;
-			height: 100% !important;
+			// scale up if possible
+			width: 1000px !important;
+			// keep the aspect ratio
+			height: auto !important;
+			// scale down if overflow
+			min-width: 535px !important;
+			// prevent overflow
 			max-width: 100% !important;
 		}
 	}
