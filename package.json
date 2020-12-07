@@ -1,6 +1,6 @@
 {
 	"name": "waifu-material",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"description": "A light-weight desktop application for hitomi.la",
 	"main": "http://localhost:8080",
 	"node-remote": "*://localhost/*",
