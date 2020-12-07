@@ -33,7 +33,7 @@ class Request {
 	readonly agent = new https.Agent({});
 	private max_redirects: number;
 	constructor(max_redirects: number) {
-		// <define default properties>
+		// default properties
 		this.max_redirects = max_redirects;
 		// @ts-ignore
 		this.agent.createConnection = (options, callback): tls.TLSSocket => {

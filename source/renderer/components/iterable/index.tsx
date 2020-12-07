@@ -16,6 +16,8 @@ import { Scheme } from "@/scheme";
 import { GalleryBlock } from "@/modules/hitomi/read";
 import { Folder, Status } from "@/modules/download";
 
+import LazyLoad from "@/renderer/components/lazyload";
+
 export type IterableState = {
 	status: Record<number, {
 		task_status: Status;
@@ -61,7 +63,7 @@ class Iterable extends React.Component<IterableState> {
 					return (
 						<section id="gallery" class="contrast" key={index}>
 							<section id="upper" class="contrast">
-								<canvas id="thumbnail" style={{ background: `url(${gallery.thumbnail[0]}) no-repeat center / cover` }}></canvas>
+								<LazyLoad src={gallery.thumbnail[0]}></LazyLoad>
 								<section id="interacts" class="contrast center">
 									{[
 										{
