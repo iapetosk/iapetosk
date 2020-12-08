@@ -1,6 +1,7 @@
 import { app, session, BrowserWindow } from "electron";
 
 app.on("ready", () => {
+	// create window
 	const window = new BrowserWindow({
 		// icon
 		icon: "source/assets/icons/icon.ico",
@@ -22,15 +23,25 @@ app.on("ready", () => {
 			enableRemoteModule: true
 		}
 	});
-	// react framework
-	window.loadURL("http://localhost:8080/");
-
+	switch (process.env.NODE_ENV) {
+		case "development": {
+			// webpack-dev-server
+			window.loadURL("http://localhost:8080");
+			break;
+		}
+		default: {
+			// asar file
+			window.loadFile("build/index.html");
+			break;
+		}
+	}
+	// show om ready
 	window.on("ready-to-show", () => {
 		window.show();
 	});
 	// bypass same-origin-policy
-	session.defaultSession.webRequest.onBeforeSendHeaders((details, callback) => {
+	session.defaultSession.webRequest.onBeforeSendHeaders({ urls: ["*://*.hitomi.la/*"] }, (details, callback) => {
 		details.requestHeaders["referer"] = "https://hitomi.la/";
 		return callback({ requestHeaders: details.requestHeaders });
-	});	
+	});
 });

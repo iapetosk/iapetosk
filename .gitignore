@@ -6,6 +6,6 @@
 /bundles
 /downloads
 /settings.json
-# nw.js
+# electron
 /build
 /releases
