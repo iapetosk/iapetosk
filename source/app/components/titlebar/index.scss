@@ -1,7 +1,7 @@
 #titlebar {
 	display: grid;
 	grid-template-areas:
-	". focus restore close";
+	". focus maximize close";
 	grid-template-rows: 1fr;
 	grid-template-columns: 1fr auto auto auto;
 	background-color: var(--colour_1);
@@ -12,8 +12,8 @@
 	> #focus {
 		grid-area: focus;
 	}
-	> #restore {
-		grid-area: restore;
+	> #maximize {
+		grid-area: maximize;
 	}
 	> #close {
 		grid-area: close;

@@ -2,9 +2,9 @@ import * as React from "react";
 
 import "./index.scss";
 
-import utility from "@/modules/utility";
+import Media from "@/app/components/media";
 
-import Media from "@/renderer/components/media";
+import utility from "@/modules/utility";
 
 export type ReaderState = {
 	disable: boolean;

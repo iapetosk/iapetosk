@@ -10,7 +10,7 @@ import { Scheme } from "@/scheme";
 import { Layer } from "@/scheme/router";
 import { GalleryJS } from "@/modules/hitomi/read";
 
-import LazyLoad from "@/renderer/components/lazyload";
+import LazyLoad from "@/app/components/lazyload";
 
 export type MediaState = {
 	script?: GalleryJS;

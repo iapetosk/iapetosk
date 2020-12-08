@@ -22,8 +22,9 @@ export type Keyword = {
 	}[]
 };
 
+const RegExp = /^([-])*(id|type|language|character|series|artist|group|tag|male|female|custom):([a-zA-Z0-9_]+)$/;
+
 class Filter {
-	private static readonly RegExp = /^([-])*(id|type|language|character|series|artist|group|tag|male|female|custom):([a-zA-Z0-9_]+)$/; 
 	public get(input: string) {
 		const output: Keyword = {
 			"id": [],
@@ -39,14 +40,14 @@ class Filter {
 			"custom": []
 		};
 		for (const keyword of input.toLowerCase().split(/\s+/)) {
-			if (Filter.RegExp.test(keyword)) {
+			if (RegExp.test(keyword)) {
 				/*
 				[0] = string
 				[1] = string | undefined
 				[2] = string
 				[3] = string
 				*/
-				const [unused, prefix, tag, value] = Filter.RegExp.exec(keyword)!;
+				const [unused, prefix, tag, value] = RegExp.exec(keyword)!;
 
 				output[tag as Tag].push({
 					prefix: prefix ? prefix as Prefix : Prefix.POSITIVE,

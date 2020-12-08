@@ -85,26 +85,5 @@ class Utility {
 	public devide(text: string, index: number): [string, string] {
 		return [text.substring(0, index), text.substring(index)];
 	}
-	public referer(referer?: string) {
-		chrome.webRequest.onBeforeSendHeaders.addListener((response: any) => {
-			let socket = NaN;
-
-			for (let index = 0; index < response.requestHeaders.length; index++) {
-				switch (response.requestHeaders[index].name) {
-					case "Referer": {
-						socket = index;
-						break;
-					}
-				}
-			}
-			if (isNaN(socket)) {
-				response.requestHeaders = [...response.requestHeaders, { name: "Referer", value: referer }];
-			} else {
-				response.requestHeaders[socket] = { ...response.requestHeaders[socket], value: referer };
-			}
-			return { requestHeaders: response.requestHeaders };
-		},
-		{ urls: ["<all_urls>"] }, ["blocking", "requestHeaders", "extraHeaders"]);
-	}
 }
 export default (new Utility());

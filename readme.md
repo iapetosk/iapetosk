@@ -1,7 +1,7 @@
 
 # Instruction
 
-*Waifu Material* is highly module driven *Downloader / Reader*, built upon *Imouto-Material*, written in *typescript*, and powered by *nw.js*.<br>
+*Waifu Material* is highly module driven *Downloader / Reader*, built upon *Imouto-Material*, written in *[TypeScript](https://github.com/microsoft/TypeScript)*, and powered by :electron: *[Electron](https://github.com/electron)*.<br>
 It's motivated by how my previous project lack in downloader features.<br>
 
 # Installation
