@@ -2,11 +2,11 @@ import * as React from "react";
 
 import "./index.scss";
 
+import Query from "@/app/components/query";
+import Iterable from "@/app/components/iterable";
+
 import utility from "@/modules/utility";
 import worker from "@/scheme/worker";
-
-import Query from "@/renderer/components/query";
-import Iterable from "@/renderer/components/iterable";
 
 export type BrowserState = {
 	disable: boolean;

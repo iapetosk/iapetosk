@@ -4,12 +4,8 @@ function resolve_path() {
 	return path.resolve(__dirname, "..", ...arguments);
 }
 
-module.exports = {
-	target: "node-webkit",
+const boilerplate = {
 	stats: "errors-only",
-	entry: {
-		renderer: resolve_path("source", "renderer", "index.tsx")
-	},
 	module: {
 		rules: [
 			{
@@ -27,8 +23,7 @@ module.exports = {
 		]
 	},
 	output: {
-		filename: "bundle.js",
-		path: resolve_path("build/system")
+		path: resolve_path("build")
 	},
 	resolve: {
 		alias: {
@@ -54,10 +49,33 @@ module.exports = {
 			})
 		]
 	},
+	plugins: []
+};
+const main = {
+	...boilerplate,
+	target: "electron-main",
+	entry: resolve_path("electron", "main.ts"),
+	output: {
+		...boilerplate.output,
+		filename: "main.js"
+	}
+};
+const renderer = {
+	...boilerplate,
+	target: "electron-renderer",
+	entry: resolve_path("electron", "renderer.tsx"),
+	output: {
+		...boilerplate.output,
+		filename: "renderer.js"
+	},
 	plugins: [
 		new (require("html-webpack-plugin"))({
 			filename: "index.html",
-			template: resolve_path("source", "index.html")
+			template: resolve_path("electron", "renderer.html")
 		})
 	]
+};
+module.exports = {
+	main: main,
+	renderer: renderer
 };

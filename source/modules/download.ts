@@ -2,9 +2,8 @@ import * as fs from "fs";
 import * as path from "path";
 import * as events from "events";
 
-import settings from "@/modules/configure";
-
 import read from "@/modules/hitomi/read";
+import settings from "@/modules/configure";
 import listener from "@/modules/listener";
 import storage from "@/modules/storage";
 import request from "@/modules/request";

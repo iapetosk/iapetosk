@@ -16,7 +16,7 @@ import { Scheme } from "@/scheme";
 import { GalleryBlock } from "@/modules/hitomi/read";
 import { Folder, Status } from "@/modules/download";
 
-import LazyLoad from "@/renderer/components/lazyload";
+import LazyLoad from "@/app/components/lazyload";
 
 export type IterableState = {
 	status: Record<number, {

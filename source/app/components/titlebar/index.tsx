@@ -1,4 +1,5 @@
 import * as React from "react";
+import { remote } from "electron";
 
 import "./index.scss";
 
@@ -7,9 +8,11 @@ import utility from "@/modules/utility";
 export type TitleBarState = {
 	visible: boolean,
 	focus: boolean,
-	restore: boolean,
+	maximize: boolean,
 	fullscreen: boolean;
 };
+
+const $window = remote.getCurrentWindow();
 
 class TitleBar extends React.Component<TitleBarState> {
 	public state: TitleBarState;
@@ -25,23 +28,23 @@ class TitleBar extends React.Component<TitleBarState> {
 			<section id="titlebar" class={utility.inline({ "draggable": true, "contrast": true, "visible": this.state.visible })}>
 				<button id="focus" class="un_draggable"
 					onClick={() => {
-						nw.Window.get().minimize();
+						$window.minimize();
 					}}
 					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/focus.svg`) }}>
 				</button>
-				<button id="restore" class="un_draggable"
+				<button id="maximize" class="un_draggable"
 					onClick={() => {
-						if (!this.state.restore) {
-							nw.Window.get().maximize();
-						} else if (this.state.focus && !this.state.fullscreen) {
-							nw.Window.get().restore();
+						if (this.state.maximize) {
+							$window.unmaximize();
+						} else {
+							$window.maximize();
 						}
 					}}
-					dangerouslySetInnerHTML={{ __html: require(this.state.restore ? "!html-loader!@/assets/icons/minimize.svg" : "!html-loader!@/assets/icons/maximize.svg") }}>
+					dangerouslySetInnerHTML={{ __html: require(this.state.maximize ? "!html-loader!@/assets/icons/minimize.svg" : "!html-loader!@/assets/icons/maximize.svg") }}>
 				</button>
 				<button id="close" class="un_draggable"
 					onClick={() => {
-						nw.Window.get().close();
+						$window.close();
 					}}
 					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/close.svg`) }}>
 				</button>

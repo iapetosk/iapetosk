@@ -123,8 +123,6 @@ class Suggest {
 	// @see search.js > get_node_at_address
 	private unknown_3(field: string, adress: number) {
 		return new Promise<SearchBundle>((resolve, reject) => {
-			const URI = ["https://ltn.hitomi.la/"];
-
 			function recursive(I: Suggest) {
 				switch (I.version.tagindex.length) {
 					case 0: {
@@ -134,25 +132,7 @@ class Suggest {
 						break;
 					}
 					default: {
-						switch (field) {
-							case "galleries": {
-								URI.push("galleriesindex", "/galleries.", I.version.galleries, ".index");
-								break;
-							}
-							case "languages": {
-								URI.push("languagesindex", "/languages.", I.version.languages, ".index");
-								break;
-							}
-							case "noromiurl": {
-								URI.push("nozomiurlindex", "/nozomiurl.", I.version.nozomiurl, ".index");
-								break;
-							}
-							default: {
-								URI.push("tagindex", `/${field}.`, I.version.tagindex, ".index");
-								break;
-							}
-						}
-						I.unknown_4(URI.join(""), [adress, adress + 464 - 1]).then((callback) => {
+						I.unknown_4(`https://ltn.hitomi.la/${field}index/${field}.${I.version[field as never]}.index`, [adress, adress + 464 - 1]).then((callback) => {
 							if (callback) {
 								return resolve(I.unknown_2(callback));
 							} else {
