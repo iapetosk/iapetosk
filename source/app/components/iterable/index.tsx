@@ -125,7 +125,7 @@ class Iterable extends React.Component<IterableState> {
 							</section>
 							<section id="lower" class="center-y">
 								<legend id="title" class="eclipse">{gallery.title}</legend>
-								<legend id="id" class="center">({gallery.id})</legend>
+								<legend id="id" class="center">#{gallery.id}</legend>
 							</section>
 							{/*
 							<legend id="id">{value.id}</legend>

@@ -71,7 +71,7 @@ const renderer = {
 	plugins: [
 		new (require("html-webpack-plugin"))({
 			filename: "index.html",
-			template: resolve_path("electron", "renderer.html")
+			template: resolve_path("electron", "index.html")
 		})
 	]
 };

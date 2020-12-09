@@ -13,7 +13,7 @@ app.on("ready", () => {
 		minWidth: 775,
 		// minimum height
 		minHeight: 565,
-		// resize flashing
+		// resize flash colour
 		backgroundColor: "#000000",
 		// renderer proccess controls
 		webPreferences: {
@@ -23,22 +23,22 @@ app.on("ready", () => {
 			enableRemoteModule: true
 		}
 	});
-	switch (process.env.NODE_ENV) {
-		case "development": {
-			// webpack-dev-server
-			window.loadURL("http://localhost:8080");
-			break;
-		}
-		default: {
-			// asar file
-			window.loadFile("build/index.html");
-			break;
-		}
-	}
+	// webpack or ASAR
+	window.loadFile("build/index.html");
 	// show om ready
 	window.on("ready-to-show", () => {
 		window.show();
 	});
+	// development
+	if (!app.isPackaged) {
+		// live-reload
+		const watcher = require("fs").watch("build/renderer.js");
+		watcher.on("change", () => {
+			// webpack or ASAR
+			window.loadFile("build/index.html");
+		});
+	}
+
 	// bypass same-origin-policy
 	session.defaultSession.webRequest.onBeforeSendHeaders({ urls: ["*://*.hitomi.la/*"] }, (details, callback) => {
 		details.requestHeaders["referer"] = "https://hitomi.la/";
