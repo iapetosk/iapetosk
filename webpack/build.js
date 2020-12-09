@@ -20,6 +20,7 @@ const compiler_main = webpack({
 					builder.build({
 						targets: builder.Platform.WINDOWS.createTarget("portable"),
 						config: {
+							artifactName: "waifu-material.exe",
 							appId: "org.sombian.waifu.material",
 							files: [
 								"build/*.js",

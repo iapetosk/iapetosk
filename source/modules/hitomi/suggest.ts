@@ -132,7 +132,7 @@ class Suggest {
 						break;
 					}
 					default: {
-						I.unknown_4(`https://ltn.hitomi.la/${field}index/${field}.${I.version[field as never]}.index`, [adress, adress + 464 - 1]).then((callback) => {
+						I.unknown_4(`https://ltn.hitomi.la/${field.replace("global", "tag")}index/${field}.${I.version[field.replace("global", "tagindex") as never]}.index`, [adress, adress + 464 - 1]).then((callback) => {
 							if (callback) {
 								return resolve(I.unknown_2(callback));
 							} else {
