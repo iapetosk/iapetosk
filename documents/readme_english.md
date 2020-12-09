@@ -5,7 +5,7 @@
 ## 1. Fullscreen Shortcut
 
 Press <kbd>F11</kbd> will **enter** fullscreen.<br>
-Press <kbd>F11</kbd> again or <kbd>ESCAPE</kbd> will **leave** fullscreen.<br>
+Press <kbd>F11</kbd> again will **leave** fullscreen.<br>
 Also, upon **enter**ing fullscreen, both **titlebar**, and **paging** will become invisible.<br>
 
 ## 2. Arrow-key Interactions
