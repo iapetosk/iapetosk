@@ -18,7 +18,7 @@ const compiler_main = webpack({
 			compiler_renderer.close(() => {
 				fs.writeFile("./build/package.json", JSON.stringify({ name: package.name, main: package.main, version: package.version, description: package.description }), {}, () => {
 					builder.build({
-						targets: builder.Platform.WINDOWS.createTarget(),
+						targets: builder.Platform.WINDOWS.createTarget("portable"),
 						config: {
 							appId: "org.sombian.waifu.material",
 							files: [
@@ -29,10 +29,10 @@ const compiler_main = webpack({
 							directories: {
 								output: "releases"
 							},
+							portable: {
+								unpackDirName: "waifu-material"
+							},
 							icon: "../source/assets/icons/icon.ico",
-							win: {
-								target: "portable"
-							}
 						}
 					});
 				});
