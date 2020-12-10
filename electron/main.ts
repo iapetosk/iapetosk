@@ -38,7 +38,6 @@ app.on("ready", () => {
 			window.loadFile("build/index.html");
 		});
 	}
-
 	// bypass same-origin-policy
 	session.defaultSession.webRequest.onBeforeSendHeaders({ urls: ["*://*.hitomi.la/*"] }, (details, callback) => {
 		details.requestHeaders["referer"] = "https://hitomi.la/";
