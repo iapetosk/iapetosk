@@ -4,7 +4,6 @@ import { remote } from "electron";
 import "./index.scss";
 
 import TitleBar from "@/app/components/titlebar";
-import Paging from "@/app/components/paging";
 import Browser from "@/app/views/browser";
 import Reader from "@/app/views/reader";
 
@@ -53,12 +52,11 @@ class App extends React.Component<AppState> {
 	public render() {
 		return (
 			<>
-				<TitleBar visible={!this.state.fullscreen} focus={this.state.focus} maximize={this.state.maximize} fullscreen={this.state.fullscreen}></TitleBar>
+				<TitleBar disable={this.state.fullscreen} focus={this.state.focus} maximize={this.state.maximize} fullscreen={this.state.fullscreen}></TitleBar>
 				<section id="content" class="contrast">
 					<Browser disable={this.state.view !== "browser"}></Browser>
 					<Reader disable={this.state.view !== "reader"}></Reader>
 				</section>
-				<Paging visible={!this.state.fullscreen && this.state.view !== "reader"} disable={false}></Paging>
 			</>
 		);
 	}

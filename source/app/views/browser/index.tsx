@@ -4,6 +4,7 @@ import "./index.scss";
 
 import Query from "@/app/components/query";
 import Iterable from "@/app/components/iterable";
+import Paging from "@/app/components/paging";
 
 import utility from "@/modules/utility";
 import worker from "@/scheme/worker";
@@ -24,8 +25,11 @@ class Browser extends React.Component<BrowserState> {
 	public render() {
 		return (
 			<section id="browser" class={utility.inline({ "disable": this.state.disable, "left": true })}>
-				<Query focus={false} suggests={[]}></Query>
-				<Iterable status={Object.assign({}, ...Object.values(worker.get()).map((task, index) => { return { [task.id]: { task_status: task.status } }; }))} blocks={[]}></Iterable>
+				<section id="scrollable" class="scroll-y">
+					<Query focus={false} disable={true} suggests={[]}></Query>
+					<Iterable status={Object.assign({}, ...Object.values(worker.get()).map((task, index) => { return { [task.id]: { task_status: task.status } }; }))} blocks={[]}></Iterable>
+				</section>
+				<Paging disable={false}></Paging>
 			</section>
 		);
 	}

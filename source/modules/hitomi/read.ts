@@ -50,52 +50,60 @@ class Read {
 		return new Promise<GalleryBlock>((resolve, reject) => {
 			const object: Record<string, any> = {};
 
-			request.get(`https://ltn.hitomi.la/galleryblock/${id}.html`).then((response) => {
-				for (const [index, value] of (utility.parse(response.encode, "td") as string[]).entries()) {
-					if (index % 2) {
-						object[Object.keys(object).pop()!] = utility.unwrap(value.split(/\s\s+/).filter((value) => { return value.length; }));
-					} else {
-						object[value.toLowerCase()] = undefined;
+			function recursive() {
+				request.get(`https://ltn.hitomi.la/galleryblock/${id}.html`).then((response) => {
+					for (const [index, value] of (utility.parse(response.encode, "td") as string[]).entries()) {
+						if (index % 2) {
+							object[Object.keys(object).pop()!] = utility.unwrap(value.split(/\s\s+/).filter((value) => { return value.length; }));
+						} else {
+							object[value.toLowerCase()] = undefined;
+						}
 					}
-				}
-				// resolve
-				return resolve({
-					...object,
-					...{
+					// resolve
+					return resolve({
+						...object,
 						id: id,
 						title: (utility.parse(response.encode, ".lillie a")),
-						thumbnail: (utility.parse(response.encode, "img", "src") as [string, string]).map((value, index) => { return "https:" + value; }),
+						thumbnail: (utility.parse(response.encode, "img", "src") as [string, string]).map((value) => { return "https:" + value; }),
 						artist: (utility.parse(response.encode, ".artist-list a")),
-						date: (utility.parse(response.encode, ".date")),
-					}
-				} as GalleryBlock);
-			});
+						date: (utility.parse(response.encode, ".date"))
+					} as GalleryBlock);
+				}).catch(() => {
+					return recursive();
+				});
+			}
+			return recursive();
 		});
 	}
 	public script(id: number) {
 		return new Promise<GalleryJS>((resolve, reject) => {
-			request.get(`https://ltn.hitomi.la/galleries/${id}.js`).then((response) => {
-				switch (response.status.code) {
-					case 404: {
-						return reject();
+			function recursive(I: Read) {
+				request.get(`https://ltn.hitomi.la/galleries/${id}.js`).then((response) => {
+					switch (response.status.code) {
+						case 404: {
+							return reject();
+						}
+						default: {
+							const script: GalleryJS = utility.extract(`${response.encode};`, "galleryinfo", "object");
+							// resolve
+							return resolve({
+								...script,
+								files: script.files.map((value, index) => {
+									return {
+										// @ts-ignore
+										url: I.unknown_0(script.id, script.files[index]),
+										width: value.width,
+										height: value.height
+									};
+								})
+							});
+						}
 					}
-					default: {
-						const script: GalleryJS = utility.extract(`${response.encode};`, "galleryinfo", "object");
-						// resolve
-						return resolve({
-							...script,
-							files: script.files.map((value, index) => {
-								return {
-									// @ts-ignore
-									url: this.unknown_0(script.id, script.files[index]),
-									width: value.width,
-									height: value.height
-								};
-							})
-						});
-					}
-				}
-			});
+				}).catch(() => {
+					return recursive(I);
+				});
+			}
+			return recursive(this);
 		});
 	}
 	// @see common.js > url_from_url_from_hash

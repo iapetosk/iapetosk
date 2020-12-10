@@ -106,7 +106,7 @@ class Iterable extends React.Component<IterableState> {
 											}
 										},
 										{
-											HTML: require(`!html-loader!@/assets/icons/info.svg`),
+											HTML: require(`!html-loader!@/assets/icons/discovery.svg`),
 											click: () => {
 												// TODO: info
 											}
@@ -127,15 +127,6 @@ class Iterable extends React.Component<IterableState> {
 								<legend id="title" class="eclipse">{gallery.title}</legend>
 								<legend id="id" class="center">#{gallery.id}</legend>
 							</section>
-							{/*
-							<legend id="id">{value.id}</legend>
-							<legend id="title">{value.title}</legend>
-							<legend id="language">{value.language}</legend>
-							{value.tags?.map((value, index) => {
-								return <mark key={index}>{value.male ? "male" : value.female ? "female" : "tag"}:{value.tag.replace(/\s/g, "_")}</mark>;
-							})}
-							<legend id="date">{value.date}</legend>
-							*/}
 						</section>
 					);
 				})}

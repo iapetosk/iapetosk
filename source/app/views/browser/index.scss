@@ -1,0 +1,14 @@
+#browser {
+	display: grid;
+	grid-template-areas:
+	"scrollable"
+	"paging";
+	grid-template-rows: 1fr auto;
+	grid-template-columns: 1fr;
+	> #scrollable {
+		grid-area: scrollable;
+	}
+	> #paging {
+		grid-area: paging;
+	}
+}

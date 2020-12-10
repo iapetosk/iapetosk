@@ -21,7 +21,13 @@
 	--paging_height: 30px;
 	--query_height: 30px;
 }
-* {
+html,
+body {
+	overflow: hidden;
+}
+body,
+body * {
+	display: block;
 	margin: 0px;
 	padding: 0px;
 	border: none;
@@ -30,10 +36,6 @@
 	user-select: none;
 	font-family: arial;
 	box-sizing: border-box;
-}
-html,
-body {
-	overflow: hidden;
 }
 button {
 	color: var(--colour_9);
@@ -101,6 +103,14 @@ svg {
 	display: flex;
 	align-items: center;
 }
+.scroll-x {
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+.scroll-y {
+	overflow-x: hidden;
+	overflow-y: auto;
+}
 .eclipse {
 	overflow: hidden;
 	white-space: nowrap;
@@ -112,24 +122,22 @@ svg {
 	width: 100vw;
 	grid-template-areas:
 	"header"
-	"main"
-	"footer";
-	grid-template-rows: auto 1fr auto;
+	"content";
+	grid-template-rows: auto 1fr;
 	grid-template-columns: 1fr;
+	> * {
+		overflow: hidden;
+		position: relative;
+	}
 	> #titlebar {
 		grid-area: header;
-		height: var(--titlebar_height);
-		border-bottom-width: 0px;
 	}
 	> #content {
-		position: relative;
-		overflow: hidden;
-		grid-area: main;
+		grid-area: content;
+		border-top-width: 0px;
 		background-color: var(--colour_2);
 		> * {
 			position: absolute;
-			overflow-x: hidden;
-			overflow-y: auto;
 			width: 100%;
 			height: 100%;
 			transition: transform 500ms;
@@ -144,10 +152,5 @@ svg {
 				}
 			}
 		}
-	}
-	> #paging {
-		grid-area: footer;
-		height: var(--paging_height);
-		border-top-width: 0px;
 	}
 }

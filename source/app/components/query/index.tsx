@@ -15,9 +15,11 @@ import query from "@/scheme/query";
 
 import { Scheme } from "@/scheme";
 import { Suggestion } from "@/modules/hitomi/suggest";
+import { GalleryBlock } from "@/modules/hitomi/read";
 
 export type QueryState = {
 	focus: boolean,
+	disable: boolean,
 	suggests: Suggestion;
 };
 
@@ -27,6 +29,9 @@ class Query extends React.Component<QueryState> {
 		super(properties);
 		this.state = { ...properties };
 		
+		listener.on(Scheme.GALLERY, ($new: { blocks: GalleryBlock[], size: number; }) => {
+			this.setState({ ...this.state, disable: !$new.blocks.length && !$new.size });
+		});
 		listener.on(Scheme.QUERY, ($new: string) => {
 			// suggest reset
 			this.setState({ ...this.state, suggests: [] });
@@ -49,7 +54,7 @@ class Query extends React.Component<QueryState> {
 	public render() {
 		return (
 			<section id="query">
-				<input id="input" class="contrast" placeholder={query.get()} autoComplete="off"
+				<input id="input" class="contrast" disabled={this.state.disable} placeholder={query.get()} autoComplete="off"
 					onFocus={(event) => {
 						this.setState({ ...this.state, focus: true });
 					}}

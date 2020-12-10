@@ -152,8 +152,6 @@ class Request {
 						});
 					});
 					response.on("error", (error) => {
-						// print ERROR
-						console.log(error);
 						// reject ERROR
 						return reject(error);
 					});

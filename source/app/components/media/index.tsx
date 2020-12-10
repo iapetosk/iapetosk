@@ -65,7 +65,7 @@ class Media extends React.Component<MediaState> {
 						);
 					})}
 				</section>
-				<section id="scrollable">
+				<section id="scrollable" class="scroll-y">
 					{this.state.script?.files.map((file, index) => {
 						return (
 							<LazyLoad src={file.url} width={file.width} height={file.height} key={index}></LazyLoad>

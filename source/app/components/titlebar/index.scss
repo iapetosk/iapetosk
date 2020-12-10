@@ -1,10 +1,11 @@
 #titlebar {
 	display: grid;
+	height: var(--titlebar_height);
+	background-color: var(--colour_1);
 	grid-template-areas:
 	". focus maximize close";
 	grid-template-rows: 1fr;
 	grid-template-columns: 1fr auto auto auto;
-	background-color: var(--colour_1);
 	will-change: display;
 	> * {
 		width: 45px;
@@ -21,7 +22,7 @@
 			background-color: var(--colour_error);
 		}
 	}
-	&:not(.visible) {
+	&.disable {
 		display: none;
 	}
 }

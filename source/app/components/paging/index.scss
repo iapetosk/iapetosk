@@ -1,5 +1,8 @@
 #paging {
+	height: var(--paging_height);
 	background-color: var(--colour_1);
+	border-width: 0px;
+	border-top-width: thin;
 	will-change: display;
 	&.disable {
 		pointer-events: none;
@@ -22,8 +25,5 @@
 				fill: var(--colour_2);
 			}
 		}
-	}
-	&:not(.visible) {
-		display: none;
 	}
 }
