@@ -5,27 +5,50 @@ import "./index.scss";
 
 import utility from "@/modules/utility";
 
+const $window = remote.getCurrentWindow();
+
+export type TitleBarProps = {
+	enable: boolean;
+};
 export type TitleBarState = {
-	disable: boolean,
 	focus: boolean,
 	maximize: boolean,
 	fullscreen: boolean;
 };
 
-const $window = remote.getCurrentWindow();
-
-class TitleBar extends React.Component<TitleBarState> {
+class TitleBar extends React.Component<TitleBarProps, TitleBarState> {
+	public props: TitleBarProps;
 	public state: TitleBarState;
-	constructor(properties: TitleBarState) {
-		super(properties);
-		this.state = { ...properties };
+	constructor(props: TitleBarProps) {
+		super(props);
+		this.props = props;
+		this.state = { focus: false, maximize: false, fullscreen: false };
+
+		$window.on("focus", () => {
+			this.setState({ ...this.state, focus: true });
+		});
+		$window.on("blur", () => {
+			this.setState({ ...this.state, focus: false });
+		});
+		$window.on("maximize", () => {
+			this.setState({ ...this.state, maximize: true });
+		});
+		$window.on("unmaximize", () => {
+			this.setState({ ...this.state, maximize: false });
+		});
+		$window.on("enter-full-screen", () => {
+			this.setState({ ...this.state, fullscreen: true });
+		});
+		$window.on("leave-full-screen", () => {
+			this.setState({ ...this.state, fullscreen: false });
+		});
 	}
-	static getDerivedStateFromProps($new: TitleBarState, $old: TitleBarState) {
+	static getDerivedStateFromProps($new: TitleBarProps, $old: TitleBarProps) {
 		return $new;
 	}
 	public render() {
 		return (
-			<section id="titlebar" class={utility.inline({ "draggable": true, "contrast": true, "disable": this.state.disable })}>
+			<section id="titlebar" class={utility.inline({ "draggable": true, "contrast": true, "enable": this.props.enable })}>
 				<button id="focus" class="un_draggable"
 					onClick={() => {
 						$window.minimize();

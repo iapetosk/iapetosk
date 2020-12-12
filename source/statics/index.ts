@@ -1,17 +1,13 @@
 import listener from "@/modules/listener";
 
-export enum Scheme {
-	QUERY = "query",
+export enum Static {
 	ROUTER = "route",
-	WORKER = "worker",
-	PAGING = "paging",
-	HISTORY = "history",
-	GALLERY = "gallery"
+	WORKER = "worker"
 };
-export class Schema<state> {
+export class StaticHandler<state> {
 	private state: state;
-	private event: Scheme;
-	constructor(state: state, event: Scheme) {
+	private event: Static;
+	constructor(state: state, event: Static) {
 		this.state = state;
 		this.event = event;
 	}

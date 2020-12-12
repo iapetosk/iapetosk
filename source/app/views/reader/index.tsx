@@ -6,22 +6,25 @@ import Media from "@/app/components/media";
 
 import utility from "@/modules/utility";
 
-export type ReaderState = {
-	disable: boolean;
+export type ReaderProps = {
+	enable: boolean;
 };
+export type ReaderState = {};
 
-class Reader extends React.Component<ReaderState> {
+class Reader extends React.Component<ReaderProps> {
+	public props: ReaderProps;
 	public state: ReaderState;
-	constructor(properties: ReaderState) {
-		super(properties);
-		this.state = { ...properties };
+	constructor(props: ReaderProps) {
+		super(props);
+		this.props = props;
+		this.state = {};
 	}
-	static getDerivedStateFromProps($new: ReaderState, $old: ReaderState) {
+	static getDerivedStateFromProps($new: ReaderProps, $old: ReaderProps) {
 		return $new;
 	}
 	public render() {
 		return (
-			<section id="reader" class={utility.inline({ "disable": this.state.disable, "right": true })}>
+			<section id="reader" class={utility.inline({ "enable": this.props.enable, "right": true })}>
 				<Media></Media>
 			</section>
 		);

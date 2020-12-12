@@ -4,25 +4,28 @@ import "./index.scss";
 
 import read from "@/modules/hitomi/read";
 import listener from "@/modules/listener";
-import router from "@/scheme/router";
+import router from "@/statics/router";
 
-import { Scheme } from "@/scheme";
-import { Layer } from "@/scheme/router";
+import { Static } from "@/statics";
+import { Viewport } from "@/statics/router";
 import { GalleryJS } from "@/modules/hitomi/read";
 
 import LazyLoad from "@/app/components/lazyload";
 
+export type MediaProps = {};
 export type MediaState = {
 	script?: GalleryJS;
 };
 
-class Media extends React.Component<MediaState> {
+class Media extends React.Component<MediaProps, MediaState> {
+	public props: MediaProps;
 	public state: MediaState;
-	constructor(properties: MediaState) {
-		super(properties);
-		this.state = { ...properties };
+	constructor(props: MediaProps) {
+		super(props);
+		this.props = props;
+		this.state = { script: undefined };
 
-		listener.on(Scheme.ROUTER, ($new: Layer) => {
+		listener.on(Static.ROUTER, ($new: Viewport) => {
 			switch ($new.view) {
 				case "reader": {
 					this.setState({ ...this.state, script: undefined });

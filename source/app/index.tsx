@@ -8,39 +8,29 @@ import Browser from "@/app/views/browser";
 import Reader from "@/app/views/reader";
 
 import listener from "@/modules/listener";
+import router from "@/statics/router";
 
-import { Scheme } from "@/scheme";
-import { Layer } from "@/scheme/router";
-
-export type AppState = {
-	view: string,
-	focus: boolean,
-	maximize: boolean,
-	fullscreen: boolean;
-};
+import { Static } from "@/statics";
+import { Viewport } from "@/statics/router";
 
 const $window = remote.getCurrentWindow();
 
-class App extends React.Component<AppState> {
-	public state: AppState;
-	constructor(properties: AppState) {
-		super(properties);
-		this.state = { ...properties };
+export type AppProps = {};
+export type AppState = {
+	view: string,
+	fullscreen: boolean;
+};
 
-		listener.on(Scheme.ROUTER, ($new: Layer) => {
+class App extends React.Component<AppProps, AppState> {
+	public props: AppProps;
+	public state: AppState;
+	constructor(props: AppProps) {
+		super(props);
+		this.props = props;
+		this.state = { view: router.get().view, fullscreen: false };
+
+		listener.on(Static.ROUTER, ($new: Viewport) => {
 			this.setState({ ...this.state, view: $new.view });
-		});
-		$window.on("focus", () => {
-			this.setState({ ...this.state, focus: true });
-		});
-		$window.on("blur", () => {
-			this.setState({ ...this.state, focus: false });
-		});
-		$window.on("maximize", () => {
-			this.setState({ ...this.state, maximize: true });
-		});
-		$window.on("unmaximize", () => {
-			this.setState({ ...this.state, maximize: false });
 		});
 		$window.on("enter-full-screen", () => {
 			this.setState({ ...this.state, fullscreen: true });
@@ -52,10 +42,10 @@ class App extends React.Component<AppState> {
 	public render() {
 		return (
 			<>
-				<TitleBar disable={this.state.fullscreen} focus={this.state.focus} maximize={this.state.maximize} fullscreen={this.state.fullscreen}></TitleBar>
+				<TitleBar enable={!this.state.fullscreen}></TitleBar>
 				<section id="content" class="contrast">
-					<Browser disable={this.state.view !== "browser"}></Browser>
-					<Reader disable={this.state.view !== "reader"}></Reader>
+					<Browser enable={this.state.view === "browser"}></Browser>
+					<Reader enable={this.state.view === "reader"}></Reader>
 				</section>
 			</>
 		);

@@ -2,64 +2,42 @@ import * as React from "react";
 
 import "./index.scss";
 
+import LazyLoad from "@/app/components/lazyload";
+
 import * as path from "path";
 import * as process from "child_process";
 
-import listener from "@/modules/listener";
 import download from "@/modules/download";
-import history from "@/scheme/history";
-import gallery from "@/scheme/gallery";
-import router from "@/scheme/router";
-import paging from "@/scheme/paging";
+import worker from "@/statics/worker";
+import router from "@/statics/router";
 
-import { Scheme } from "@/scheme";
 import { GalleryBlock } from "@/modules/hitomi/read";
 import { Folder, Status } from "@/modules/download";
 
-import LazyLoad from "@/app/components/lazyload";
-
-export type IterableState = {
-	status: Record<number, {
-		task_status: Status;
-	}>,
+export type IterableProps = {
 	blocks: GalleryBlock[];
 };
+export type IterableState = {
+	[key: number]: {
+		task_status: Status
+	}
+};
 
-class Iterable extends React.Component<IterableState> {
+class Iterable extends React.Component<IterableProps, IterableState> {
+	public props: IterableProps;
 	public state: IterableState;
-	constructor(properties: IterableState) {
-		super(properties);
-		this.state = { ...properties };
-
-		gallery.set(history.get_session());
-
-		listener.on(Scheme.HISTORY, () => {
-			gallery.set(history.get_session());
-		});
-		listener.on(Scheme.GALLERY, ($new: { blocks: GalleryBlock[], size: number; }) => {
-			if ($new.blocks.length && $new.size) {
-				paging.set({ ...paging.get(), index: paging.get().index, size: Math.ceil($new.size / 25) });
-			}
-			this.setState({ ...this.state, blocks: $new.blocks });
-		});
-		/*
-		listener.on(Scheme.WORKER, ($index: number, $new: Task | undefined) => {
-			switch ($new?.status) {
-				case this.state.status[$index]?.task_status: {
-					break;
-				}
-				default: {
-					this.setState({ ...this.state, status: { ...this.state.status, [$index]: { ...this.state.status[$index], task_status: $new ? $new.status : Status.NONE } } });
-					break;
-				}
-			}
-		});
-		*/
+	constructor(props: IterableProps) {
+		super(props);
+		this.props = props;
+		this.state = Object.assign({}, ...Object.values(worker.get()).map((task, index) => { return { [task.id]: { task_status: task.status } }; }));
+	}
+	static getDerivedStateFromProps($new: IterableProps, $old: IterableProps) {
+		return $new;
 	}
 	public render() {
 		return (
 			<section id="iterable">
-				{this.state.blocks.map((gallery, index) => {
+				{this.props.blocks.map((gallery, index) => {
 					return (
 						<section id="gallery" class="contrast" key={index}>
 							<section id="upper" class="contrast">
@@ -72,14 +50,15 @@ class Iterable extends React.Component<IterableState> {
 												router.set({ view: "reader", options: gallery.id });
 											}
 										},
-										...(this.state.status[gallery.id]?.task_status ? [
+										...(this.state[gallery.id]?.task_status ? [
 										{
 											HTML: require(`!html-loader!@/assets/icons/delete.svg`),
 											click: () => {
-												download.remove(gallery.id).then(() => {
-													// TODO: none
+												this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], task_status: Status.NONE } }, () => {
+													download.remove(gallery.id).then(() => {
+														// TODO: none
+													});
 												});
-												this.setState({ ...this.state, status: { ...this.state.status, [gallery.id]: { ...this.state.status[gallery.id], task_status: Status.NONE } } });
 											}
 										},
 										{
@@ -92,10 +71,11 @@ class Iterable extends React.Component<IterableState> {
 											HTML: require(`!html-loader!@/assets/icons/download.svg`),
 											click: () => {
 												download.evaluate(`https://hitomi.la/galleries/${gallery.id}.html`).then((task) => {
-													download.create(task).then(() => {
-														// TODO: none
+													this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], task_status: Status.WORKING } }, () => {
+														download.create(task).then(() => {
+															// TODO: none
+														});
 													});
-													this.setState({ ...this.state, status: { ...this.state.status, [gallery.id]: { ...this.state.status[gallery.id], task_status: Status.WORKING } } });
 												});
 											}
 										}]),

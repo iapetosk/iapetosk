@@ -15,10 +15,10 @@ class Search {
 	constructor() {
 		// TODO: none
 	}
-	public get(filter: Keyword, per_page: number, index: number) {
-		return this.unknown_0(filter, per_page, index);
+	public get(filter: Keyword, index: number, per_page: number) {
+		return this.unknown_0(filter, index, per_page);
 	}
-	public unknown_0(filter: Keyword, per_page: number, index: number) {
+	private unknown_0(filter: Keyword, index: number, per_page: number) {
 		// array of gallery array
 		let array: number[] = [];
 		// length of gallery array

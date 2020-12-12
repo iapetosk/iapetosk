@@ -2,102 +2,86 @@ import * as React from "react";
 
 import "./index.scss";
 
-import settings from "@/modules/configure";
-
-import suggest from "@/modules/hitomi/suggest";
-import filter from "@/modules/hitomi/filter";
-
-import listener from "@/modules/listener";
 import utility from "@/modules/utility";
-import history from "@/scheme/history";
-import paging from "@/scheme/paging";
-import query from "@/scheme/query";
+import suggest from "@/modules/hitomi/suggest";
 
-import { Scheme } from "@/scheme";
 import { Suggestion } from "@/modules/hitomi/suggest";
-import { GalleryBlock } from "@/modules/hitomi/read";
 
+export type QueryProps = {
+	enable: boolean,
+	options: {
+		input: string;
+	},
+	handler: Record<"keydown", (value: string) => void>;
+};
 export type QueryState = {
 	focus: boolean,
-	disable: boolean,
-	suggests: Suggestion;
+	suggest: Suggestion;
 };
 
-class Query extends React.Component<QueryState> {
+class Query extends React.Component<QueryProps, QueryState> {
+	public props: QueryProps;
 	public state: QueryState;
-	constructor(properties: QueryState) {
-		super(properties);
-		this.state = { ...properties };
-		
-		listener.on(Scheme.GALLERY, ($new: { blocks: GalleryBlock[], size: number; }) => {
-			this.setState({ ...this.state, disable: !$new.blocks.length && !$new.size });
-		});
-		listener.on(Scheme.QUERY, ($new: string) => {
-			// suggest reset
-			this.setState({ ...this.state, suggests: [] });
-			// suggest outdate
-			suggest.up();
-			// paging reset
-			paging.set({ ...paging.get(), index: 0, size: 0 });
-			// history create
-			history.set_session({ filter: filter.get($new), index: 0 });
-			// settings update
-			settings.query = { ...settings.query, input: $new };
-		});
+	constructor(props: QueryProps) {
+		super(props);
+		this.props = props;
+		this.state = { focus: false, suggest: [] };
 	}
-	public input() {
-		return document.getElementById("input") as HTMLInputElement;
-	}
-	public query() {
-		return this.input().value.toLowerCase().split(/\s+/).pop()!.split(/:/).pop()!;
+	static getDerivedStateFromProps($new: QueryProps, $old: QueryProps) {
+		return $new;
 	}
 	public render() {
+		const I = this;
+		function input() {
+			return document.getElementById("input") as HTMLInputElement;
+		}
+		function query() {
+			return input().value.toLowerCase().split(/\s+/).pop()!.split(/:/).pop()!;
+		}
 		return (
 			<section id="query">
-				<input id="input" class="contrast" disabled={this.state.disable} placeholder={query.get()} autoComplete="off"
-					onFocus={(event) => {
+				<input id="input" class="contrast" disabled={!this.props.enable} placeholder={this.props.options.input} autoComplete="off"
+					onFocus={() => {
 						this.setState({ ...this.state, focus: true });
 					}}
-					onBlur={(event) => {
+					onBlur={() => {
 						this.setState({ ...this.state, focus: false });
 					}}
-					onChange={(event) => {
-						// suggest reset
-						this.setState({ ...this.state, suggests: [] });
-						// suggest outdate
-						suggest.up();
-						// suggest request
-						suggest.get(this.query()).then((suggestion) => {
-							this.setState({ ...this.state, suggests: suggestion });
+					onChange={() => {
+						this.setState({ ...this.state, suggest: [] }, () => {
+							suggest.up();
+							suggest.get(query()).then((suggestion) => {
+								this.setState({ ...this.state, suggest: suggestion });
+							});
 						});
 					}}
 					onKeyDown={(event) => {
 						switch (event.key) {
 							case "Enter": {
-								query.set(this.input().value);
+								this.props.handler.keydown(input().value);
 								break;
 							}
 						}
 					}}
 				></input>
-				<section id="dropdown" class={utility.inline({ "contrast": true, "active": this.state.focus && this.state.suggests.length > 0 })}>
-					{this.state.suggests.map((suggestion, index) => {
+				<section id="dropdown" class={utility.inline({ "contrast": true, "active": this.state.focus && this.state.suggest.length > 0 })}>
+					{this.state.suggest.map((suggestion, index) => {
 						return (
 							<legend key={index} class="center-y" data-count={suggestion.count}
-								onClick={(event) => {
-									this.setState({ ...this.state, suggests: [] });
-
-									suggest.up();
-									this.input().value = this.input().value.split(/\s+/).map((value, index, array) => {
-										return index < array.length - 1 ? value : `${suggestion.index}:${suggestion.value.replace(/\s+/g, "_")}`;
-									}).join("\u0020");
+								onClick={() => {
+									this.setState({ ...this.state, suggest: [] }, () => {
+										suggest.up();
+										input().value = input().value.split(/\s+/).map((value, index, array) => {
+											return index < array.length - 1 ? value : `${suggestion.index}:${suggestion.value.replace(/\s+/g, "_")}`;
+										}).join("\u0020");
+									});
 								}}
 							>
 								{suggestion.index}:
-								{[...suggestion.value.split(this.query())].map((value, index, array) => {
+								{[...suggestion.value.split(query())].map((value, index, array) => {
 									return ([
 										value,
-										index < array.length - 1 ? <strong key={index}>{this.query()}</strong> : undefined
+										index < array.length - 1 ? <strong key={index}>{query()}</strong> : undefined
 									]);
 								})}
 							</legend>

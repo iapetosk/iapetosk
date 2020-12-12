@@ -7,9 +7,9 @@ import settings from "@/modules/configure";
 import listener from "@/modules/listener";
 import storage from "@/modules/storage";
 import request from "@/modules/request";
-import worker from "@/scheme/worker";
+import worker from "@/statics/worker";
 
-import { Scheme } from "@/scheme";
+import { Static } from "@/statics";
 import { PartialOptions } from "@/modules/request";
 
 export enum Folder {
@@ -134,7 +134,7 @@ export class Download {
 				}
 				return resolve();
 			});
-			listener.on(Scheme.WORKER, ($index: number, $new: Task | undefined, $old: Task | undefined) => {
+			listener.on(Static.WORKER, ($index: number, $new: Task | undefined, $old: Task | undefined) => {
 				if ($index === task.id && !$new) {
 					// remove
 					this.remove(task.id);

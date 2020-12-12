@@ -4,23 +4,23 @@
 	border-width: 0px;
 	border-top-width: thin;
 	will-change: display;
-	&.disable {
-		pointer-events: none;
-		> * {
-			color: var(--colour_2);
-			> svg {
-				fill: var(--colour_2);
-			}
-		}
-	}
 	> * {
 		height: 100%;
 		width: 45px;
 		&.active {
 			color: var(--colour_success);
 		}
-		&.disable {
+		&:not(.enable) {
 			pointer-events: none;
+			> svg {
+				fill: var(--colour_2);
+			}
+		}
+	}
+	&:not(.enable) {
+		pointer-events: none;
+		> * {
+			color: var(--colour_2);
 			> svg {
 				fill: var(--colour_2);
 			}

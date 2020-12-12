@@ -142,7 +142,7 @@ svg {
 			height: 100%;
 			transition: transform 500ms;
 			will-change: pointer-events, transform;
-			&.disable {
+			&:not(.enable) {
 				pointer-events: none;
 				&.left {
 					transform: translateX(-100%);

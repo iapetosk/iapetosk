@@ -1,9 +1,9 @@
 import listener from "@/modules/listener";
 
-import { Scheme, Schema } from "@/scheme";
+import { Static, StaticHandler } from "@/statics";
 import { Task } from "@/modules/download";
 
-class Worker extends Schema<Record<string, Task>> {
+class Worker extends StaticHandler<Record<string, Task>> {
 
 	public get() {
 		return this["state"];
@@ -35,4 +35,4 @@ class Worker extends Schema<Record<string, Task>> {
 		return condition ? Object.values(this["state"]).filter((task) => { return task[condition.key] == condition.value; }) : Object.values(this["state"]);
 	}
 }
-export default (new Worker({}, Scheme.WORKER));
+export default (new Worker({}, Static.WORKER));

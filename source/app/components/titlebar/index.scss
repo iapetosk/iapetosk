@@ -22,7 +22,7 @@
 			background-color: var(--colour_error);
 		}
 	}
-	&.disable {
+	&:not(.enable) {
 		display: none;
 	}
 }
