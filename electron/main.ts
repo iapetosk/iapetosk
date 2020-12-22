@@ -32,10 +32,8 @@ app.on("ready", () => {
 	// development
 	if (!app.isPackaged) {
 		// live-reload
-		const watcher = require("fs").watch("build/renderer.js");
-		watcher.on("change", () => {
-			// webpack or ASAR
-			window.loadFile("build/index.html");
+		require("fs").watch("build/renderer.js").on("change", () => {
+			window.reload();
 		});
 	}
 	// bypass same-origin-policy

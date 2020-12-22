@@ -22,25 +22,29 @@ export type QueryState = {
 class Query extends React.Component<QueryProps, QueryState> {
 	public props: QueryProps;
 	public state: QueryState;
+	public refer: Record<"input", HTMLElement | undefined>;
 	constructor(props: QueryProps) {
 		super(props);
 		this.props = props;
 		this.state = { focus: false, suggest: [] };
+		this.refer = { input: undefined };
+	}
+	public get_input() {
+		return this.refer.input as HTMLInputElement;
+	}
+	public get_query() {
+		return this.get_input().value.toLowerCase().split(/\s+/).pop()!.split(/:/).pop()!;
 	}
 	static getDerivedStateFromProps($new: QueryProps, $old: QueryProps) {
 		return $new;
 	}
+	public componentDidMount() {
+		this.refer.input = document.querySelector("#query > #input") as HTMLElement;
+	}
 	public render() {
-		const I = this;
-		function input() {
-			return document.getElementById("input") as HTMLInputElement;
-		}
-		function query() {
-			return input().value.toLowerCase().split(/\s+/).pop()!.split(/:/).pop()!;
-		}
 		return (
 			<section id="query">
-				<input id="input" class="contrast" disabled={!this.props.enable} placeholder={this.props.options.input} autoComplete="off"
+				<input id="input" class="contrast" defaultValue={this.props.options.input} placeholder={this.props.options.input} disabled={!this.props.enable} autoComplete="off"
 					onFocus={() => {
 						this.setState({ ...this.state, focus: true });
 					}}
@@ -50,7 +54,7 @@ class Query extends React.Component<QueryProps, QueryState> {
 					onChange={() => {
 						this.setState({ ...this.state, suggest: [] }, () => {
 							suggest.up();
-							suggest.get(query()).then((suggestion) => {
+							suggest.get(this.get_query()).then((suggestion) => {
 								this.setState({ ...this.state, suggest: suggestion });
 							});
 						});
@@ -58,7 +62,7 @@ class Query extends React.Component<QueryProps, QueryState> {
 					onKeyDown={(event) => {
 						switch (event.key) {
 							case "Enter": {
-								this.props.handler.keydown(input().value);
+								this.props.handler.keydown(this.get_input().value);
 								break;
 							}
 						}
@@ -71,17 +75,17 @@ class Query extends React.Component<QueryProps, QueryState> {
 								onClick={() => {
 									this.setState({ ...this.state, suggest: [] }, () => {
 										suggest.up();
-										input().value = input().value.split(/\s+/).map((value, index, array) => {
+										this.get_input().value = this.get_input().value.split(/\s+/).map((value, index, array) => {
 											return index < array.length - 1 ? value : `${suggestion.index}:${suggestion.value.replace(/\s+/g, "_")}`;
 										}).join("\u0020");
 									});
 								}}
 							>
 								{suggestion.index}:
-								{[...suggestion.value.split(query())].map((value, index, array) => {
+								{[...suggestion.value.split(this.get_query())].map((value, index, array) => {
 									return ([
 										value,
-										index < array.length - 1 ? <strong key={index}>{query()}</strong> : undefined
+										index < array.length - 1 ? <strong key={index}>{this.get_query()}</strong> : undefined
 									]);
 								})}
 							</legend>

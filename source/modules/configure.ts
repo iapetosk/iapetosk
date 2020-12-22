@@ -3,12 +3,15 @@ import storage from "@/modules/storage";
 import { StoragePreset } from "@/modules/storage";
 
 export type Configure = {
-	query: {
-		input: string;
-	},
 	browser: {
 		resolution: "low" | "medium" | "high",
 		censor: boolean;
+	},
+	query: {
+		input: string;
+	},
+	iterable: {
+		discovery: string[]
 	},
 	paging: {
 		metre: number;
@@ -27,12 +30,25 @@ export type Configure = {
 	};
 };
 const boilerplate: Configure = {
-	query: {
-		input: ""
-	},
 	browser: {
 		resolution: "low",
 		censor: true
+	},
+	query: {
+		input: ""
+	},
+	iterable: {
+		discovery: [
+			"type",
+			"title",
+			"language",
+			"character",
+			"artist",
+			"series",
+			"group",
+			"tags",
+			"date"
+		]
 	},
 	paging: {
 		metre: 10,

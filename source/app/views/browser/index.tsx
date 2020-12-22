@@ -35,13 +35,15 @@ export type BrowserState = {
 class Browser extends React.Component<BrowserProps> {
 	public props: BrowserProps;
 	public state: BrowserState;
+	public refer: Record<"query" | "iterable" | "paging", React.RefObject<any>>;
 	constructor(props: BrowserProps) {
 		super(props);
 		this.props = props;
-		this.state = { query: { enable: true, options: { input: settings.query.input }, handler: { keydown: (value: string) => { this.set_query({ ...this.state.query, options: { ...this.state.query.options, input: value } }); } } }, iterable: { blocks: [] }, paging: { enable: true, options: { size: 0, index: 0, metre: settings.paging.metre }, handler: { click: (value: number) => { this.set_paging({ ...this.state.paging, options: { ...this.state.paging.options, index: value } }); } } }, session: { history: [], version: 0 }, blocks: [[], 0] };
+		this.state = { query: { enable: true, options: { input: settings.query.input }, handler: { keydown: (value: string) => { this.set_query({ ...this.state.query, options: { ...this.state.query.options, input: value } }); } } }, iterable: { options: { blocks: [], discovery: settings.iterable.discovery }, handler: { "click": (key: string, value: string) => { if (!/title|date/.test(key) && !new RegExp(`${key}:${value}`).test(this.refer.query.current.get_input().value)) { this.refer.query.current.get_input().value = [...this.refer.query.current.get_input().value.split(/\s+/), `${key}:${value}`].map((value) => { return value;  }).join("\u0020"); } } } }, paging: { enable: true, options: { size: 0, index: 0, metre: settings.paging.metre }, handler: { click: (value: number) => { this.set_paging({ ...this.state.paging, options: { ...this.state.paging.options, index: value } }); } } }, session: { history: [], version: 0 }, blocks: [[], 0] };
+		this.refer = { query: React.createRef(), iterable: React.createRef(), paging: React.createRef() };
 
 		window.addEventListener("keydown", (event) => {
-			if (this.props.enable && this.state.iterable.blocks.length && !document.querySelectorAll("input:focus").length) {
+			if (this.props.enable && this.state.blocks.length && !document.querySelectorAll("input:focus").length) {
 				switch (event.key) {
 					case "ArrowLeft": {
 						this.set_paging({ ...this.state.paging, options: { ...this.state.paging.options, index: utility.clamp(this.state.paging.options.index - 1, 0, this.state.paging.options.size - 1) } });
@@ -81,7 +83,11 @@ class Browser extends React.Component<BrowserProps> {
 					enable: true,
 				},
 				iterable: {
-					blocks: value[0]
+					...this.state.iterable,
+					options: {
+						...this.state.iterable.options,
+						blocks: value[0]
+					}
 				},
 				paging: {
 					...this.state.paging,
@@ -92,18 +98,22 @@ class Browser extends React.Component<BrowserProps> {
 					}
 				}
 			} : {
-					query: {
-						...this.state.query,
-						enable: false,
-					},
-					iterable: {
+				query: {
+					...this.state.query,
+					enable: false,
+				},
+				iterable: {
+					...this.state.iterable,
+					options: {
+						...this.state.iterable.options,
 						blocks: []
-					},
-					paging: {
-						...this.state.paging,
-						enable: false
 					}
-				})
+				},
+				paging: {
+					...this.state.paging,
+					enable: false
+				}
+			})
 		});
 	}
 	public set_query(value: BrowserState["query"]) {
@@ -131,10 +141,10 @@ class Browser extends React.Component<BrowserProps> {
 		return (
 			<section id="browser" class={utility.inline({ "enable": this.props.enable, "left": true })}>
 				<section id="scrollable" class="scroll-y">
-					<Query enable={this.state.query.enable} options={this.state.query.options} handler={this.state.query.handler}></Query>
-					<Iterable blocks={this.state.iterable.blocks}></Iterable>
+					<Query ref={this.refer.query} enable={this.state.query.enable} options={this.state.query.options} handler={this.state.query.handler}></Query>
+					<Iterable ref={this.refer.iterable} options={this.state.iterable.options} handler={this.state.iterable.handler}></Iterable>
 				</section>
-				<Paging enable={this.state.paging.enable} options={this.state.paging.options} handler={this.state.paging.handler}></Paging>
+				<Paging ref={this.refer.paging} enable={this.state.paging.enable} options={this.state.paging.options} handler={this.state.paging.handler}></Paging>
 			</section>
 		);
 	}
