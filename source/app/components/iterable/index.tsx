@@ -20,7 +20,7 @@ export type IterableProps = {
 		blocks: GalleryBlock[],
 		discovery: string[];
 	},
-	handler: Record<"click", (key: string, value: string) => void>;
+	handler: Record<"click", (button: number, key: string, value: string) => void>;
 };
 export type IterableState = {
 	[key: number]: {
@@ -80,9 +80,9 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 														return (
 															<button id="key" class="contrast center" key={index}>
 																<mark id="value" class="eclipse"
-																onClick={() => {
+																onMouseUp={(event) => {
 																	const [$key, $value] = [/tags/.test(key) ? /♂/.test(value) ? "male" : /♀/.test(value) ? "female" : "tag" : key, /language/.test(key) ? languages_english[utility.index_of(languages_local, value)] : value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_")];
-																	this.props.handler.click($key, $value);
+																	this.props.handler.click(event.button, $key, $value);
 																}}>
 																{value}</mark>
 															</button>
