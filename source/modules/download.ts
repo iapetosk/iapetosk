@@ -12,12 +12,11 @@ import worker from "@/statics/worker";
 import { Static } from "@/statics";
 import { PartialOptions } from "@/modules/request";
 
-export enum Folder {
-	DEBUGS = "debugs",
-	BUNDLES = "bundles",
-	DOWNLOADS = "downloads"
+export enum TaskJob {
+	OPEN = "open",
+	CLOSE = "close"
 };
-export enum Status {
+export enum TaskStatus {
 	NONE,
 	FINISHED,
 	WORKING,
@@ -25,7 +24,12 @@ export enum Status {
 	PAUSED,
 	ERROR
 };
-export class File {
+export enum TaskFolder {
+	DEBUGS = "debugs",
+	BUNDLES = "bundles",
+	DOWNLOADS = "downloads"
+};
+export class TaskFile {
 	public url: string;
 	public path: string;
 	public size: number;
@@ -41,17 +45,20 @@ export class Task {
 	public id: number;
 	public from: string;
 	public title: string;
-	public files: File[];
-	public status: Status = Status.NONE;
+	public files: TaskFile[];
+	public status: TaskStatus;
 	public options: PartialOptions;
-	public working: number = 0;
-	public finished: number = 0;
-	constructor(from: string, title: string, files: File[], options: PartialOptions = {}, id: number = Date.now()) {
+	public working: number;
+	public finished: number;
+	constructor(from: string, title: string, files: TaskFile[], options: PartialOptions = {}, id: number = Date.now()) {
 		this.id = id;
 		this.from = from;
 		this.title = title;
 		this.files = files;
+		this.status = TaskStatus.NONE;
 		this.options = options;
+		this.working = 0;
+		this.finished = 0;
 	}
 }
 export class Download {
@@ -60,19 +67,18 @@ export class Download {
 	constructor(max_threads: number, max_working: number) {
 		this.max_threads = max_threads;
 		this.max_working = max_working;
-		// exception occured if folder isn't exist
 		try {
-			for (const file of fs.readdirSync(Folder.BUNDLES)) {
+			for (const file of fs.readdirSync(TaskFolder.BUNDLES)) {
 				// check if file is .json
-				if (fs.statSync(path.join(Folder.BUNDLES, file)).isFile() && path.extname(file) === ".json") {
+				if (fs.statSync(path.join(TaskFolder.BUNDLES, file)).isFile() && path.extname(file) === ".json") {
 					// read task from .json
-					storage.register(file.split(/\./)[0], path.join(Folder.BUNDLES, file), "@import");
+					storage.register(file.split(/\./)[0], path.join(TaskFolder.BUNDLES, file), "@import");
 
 					const task: Task = storage.get_data(file.split(/\./)[0]);
 
 					switch (task.status) {
-						case Status.NONE:
-						case Status.WORKING: {
+						case TaskStatus.NONE:
+						case TaskStatus.WORKING: {
 							this.create(task);
 							break;
 						}
@@ -86,64 +92,65 @@ export class Download {
 		} catch {
 			// TODO: none
 		}
+		listener.on(Static.WORKER, ($index: number, $new: Task | undefined) => {
+			// bundle is removed
+			if (storage.get_data(String($index))) {
+				// update storage
+				storage.set_data(String($index), $new);
+			}
+			// else alone is enough
+			else if (!$new) {
+				// remove
+				this.remove($index);
+			}
+		});
 	}
 	public create(task: Task) {
 		const observer = new events.EventEmitter, files: number[] = [];
 		return new Promise<void>((resolve, reject) => {
 			function update(key: "id" | "from" | "title" | "files" | "status" | "options" | "working" | "finished", value: any) {
-				if (storage.get_data(String(task.id))) {
-					// update task
-					task = { ...task, [key]: value as never };
-					// update worker
-					worker.set(task.id, task);
-					// update storage
-					storage.set_data(String(task.id), task);
-				} else {
-					fs.rmdir(path.join(Folder.DOWNLOADS, String(task.id)), { recursive: true }, () => {
-						// TODO: none
-					});
-				}
+				// update task
+				task[key] = value as never;
+				// update worker
+				worker.set(task.id, { ...task });
 			}
-			observer.on("start", (index: number) => {
-				if (task.status !== Status.WORKING) {
-					return observer.emit("end");
+			observer.on(TaskJob.OPEN, (index: number) => {
+				if (task.status !== TaskStatus.WORKING || !storage.get_data(String(task.id))) {
+					return observer.emit(TaskJob.CLOSE);
 				}
 				update("working", task.working + 1);
 				request.get(task.files[files[index]].url, { ...task.options, headers: { ...task.options.headers, ...task.files[files[index]].written ? { "content-range": `bytes=${task.files[files[index]].written}-` } : {} } }, task.files[files[index]]).then(() => {
-					if (task.status !== Status.WORKING) {
-						return observer.emit("end");
+					if (task.status !== TaskStatus.WORKING || !storage.get_data(String(task.id))) {
+						return observer.emit(TaskJob.CLOSE);
 					}
 					update("finished", task.finished + 1);
 
 					if (!!files[task.working] && task.working - task.finished < this.max_working) {
-						return observer.emit("start", task.working);
+						return observer.emit(TaskJob.OPEN, task.working);
 					}
 					if (task.finished === files.length) {
-						update("status", Status.FINISHED);
-						return observer.emit("end");
+						update("status", TaskStatus.FINISHED);
+						return observer.emit(TaskJob.CLOSE);
 					}
 				});
 				if (!!files[task.working] && task.working - task.finished < this.max_working) {
-					return observer.emit("start", task.working);
+					return observer.emit(TaskJob.OPEN, task.working);
 				}
 			});
-			observer.on("end", () => {
-				for (const queued of worker.filter({ key: "status", value: Status.QUEUED })) {
+			observer.once(TaskJob.CLOSE, () => {
+				// stop observe
+				observer.removeAllListeners();
+				// start queued task
+				for (const queued of worker.filter({ key: "status", value: TaskStatus.QUEUED })) {
 					this.create(queued);
 					break;
 				}
 				return resolve();
 			});
-			listener.on(Static.WORKER, ($index: number, $new: Task | undefined, $old: Task | undefined) => {
-				if ($index === task.id && !$new) {
-					// remove
-					this.remove(task.id);
-				}
-			});
 			// task counts reached its limit
-			if (this.max_threads <= worker.filter({ key: "status", value: Status.WORKING }).length) {
-				update("status", Status.QUEUED);
-				return observer.emit("end");
+			if (this.max_threads <= worker.filter({ key: "status", value: TaskStatus.WORKING }).length) {
+				update("status", TaskStatus.QUEUED);
+				return observer.emit(TaskJob.CLOSE);
 			}
 			// scan unfinished files
 			for (let index = 0; index < task.files.length; index++) {
@@ -153,26 +160,26 @@ export class Download {
 			}
 			// task is finished
 			if (!files.length) {
-				update("status", Status.FINISHED);
-				return observer.emit("end");
+				update("status", TaskStatus.FINISHED);
+				return observer.emit(TaskJob.CLOSE);
 			}
 			// register storage
 			if (!storage.exist(String(task.id))) {
-				storage.register(String(task.id), path.join(Folder.BUNDLES, String(task.id) + ".json"), task);
+				storage.register(String(task.id), path.join(TaskFolder.BUNDLES, String(task.id) + ".json"), task);
 			}
 			// update status
-			update("status", Status.WORKING);
+			update("status", TaskStatus.WORKING);
 			// download recursivly
-			return observer.emit("start", 0);
+			return observer.emit(TaskJob.OPEN, 0);
 		});
 	}
 	public remove(id: number) {
 		return new Promise<void>((resolve, reject) => {
-			// remove worker
-			worker.set(id, undefined);
 			// remove storage
 			storage.un_register(String(id));
-			fs.rmdir(path.join(Folder.DOWNLOADS, String(id)), { recursive: true }, () => {
+			// remove worker
+			worker.set(id, undefined);
+			fs.rmdir(path.join(TaskFolder.DOWNLOADS, String(id)), { recursive: true }, () => {
 				return resolve();
 			});
 		});
@@ -185,12 +192,8 @@ export class Download {
 						return read.script(Number(/([0-9]+).html$/.exec(url)![1])).then((script) => {
 							return resolve(
 								new Task(url, script.title, script.files.map((value, index) => {
-									return new File(value.url, path.join(Folder.DOWNLOADS, String(script.id), `${index}.${value.url.split(/\./).pop()}`));
-								}), {
-									headers: {
-										"referer": "https://hitomi.la"
-									}
-								}, script.id)
+									return new TaskFile(value.url, path.join(TaskFolder.DOWNLOADS, String(script.id), `${index}.${value.url.split(/\./).pop()}`));
+								}), { headers: { "referer": "https://hitomi.la" } }, script.id)
 							);
 						});
 					}

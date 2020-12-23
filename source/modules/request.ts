@@ -6,7 +6,7 @@ import * as https from "https";
 
 import settings from "@/modules/configure";
 
-import { File } from "@/modules/download";
+import { TaskFile } from "@/modules/download";
 
 export type RequestOptions = PartialOptions & PrivateOptions & {
 	url: string,
@@ -40,10 +40,10 @@ class Request {
 			return tls.connect({ ...options, servername: undefined }, callback);
 		};
 	}
-	public async send(options: RequestOptions, file?: File) {
+	public async send(options: RequestOptions, file?: TaskFile) {
 		const I: Request = this;
 		return new Promise<RequestResponse>((resolve, reject) => {
-			function recursive(options: RequestOptions, file?: File) {
+			function recursive(options: RequestOptions) {
 				// content
 				const chunks: Buffer[] = [];
 				// send request
@@ -95,7 +95,7 @@ class Request {
 							// subtract by one
 							override.options.redirects = override.options.redirects ? override.options.redirects + 1 : 1;
 							// return new instance
-							return recursive({ ...override.options }, file);
+							return recursive({ ...override.options });
 						}
 					}
 					// encoding
@@ -157,19 +157,19 @@ class Request {
 					});
 				}).end();
 			}
-			return recursive(options, file);
+			return recursive(options);
 		});
 	};
-	public async get(url: string, options: PartialOptions = {}, file?: File) {
+	public async get(url: string, options: PartialOptions = {}, file?: TaskFile) {
 		return this.send({ url: url, method: "GET", ...options }, file);
 	}
-	public async put(url: string, options: PartialOptions = {}, file?: File) {
+	public async put(url: string, options: PartialOptions = {}, file?: TaskFile) {
 		return this.send({ url: url, method: "PUT", ...options }, file);
 	}
-	public async post(url: string, options: PartialOptions = {}, file?: File) {
+	public async post(url: string, options: PartialOptions = {}, file?: TaskFile) {
 		return this.send({ url: url, method: "POST", ...options }, file);
 	}
-	public async delete(url: string, options: PartialOptions = {}, file?: File) {
+	public async delete(url: string, options: PartialOptions = {}, file?: TaskFile) {
 		return this.send({ url: url, method: "DELETE", ...options }, file);
 	}
 	public parse(url: string) {

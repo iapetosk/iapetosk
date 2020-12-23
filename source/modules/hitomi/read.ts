@@ -6,7 +6,7 @@ export type GalleryBlock = {
 	type: string,
 	title: string,
 	language: string,
-	thumbnail: string[];
+	thumbnail: [string, string];
 	character?: string[],
 	artist?: string[],
 	series?: string,

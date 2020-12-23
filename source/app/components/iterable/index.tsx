@@ -8,12 +8,12 @@ import * as path from "path";
 import * as process from "child_process";
 
 import download from "@/modules/download";
+import utility from "@/modules/utility";
 import worker from "@/statics/worker";
 import router from "@/statics/router";
 
 import { GalleryBlock } from "@/modules/hitomi/read";
-import { Folder, Status } from "@/modules/download";
-import utility from "@/modules/utility";
+import { TaskFolder, TaskStatus } from "@/modules/download";
 
 export type IterableProps = {
 	options: {
@@ -25,7 +25,7 @@ export type IterableProps = {
 export type IterableState = {
 	[key: number]: {
 		task: {
-			status: Status
+			status: TaskStatus
 		},
 		data: {
 			HTML: IterableHTML
@@ -107,7 +107,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 										{
 											HTML: require(`!html-loader!@/assets/icons/delete.svg`),
 											click: () => {
-												this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], task: { ...this.state[gallery.id]?.task, status: Status.NONE } } }, () => {
+												this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], task: { ...this.state[gallery.id]?.task, status: TaskStatus.NONE } } }, () => {
 													download.remove(gallery.id).then(() => {
 														// TODO: none
 													});
@@ -117,14 +117,14 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 										{
 											HTML: require(`!html-loader!@/assets/icons/open.svg`),
 											click: () => {
-												process.exec(`start "" "${path.join(Folder.DOWNLOADS, String(gallery.id))}"`);
+												process.exec(`start "" "${path.join(TaskFolder.DOWNLOADS, String(gallery.id))}"`);
 											}
 										}] : [
 										{
 											HTML: require(`!html-loader!@/assets/icons/download.svg`),
 											click: () => {
 												download.evaluate(`https://hitomi.la/galleries/${gallery.id}.html`).then((task) => {
-													this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], task: { ...this.state[gallery.id]?.task, status: Status.NONE } } }, () => {
+													this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], task: { ...this.state[gallery.id]?.task, status: TaskStatus.WORKING } } }, () => {
 														download.create(task).then(() => {
 															// TODO: none
 														});
