@@ -7,13 +7,15 @@ import LazyLoad from "@/app/components/lazyload";
 import * as path from "path";
 import * as process from "child_process";
 
+import listener from "@/modules/listener";
 import download from "@/modules/download";
 import utility from "@/modules/utility";
 import worker from "@/statics/worker";
 import router from "@/statics/router";
 
+import { StaticEvent } from "@/statics";
 import { GalleryBlock } from "@/modules/hitomi/read";
-import { TaskFolder, TaskStatus } from "@/modules/download";
+import { Task, TaskStatus, TaskFolder } from "@/modules/download";
 
 export type IterableProps = {
 	options: {
@@ -49,6 +51,18 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 		super(props);
 		this.props = props;
 		this.state = Object.assign({}, ...Object.values(worker.get()).map((task) => { return { [task.id]: { status: { task: task.status } } }; }));
+
+		listener.on(StaticEvent.WORKER, ($index: number, $new: Task | undefined) => {
+			switch ($new ? $new.status : TaskStatus.NONE) {
+				case this.state[$index]?.status?.task: {
+					break;
+				}
+				default: {
+					this.setState({ ...this.state, [$index]: { ...this.state[$index], status: { ...this.state[$index]?.status, task: $new ? $new.status : TaskStatus.NONE } } });
+					break;
+				}
+			}
+		});
 	}
 	static getDerivedStateFromProps($new: IterableProps, $old: IterableProps) {
 		return $new;
@@ -103,14 +117,12 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 												router.set({ view: "reader", options: gallery.id });
 											}
 										},
-										...(this.state[gallery.id]?.status?.task ? [
+										...((this.state[gallery.id]?.status?.task === TaskStatus.WORKING || this.state[gallery.id]?.status?.task === TaskStatus.FINISHED) ? [
 										{
 											HTML: require(`!html-loader!@/assets/icons/delete.svg`),
 											click: () => {
-												this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], status: { ...this.state[gallery.id]?.status, task: TaskStatus.NONE } } }, () => {
-													download.remove(gallery.id).then(() => {
-														// TODO: none
-													});
+												download.remove(gallery.id).then(() => {
+													// TODO: none
 												});
 											}
 										},
@@ -124,10 +136,8 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 											HTML: require(`!html-loader!@/assets/icons/download.svg`),
 											click: () => {
 												download.evaluate(`https://hitomi.la/galleries/${gallery.id}.html`).then((task) => {
-													this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], status: { ...this.state[gallery.id]?.status, task: TaskStatus.WORKING } } }, () => {
-														download.create(task).then((status) => {
-															this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], status: { ...this.state[gallery.id]?.status, task: status } } });
-														});
+													download.create(task).then((status) => {
+														// TODO: none
 													});
 												});
 											}

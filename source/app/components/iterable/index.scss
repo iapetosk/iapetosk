@@ -179,11 +179,14 @@
 					transform: rotate(45deg);
 					color: var(--colour_1);
 				}
+				&.QUEUED {
+					background-color: var(--colour_warning);
+				}
 				&.WORKING {
-					background-color: var(--colour_3);
+					background-color: var(--colour_success);
 				}
 				&.FINISHED {
-					background-color: var(--colour_success);
+					background-color: var(--colour_error);
 				}
 			}
 			&:not(.active) {

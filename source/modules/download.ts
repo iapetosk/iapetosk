@@ -13,8 +13,8 @@ import { StaticEvent } from "@/statics";
 import { PartialOptions } from "@/modules/request";
 
 export enum TaskJob {
-	OPEN = "open",
-	CLOSE = "close"
+	CREATE = "create",
+	DESTROY = "destroy"
 };
 export enum TaskStatus {
 	NONE,
@@ -99,7 +99,7 @@ export class Download {
 				storage.set_data(String($index), $new);
 			}
 			// else alone is enough
-			else if (!$new) {
+			else if ($new?.status !== TaskStatus.QUEUED) {
 				// remove
 				this.remove($index);
 			}
@@ -114,45 +114,51 @@ export class Download {
 				// update worker
 				worker.set(task.id, { ...task });
 			}
-			observer.on(TaskJob.OPEN, (index: number) => {
+			observer.on(TaskJob.CREATE, (index: number) => {
 				if (task.status !== TaskStatus.WORKING || !storage.get_data(String(task.id))) {
 					update("status", TaskStatus.NONE);
-					return observer.emit(TaskJob.CLOSE);
+					return observer.emit(TaskJob.DESTROY);
 				}
 				update("working", task.working + 1);
 				request.get(task.files[files[index]].url, { ...task.options, headers: { ...task.options.headers, ...task.files[files[index]].written ? { "content-range": `bytes=${task.files[files[index]].written}-` } : {} } }, task.files[files[index]]).then(() => {
 					if (task.status !== TaskStatus.WORKING || !storage.get_data(String(task.id))) {
 						update("status", TaskStatus.NONE);
-						return observer.emit(TaskJob.CLOSE);
+						return observer.emit(TaskJob.DESTROY);
 					}
 					update("finished", task.finished + 1);
 
 					if (!!files[task.working] && task.working - task.finished < this.max_working) {
-						return observer.emit(TaskJob.OPEN, task.working);
+						return observer.emit(TaskJob.CREATE, task.working);
 					}
 					if (task.finished === files.length) {
 						update("status", TaskStatus.FINISHED);
-						return observer.emit(TaskJob.CLOSE);
+						return observer.emit(TaskJob.DESTROY);
 					}
 				});
 				if (!!files[task.working] && task.working - task.finished < this.max_working) {
-					return observer.emit(TaskJob.OPEN, task.working);
+					return observer.emit(TaskJob.CREATE, task.working);
 				}
 			});
-			observer.once(TaskJob.CLOSE, () => {
+			observer.once(TaskJob.DESTROY, () => {
 				// stop observe
 				observer.removeAllListeners();
 				// start queued task
-				for (const queued of worker.filter({ key: "status", value: TaskStatus.QUEUED })) {
-					this.create(queued);
-					break;
+				if (task.status !== TaskStatus.QUEUED) {
+					for (const queued of worker.filter({ key: "status", value: TaskStatus.QUEUED })) {
+						this.create(queued);
+						break;
+					}
 				}
 				return resolve(task.status);
 			});
+			// register storage
+			if (!storage.exist(String(task.id))) {
+				storage.register(String(task.id), path.join(TaskFolder.BUNDLES, String(task.id) + ".json"), task);
+			}
 			// task counts reached its limit
 			if (this.max_threads <= worker.filter({ key: "status", value: TaskStatus.WORKING }).length) {
 				update("status", TaskStatus.QUEUED);
-				return observer.emit(TaskJob.CLOSE);
+				return observer.emit(TaskJob.DESTROY);
 			}
 			// scan unfinished files
 			for (let index = 0; index < task.files.length; index++) {
@@ -163,16 +169,12 @@ export class Download {
 			// task is finished
 			if (!files.length) {
 				update("status", TaskStatus.FINISHED);
-				return observer.emit(TaskJob.CLOSE);
-			}
-			// register storage
-			if (!storage.exist(String(task.id))) {
-				storage.register(String(task.id), path.join(TaskFolder.BUNDLES, String(task.id) + ".json"), task);
+				return observer.emit(TaskJob.DESTROY);
 			}
 			// update status
 			update("status", TaskStatus.WORKING);
 			// download recursivly
-			return observer.emit(TaskJob.OPEN, 0);
+			return observer.emit(TaskJob.CREATE, 0);
 		});
 	}
 	public remove(id: number) {
