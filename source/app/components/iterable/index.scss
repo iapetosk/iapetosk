@@ -164,7 +164,9 @@
 			width: 100%;
 			height: 100%;
 			> * {
-				pointer-events: all;
+				&:not(.active) {
+					display: none;
+				}
 			}
 			> #ribbon {
 				&.corner {
@@ -176,11 +178,16 @@
 					height: 50px;
 					transform: rotate(45deg);
 					color: var(--colour_1);
+				}
+				&.WORKING {
+					background-color: var(--colour_3);
+				}
+				&.FINISHED {
 					background-color: var(--colour_success);
 				}
-				&:not(.active) {
-					display: none;
-				}
+			}
+			&:not(.active) {
+				display: none;
 			}
 		}
 		&:hover {

@@ -24,8 +24,8 @@ export type IterableProps = {
 };
 export type IterableState = {
 	[key: number]: {
-		task: {
-			status: TaskStatus
+		status: {
+			task: TaskStatus
 		},
 		html: {
 			upper: UpperSection
@@ -48,7 +48,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 	constructor(props: IterableProps) {
 		super(props);
 		this.props = props;
-		this.state = Object.assign({}, ...Object.values(worker.get()).map((task) => { return { [task.id]: { task: { status: task.status } } }; }));
+		this.state = Object.assign({}, ...Object.values(worker.get()).map((task) => { return { [task.id]: { status: { task: task.status } } }; }));
 	}
 	static getDerivedStateFromProps($new: IterableProps, $old: IterableProps) {
 		return $new;
@@ -58,7 +58,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 			<section id="iterable">
 				{this.props.options.blocks.map((gallery, index) => {
 					return (
-						<section id="gallery" class={utility.inline({ "contrast": true, [TaskStatus[this.state[gallery.id]?.task?.status || TaskStatus.NONE]]: true })} key={index}>
+						<section id="gallery" class={utility.inline({ "contrast": true, [TaskStatus[this.state[gallery.id]?.status?.task || TaskStatus.NONE]]: true })} key={index}>
 							<section id="upper" class={utility.inline({ "contrast": true, [UpperSection[this.state[gallery.id]?.html?.upper || UpperSection.INTERACTS]]: true })}>
 								<LazyLoad src={gallery.thumbnail[0]}></LazyLoad>
 								<section id="discovery" class="fluid">
@@ -103,11 +103,11 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 												router.set({ view: "reader", options: gallery.id });
 											}
 										},
-										...(this.state[gallery.id]?.task?.status ? [
+										...(this.state[gallery.id]?.status?.task ? [
 										{
 											HTML: require(`!html-loader!@/assets/icons/delete.svg`),
 											click: () => {
-												this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], task: { ...this.state[gallery.id]?.task, status: TaskStatus.NONE } } }, () => {
+												this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], status: { ...this.state[gallery.id]?.status, task: TaskStatus.NONE } } }, () => {
 													download.remove(gallery.id).then(() => {
 														// TODO: none
 													});
@@ -124,9 +124,9 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 											HTML: require(`!html-loader!@/assets/icons/download.svg`),
 											click: () => {
 												download.evaluate(`https://hitomi.la/galleries/${gallery.id}.html`).then((task) => {
-													this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], task: { ...this.state[gallery.id]?.task, status: TaskStatus.WORKING } } }, () => {
-														download.create(task).then(() => {
-															this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], task: { ...this.state[gallery.id]?.task, status: TaskStatus.FINISHED } } });
+													this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], status: { ...this.state[gallery.id]?.status, task: TaskStatus.WORKING } } }, () => {
+														download.create(task).then((status) => {
+															this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], status: { ...this.state[gallery.id]?.status, task: status } } });
 														});
 													});
 												});
@@ -160,8 +160,24 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 								<legend id="title" class="eclipse">{gallery.title}</legend>
 								<legend id="id" class="center">#{gallery.id}</legend>
 							</section>
-							<section id="status">
-								<legend id="ribbon" class={utility.inline({ "contrast": true, "center": true, "corner": true, "active": this.state[gallery.id]?.task?.status === TaskStatus.FINISHED })}>Downloaded</legend>
+							<section id="status" class={utility.inline({ "active": Object.keys(this.state[gallery.id]?.status || {}).length > 0  })}>
+								{[
+									{
+										type: "ribbon",
+										active: this.state[gallery.id]?.status?.task !== TaskStatus.NONE,
+										classes: {
+											[TaskStatus[this.state[gallery.id]?.status?.task]]: true,
+											"contrast": true,
+											"center": true,
+											"corner": true
+										},
+										content: TaskStatus[this.state[gallery.id]?.status?.task]
+									}
+								].map((status, index) => {
+									return (
+										<legend id={status.type} class={utility.inline({ "active": status.active, ...status.classes })} key={index}>{status.content}</legend>
+									);
+								})}
 							</section>
 						</section>
 					);

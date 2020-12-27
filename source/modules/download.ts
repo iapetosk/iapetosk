@@ -107,7 +107,7 @@ export class Download {
 	}
 	public create(task: Task) {
 		const observer = new events.EventEmitter, files: number[] = [];
-		return new Promise<void>((resolve, reject) => {
+		return new Promise<TaskStatus>((resolve, reject) => {
 			function update(key: "id" | "from" | "title" | "files" | "status" | "options" | "working" | "finished", value: any) {
 				// update task
 				task[key] = value as never;
@@ -116,11 +116,13 @@ export class Download {
 			}
 			observer.on(TaskJob.OPEN, (index: number) => {
 				if (task.status !== TaskStatus.WORKING || !storage.get_data(String(task.id))) {
+					update("status", TaskStatus.NONE);
 					return observer.emit(TaskJob.CLOSE);
 				}
 				update("working", task.working + 1);
 				request.get(task.files[files[index]].url, { ...task.options, headers: { ...task.options.headers, ...task.files[files[index]].written ? { "content-range": `bytes=${task.files[files[index]].written}-` } : {} } }, task.files[files[index]]).then(() => {
 					if (task.status !== TaskStatus.WORKING || !storage.get_data(String(task.id))) {
+						update("status", TaskStatus.NONE);
 						return observer.emit(TaskJob.CLOSE);
 					}
 					update("finished", task.finished + 1);
@@ -145,7 +147,7 @@ export class Download {
 					this.create(queued);
 					break;
 				}
-				return resolve();
+				return resolve(task.status);
 			});
 			// task counts reached its limit
 			if (this.max_threads <= worker.filter({ key: "status", value: TaskStatus.WORKING }).length) {
