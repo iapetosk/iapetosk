@@ -1,6 +1,6 @@
 import listener from "@/modules/listener";
 
-import { Static, StaticHandler } from "@/statics";
+import { StaticEvent, StaticHandler } from "@/statics";
 import { Task } from "@/modules/download";
 
 class Worker extends StaticHandler<Record<string, Task>> {
@@ -35,4 +35,4 @@ class Worker extends StaticHandler<Record<string, Task>> {
 		return condition ? Object.values(this["state"]).filter((task) => { return task[condition.key] == condition.value; }) : Object.values(this["state"]);
 	}
 }
-export default (new Worker({}, Static.WORKER));
+export default (new Worker({}, StaticEvent.WORKER));

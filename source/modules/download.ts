@@ -9,7 +9,7 @@ import storage from "@/modules/storage";
 import request from "@/modules/request";
 import worker from "@/statics/worker";
 
-import { Static } from "@/statics";
+import { StaticEvent } from "@/statics";
 import { PartialOptions } from "@/modules/request";
 
 export enum TaskJob {
@@ -92,7 +92,7 @@ export class Download {
 		} catch {
 			// TODO: none
 		}
-		listener.on(Static.WORKER, ($index: number, $new: Task | undefined) => {
+		listener.on(StaticEvent.WORKER, ($index: number, $new: Task | undefined) => {
 			// bundle is removed
 			if (storage.get_data(String($index))) {
 				// update storage

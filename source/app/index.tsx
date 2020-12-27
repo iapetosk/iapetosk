@@ -10,7 +10,7 @@ import Reader from "@/app/views/reader";
 import listener from "@/modules/listener";
 import router from "@/statics/router";
 
-import { Static } from "@/statics";
+import { StaticEvent } from "@/statics";
 import { Viewport } from "@/statics/router";
 
 const $window = remote.getCurrentWindow();
@@ -29,7 +29,7 @@ class App extends React.Component<AppProps, AppState> {
 		this.props = props;
 		this.state = { view: router.get().view, fullscreen: false };
 
-		listener.on(Static.ROUTER, ($new: Viewport) => {
+		listener.on(StaticEvent.ROUTER, ($new: Viewport) => {
 			this.setState({ ...this.state, view: $new.view });
 		});
 		$window.on("enter-full-screen", () => {

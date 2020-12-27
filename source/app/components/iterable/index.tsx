@@ -27,12 +27,12 @@ export type IterableState = {
 		task: {
 			status: TaskStatus
 		},
-		data: {
-			HTML: IterableHTML
+		html: {
+			upper: UpperSection
 		}
 	}
 };
-export enum IterableHTML {
+export enum UpperSection {
 	INTERACTS,
 	DISCOVERY
 };
@@ -58,19 +58,19 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 			<section id="iterable">
 				{this.props.options.blocks.map((gallery, index) => {
 					return (
-						<section id="gallery" class="contrast" key={index}>
-							<section id="upper" class="contrast" data-html={this.state[gallery.id]?.data?.HTML || IterableHTML.INTERACTS}>
+						<section id="gallery" class={utility.inline({ "contrast": true, [TaskStatus[this.state[gallery.id]?.task?.status || TaskStatus.NONE]]: true })} key={index}>
+							<section id="upper" class={utility.inline({ "contrast": true, [UpperSection[this.state[gallery.id]?.html?.upper || UpperSection.INTERACTS]]: true })}>
 								<LazyLoad src={gallery.thumbnail[0]}></LazyLoad>
 								<section id="discovery" class="fluid">
 									<section id="interacts">
 										<button id="triangle" class="contrast"
 											onClick={() => {
-												this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], data: { ...this.state[gallery.id]?.data, HTML: IterableHTML.INTERACTS } } });
+												this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], html: { ...this.state[gallery.id]?.html, upper: UpperSection.INTERACTS } } });
 											}}>
 										</button>
 									</section>
 									<section id="scrollable" class="scroll-y">
-									{this.props.options.discovery.map((key, index) => {
+									{(this.state[gallery.id]?.html?.upper === undefined ? [] : this.props.options.discovery).map((key, index) => {
 										// @ts-ignore
 										if (gallery[key] && utility.wrap(gallery[key]).length) {
 											return (
@@ -126,7 +126,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 												download.evaluate(`https://hitomi.la/galleries/${gallery.id}.html`).then((task) => {
 													this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], task: { ...this.state[gallery.id]?.task, status: TaskStatus.WORKING } } }, () => {
 														download.create(task).then(() => {
-															// TODO: none
+															this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], task: { ...this.state[gallery.id]?.task, status: TaskStatus.FINISHED } } });
 														});
 													});
 												});
@@ -141,7 +141,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 										{
 											HTML: require(`!html-loader!@/assets/icons/discovery.svg`),
 											click: () => {
-												this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], data: { ...this.state[gallery.id]?.data, HTML: IterableHTML.DISCOVERY } } });
+												this.setState({ ...this.state, [gallery.id]: { ...this.state[gallery.id], html: { ...this.state[gallery.id]?.html, upper: UpperSection.DISCOVERY } } });
 											}
 										}
 									].map((button, index) => {
@@ -159,6 +159,9 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 							<section id="lower" class="center-y">
 								<legend id="title" class="eclipse">{gallery.title}</legend>
 								<legend id="id" class="center">#{gallery.id}</legend>
+							</section>
+							<section id="status">
+								<legend id="ribbon" class={utility.inline({ "contrast": true, "center": true, "corner": true, "active": this.state[gallery.id]?.task?.status === TaskStatus.FINISHED })}>Downloaded</legend>
 							</section>
 						</section>
 					);

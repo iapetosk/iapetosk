@@ -5,6 +5,7 @@
 	grid-auto-rows: 475px;
 	grid-template-columns: repeat(auto-fit, minmax(360px, auto));
 	> #gallery {
+		position: relative;
 		display: grid;
 		grid-template-areas:
 		"upper"
@@ -13,11 +14,9 @@
 		grid-template-columns: 1fr;
 		background-color: var(--colour_3);
 		transition: border-color var(--transition), background-color var(--transition);
-		> * {
-			overflow: hidden;
-		}
 		> #upper {
 			position: relative;
+			overflow: hidden;
 			grid-area: upper;
 			margin: 10px 10px 0px 10px;
 			transition: border-color var(--transition);
@@ -26,12 +25,12 @@
 				width: 100%;
 				height: 100%;
 				bottom: 0px;
-				background-color: var(--colour_4);
 				&.fluid {
 					will-change: transform;
 				}
 			}
 			> img {
+				z-index: 0;
 				height: 100%;
 				opacity: 50%;
 				object-fit: cover;
@@ -42,6 +41,7 @@
 				}
 			}
 			> #discovery {
+				z-index: 1;
 				position: relative;
 				color: var(--colour_5);
 				background-color: var(--colour_2);
@@ -55,17 +55,17 @@
 					> #triangle {
 						// @see https://stackoverflow.com/questions/29758522/make-only-triangle-have-hover-effect-using-css
 						position: absolute;
-						// 71: sqrt((100^2)/2)
-						width: 71px;
-						height: 71px;
-						// 29: 100 - 71
-						bottom: 29px;
+						// 70.75: sqrt((100^2)/2)
+						width: 70.75px;
+						height: 70.75px;
+						// 29.25: 100 - 70.75
+						bottom: 29.25px;
 						background-color: var(--colour_1);
-						transform: rotate(45deg) translateX(29%);
+						transform: rotate(45deg) translateX(29.25%);
 						transition: border-color var(--transition), background-color var(--transition);
 						&:hover {
 							border-color: var(--colour_9);
-							background-color: var(--colour_success);
+							background-color: var(--colour_2);
 						}
 					}
 				}
@@ -86,7 +86,7 @@
 							background-color: var(--colour_3);
 							transition: border-color var(--transition), background-color var(--transition);
 							> #value {
-								color: var(--colour_1);
+								color: var(--colour_9);
 							}
 							&:hover {
 								border-color: var(--colour_9);
@@ -100,10 +100,12 @@
 				}
 			}
 			> #interacts {
+				z-index: 1;
 				height: 45px;
 				border-left-width: 0px;
 				border-right-width: 0px;
 				border-bottom-width: 0px;
+				background-color: var(--colour_4);
 				transform: translateY(100%);
 				transition: border-color var(--transition), transform var(--transition);
 				> * {
@@ -118,12 +120,12 @@
 					}
 				}
 			}
-			&[data-html="0"] {
+			&.INTERACTS {
 				> #discovery {
 					transform: translateY(100%);
 				}
 			}
-			&[data-html="1"] {
+			&.DISCOVERY {
 				> img {
 					visibility: hidden;
 				}
@@ -154,12 +156,39 @@
 				color: var(--colour_1);
 			}
 		}
+		> #status {
+			z-index: 0;
+			pointer-events: none;
+			position: absolute;
+			overflow: hidden;
+			width: 100%;
+			height: 100%;
+			> * {
+				pointer-events: all;
+			}
+			> #ribbon {
+				&.corner {
+					overflow: hidden;
+					position: absolute;
+					top: 28px;
+					right: -46px;
+					width: 198.99px;
+					height: 50px;
+					transform: rotate(45deg);
+					color: var(--colour_1);
+					background-color: var(--colour_success);
+				}
+				&:not(.active) {
+					display: none;
+				}
+			}
+		}
 		&:hover {
 			border-color: var(--colour_9);
 			background-color: var(--colour_5);
 			> #upper {
 				border-color: var(--colour_9);
-				&[data-html="0"] {
+				&.INTERACTS {
 					> img {
 						opacity: 100%;
 					}

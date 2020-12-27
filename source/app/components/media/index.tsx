@@ -6,11 +6,13 @@ import read from "@/modules/hitomi/read";
 import listener from "@/modules/listener";
 import router from "@/statics/router";
 
-import { Static } from "@/statics";
+import { StaticEvent } from "@/statics";
+import { Task } from "@/modules/download";
 import { Viewport } from "@/statics/router";
 import { GalleryJS } from "@/modules/hitomi/read";
 
 import LazyLoad from "@/app/components/lazyload";
+import storage from "@/modules/storage";
 
 export type MediaProps = {};
 export type MediaState = {
@@ -25,7 +27,7 @@ class Media extends React.Component<MediaProps, MediaState> {
 		this.props = props;
 		this.state = { script: undefined };
 
-		listener.on(Static.ROUTER, ($new: Viewport) => {
+		listener.on(StaticEvent.ROUTER, ($new: Viewport) => {
 			switch ($new.view) {
 				case "reader": {
 					this.setState({ ...this.state, script: undefined });
@@ -41,6 +43,7 @@ class Media extends React.Component<MediaProps, MediaState> {
 		});
 	}
 	public render() {
+		const task: Task | undefined = storage.get_data(String(this.state.script?.id));
 		return (
 			<section id="media">
 				<section id="navigation" class="contrast center-x">
@@ -71,7 +74,7 @@ class Media extends React.Component<MediaProps, MediaState> {
 				<section id="scrollable" class="scroll-y">
 					{this.state.script?.files.map((file, index) => {
 						return (
-							<LazyLoad src={file.url} width={file.width} height={file.height} key={index}></LazyLoad>
+							<LazyLoad src={task && task.files[index].size === task.files[index].written ? `../${task.files[index].path}` : file.url} width={file.width} height={file.height} key={index}></LazyLoad>
 						);
 					})}
 				</section>

@@ -1,13 +1,13 @@
 import listener from "@/modules/listener";
 
-export enum Static {
+export enum StaticEvent {
 	ROUTER = "route",
 	WORKER = "worker"
 };
 export class StaticHandler<state> {
 	private state: state;
-	private event: Static;
-	constructor(state: state, event: Static) {
+	private event: StaticEvent;
+	constructor(state: state, event: StaticEvent) {
 		this.state = state;
 		this.event = event;
 	}

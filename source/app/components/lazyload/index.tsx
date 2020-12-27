@@ -31,14 +31,14 @@ class LazyLoad extends React.Component<LazyLoadProps, LazyLoadState> {
 						this.setState({ ...this.state, error: 0 });
 					}
 					else if (this.state.error < 5) {
-						const observer = new IntersectionObserver((entries) => {
+						const observer: IntersectionObserver = new IntersectionObserver((entries) => {
 							for (const entry of entries) {
 								// target is within view
 								if (entry.isIntersecting) {
 									// @ts-ignore
 									event.target.src = this.props.src;
 									// stop observe
-									observer.disconnect();
+									return observer.disconnect();
 								}
 							}
 						});

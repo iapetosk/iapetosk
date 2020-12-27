@@ -1,4 +1,4 @@
-import { Static, StaticHandler } from "@/statics";
+import { StaticEvent, StaticHandler } from "@/statics";
 
 export type Viewport = {
 	view: string,
@@ -13,4 +13,4 @@ class Router extends StaticHandler<Viewport> {
 		this.$set(value);
 	}
 }
-export default (new Router({ view: "browser", options: undefined }, Static.ROUTER));
+export default (new Router({ view: "browser", options: undefined }, StaticEvent.ROUTER));
