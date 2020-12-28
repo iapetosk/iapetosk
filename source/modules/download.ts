@@ -67,7 +67,21 @@ export class Download {
 	constructor(max_threads: number, max_working: number) {
 		this.max_threads = max_threads;
 		this.max_working = max_working;
-		try {
+		listener.on(StaticEvent.WORKER, ($index: number, $new: Task | undefined) => {
+			// bundle is removed
+			if (storage.get_data(String($index))) {
+				// update storage
+				storage.set_data(String($index), $new);
+			}
+			// else alone is enough
+			else if ($new?.status !== TaskStatus.QUEUED) {
+				// remove
+				this.remove($index);
+			}
+		});
+		// if folder exists
+		if (fs.existsSync(TaskFolder.BUNDLES)) {
+			// loop files within
 			for (const file of fs.readdirSync(TaskFolder.BUNDLES)) {
 				// check if file is .json
 				if (fs.statSync(path.join(TaskFolder.BUNDLES, file)).isFile() && path.extname(file) === ".json") {
@@ -89,21 +103,7 @@ export class Download {
 					}
 				}
 			}
-		} catch {
-			// TODO: none
 		}
-		listener.on(StaticEvent.WORKER, ($index: number, $new: Task | undefined) => {
-			// bundle is removed
-			if (storage.get_data(String($index))) {
-				// update storage
-				storage.set_data(String($index), $new);
-			}
-			// else alone is enough
-			else if ($new?.status !== TaskStatus.QUEUED) {
-				// remove
-				this.remove($index);
-			}
-		});
 	}
 	public create(task: Task) {
 		const observer = new events.EventEmitter, files: number[] = [];

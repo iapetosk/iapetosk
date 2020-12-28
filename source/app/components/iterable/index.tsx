@@ -117,7 +117,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 												router.set({ view: "reader", options: gallery.id });
 											}
 										},
-										...((this.state[gallery.id]?.status?.task === TaskStatus.WORKING || this.state[gallery.id]?.status?.task === TaskStatus.FINISHED) ? [
+										...(this.state[gallery.id]?.status?.task === TaskStatus.WORKING || this.state[gallery.id]?.status?.task === TaskStatus.QUEUED || this.state[gallery.id]?.status?.task === TaskStatus.FINISHED ? [
 										{
 											HTML: require(`!html-loader!@/assets/icons/delete.svg`),
 											click: () => {
@@ -125,23 +125,25 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 													// TODO: none
 												});
 											}
-										},
-										{
-											HTML: require(`!html-loader!@/assets/icons/open.svg`),
-											click: () => {
-												process.exec(`start "" "${path.join(TaskFolder.DOWNLOADS, String(gallery.id))}"`);
-											}
-										}] : [
+										}] : []),
+										...(this.state[gallery.id]?.status?.task === TaskStatus.WORKING || this.state[gallery.id]?.status?.task === TaskStatus.FINISHED ? [
+											{
+												HTML: require(`!html-loader!@/assets/icons/open.svg`),
+												click: () => {
+													process.exec(`start "" "${path.join(TaskFolder.DOWNLOADS, String(gallery.id))}"`);
+												}
+										}] : []),
+										...(this.state[gallery.id]?.status?.task === undefined || this.state[gallery.id]?.status?.task === TaskStatus.NONE ? [
 										{
 											HTML: require(`!html-loader!@/assets/icons/download.svg`),
 											click: () => {
 												download.evaluate(`https://hitomi.la/galleries/${gallery.id}.html`).then((task) => {
-													download.create(task).then((status) => {
+													download.create(task).then(() => {
 														// TODO: none
 													});
 												});
 											}
-										}]),
+										}] : []),
 										{
 											HTML: require(`!html-loader!@/assets/icons/copy.svg`),
 											click: () => {
