@@ -89,7 +89,8 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 										if (gallery[key] && utility.wrap(gallery[key]).length) {
 											return (
 												<legend id="bundle" key={index}>
-													{key}:{// @ts-ignore
+													{key}:{
+													// @ts-ignore
 													utility.wrap(gallery[key]).map((value, index) => {
 														return (
 															<button id="key" class="contrast center" key={index}>
@@ -117,7 +118,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 												router.set({ view: "reader", options: gallery.id });
 											}
 										},
-										...(this.state[gallery.id]?.status?.task === TaskStatus.WORKING || this.state[gallery.id]?.status?.task === TaskStatus.QUEUED || this.state[gallery.id]?.status?.task === TaskStatus.FINISHED ? [
+										...(this.state[gallery.id]?.status?.task === TaskStatus.WORKING || this.state[gallery.id]?.status?.task === TaskStatus.FINISHED || this.state[gallery.id]?.status?.task === TaskStatus.QUEUED ? [
 										{
 											HTML: require(`!html-loader!@/assets/icons/delete.svg`),
 											click: () => {
@@ -133,7 +134,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 													process.exec(`start "" "${path.join(TaskFolder.DOWNLOADS, String(gallery.id))}"`);
 												}
 										}] : []),
-										...(this.state[gallery.id]?.status?.task === undefined || this.state[gallery.id]?.status?.task === TaskStatus.NONE ? [
+										...(!this.state[gallery.id]?.status?.task ? [
 										{
 											HTML: require(`!html-loader!@/assets/icons/download.svg`),
 											click: () => {
@@ -172,7 +173,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 								<legend id="title" class="eclipse">{gallery.title}</legend>
 								<legend id="id" class="center">#{gallery.id}</legend>
 							</section>
-							<section id="status" class={utility.inline({ "active": Object.keys(this.state[gallery.id]?.status || {}).length > 0  })}>
+							<section id="status" class={utility.inline({ "active": Object.keys({ ...this.state[gallery.id]?.status }).length > 0  })}>
 								{[
 									{
 										type: "ribbon",

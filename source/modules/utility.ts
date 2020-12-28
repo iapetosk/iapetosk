@@ -26,17 +26,17 @@ class Utility {
 	public unwrap<type>(value: type[]) {
 		return value.length - 1.0 ? value : value[0];
 	}
-	public parse(value: string, path: string, attribute?: string) {
+	public parse(value: Document | string, selector: string, attribute?: string) {
 		const array: string[] = [];
 
-		new DOMParser().parseFromString(value, "text/html").querySelectorAll(path).forEach((element, index) => {
+		(value instanceof Document ? value : new DOMParser().parseFromString(value, "text/html")).querySelectorAll(selector).forEach((element, index) => {
 			array[index] = attribute ? element.getAttribute(attribute)! : (element as HTMLElement).innerText;
 		});
 
 		return this.unwrap(array);
 	}
-	public extract(value: string, path: string, type: "string" | "number" | "array" | "object") {
-		const capture: string = new RegExp(`var ${path} = (.+?)(?=;)`).exec(value)![1];
+	public extract(value: string, selector: string, type: "string" | "number" | "array" | "object") {
+		const capture: string = new RegExp(`var ${selector} = (.+?)(?=;)`).exec(value)![1];
 
 		switch (type) {
 			case "string": {

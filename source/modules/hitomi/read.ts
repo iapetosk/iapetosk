@@ -52,22 +52,43 @@ class Read {
 
 			function recursive() {
 				request.get(`https://ltn.hitomi.la/galleryblock/${id}.html`).then((response) => {
-					for (const [index, value] of (utility.parse(response.encode, "td") as string[]).entries()) {
+					const parsed = new DOMParser().parseFromString(response.encode, "text/html");
+
+					for (const [index, value] of (utility.parse(parsed, "td") as string[]).entries()) {
 						if (index % 2) {
 							object[Object.keys(object).pop()!] = utility.unwrap(value.split(/\s\s+/).filter((value) => { return value.length; }));
 						} else {
 							object[value.toLowerCase()] = undefined;
 						}
 					}
+					for (const extractor of [{
+						key: "title",
+						selector: ".lillie a",
+					},
+					{
+						key: "thumbnail",
+						selector: "img",
+						attribute: "src"
+					},
+					{
+						key: "artist",
+						selector: ".artist-list a",
+					},
+					{
+						key: "date",
+						selector: ".date",
+					}]) {
+						object[extractor.key] = utility.parse(parsed, extractor.selector, extractor.attribute);
+
+						switch (extractor.key) {
+							case "thumbnail": {
+								object[extractor.key] = (object[extractor.key] as [string, string]).map((value) => { return "https:" + value; });
+								break;
+							}
+						}
+					}
 					// resolve
-					return resolve({
-						...object,
-						id: id,
-						title: (utility.parse(response.encode, ".lillie a")),
-						thumbnail: (utility.parse(response.encode, "img", "src") as [string, string]).map((value) => { return "https:" + value; }),
-						artist: (utility.parse(response.encode, ".artist-list a")),
-						date: (utility.parse(response.encode, ".date"))
-					} as GalleryBlock);
+					return resolve({ id: id, ...object } as GalleryBlock);
 				}).catch(() => {
 					return recursive();
 				});
