@@ -9,15 +9,15 @@ const boilerplate = {
 	module: {
 		rules: [
 			{
-				test: /\.(ts|tsx)$/,
+				test: [/\.tsx?$/],
 				use: [{ loader: "ts-loader" }]
 			},
 			{
-				test: /\.(scss)$/,
+				test: [/\.s?css$/],
 				use: [{ loader: "style-loader" }, { loader: "css-loader" }, { loader: "sass-loader" }]
 			},
 			{
-				test: /\.(png|jpe?g|gif|svg)$/,
+				test: [/\.png$/, /\.jpe?g$/, /\.gif$/, /\.svg$/ ],
 				use: [{ loader: "file-loader" }]
 			}
 		]

@@ -45,19 +45,19 @@ class Suggest {
 	// @see search.js > get_suggestions_for_query
 	private unknown_0(query: string) {
 		return new Promise<Suggestion>((resolve, reject) => {
-			const [field, value] = /:/.test(query) ? query.split(/:/) : ["global", query], serial: number = this.serial;
+			const I = this, [field, value] = /:/.test(query) ? query.split(/:/) : ["global", query], serial: number = this.serial;
 
-			function condition(I: Suggest) {
+			function condition() {
 				if (serial && serial !== I.serial) {
 					return resolve([]);
 				}
 			}
 			this.unknown_3(field, 0).then((bundle) => {
-				condition(this);
+				condition();
 				this.unknown_5(field, this.unknown_1(value), bundle).then((bytes) => {
-					condition(this);
+					condition();
 					this.unknown_6(field, bytes).then((suggest) => {
-						condition(this);
+						condition();
 						return resolve(suggest);
 					});
 				});
@@ -122,12 +122,13 @@ class Suggest {
 	}
 	// @see search.js > get_node_at_address
 	private unknown_3(field: string, adress: number) {
+		const I = this;
 		return new Promise<SearchBundle>((resolve, reject) => {
-			function recursive(I: Suggest) {
+			function recursive() {
 				switch (I.version.tagindex.length) {
 					case 0: {
 						setTimeout(() => {
-							return recursive(I);
+							return recursive();
 						}, 250);
 						break;
 					}
@@ -143,11 +144,11 @@ class Suggest {
 					}
 				}
 			}
-			return recursive(this);
+			return recursive();
 		});
 	}
 	// @see search.js > get_url_at_range
-	private unknown_4(url: string, range: number[]) {
+	private unknown_4(url: string, range: [number, number]) {
 		return new Promise<Uint8Array>((resolve, reject) => {
 			request.get(url, { encoding: "binary", headers: { "range": `bytes=${range[0]}-${range[1]}` } }).then((response) => {
 				return resolve(new Uint8Array(new Buffer(response.encode, "binary")));

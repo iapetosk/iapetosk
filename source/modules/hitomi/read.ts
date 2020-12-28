@@ -97,8 +97,9 @@ class Read {
 		});
 	}
 	public script(id: number) {
+		const I = this;
 		return new Promise<GalleryJS>((resolve, reject) => {
-			function recursive(I: Read) {
+			function recursive() {
 				request.get(`https://ltn.hitomi.la/galleries/${id}.js`).then((response) => {
 					switch (response.status.code) {
 						case 404: {
@@ -111,8 +112,7 @@ class Read {
 								...script,
 								files: script.files.map((value, index) => {
 									return {
-										// @ts-ignore
-										url: I.unknown_0(script.id, script.files[index]),
+										url: I.unknown_0(script.id, script.files[index] as never as GalleryFile),
 										width: value.width,
 										height: value.height
 									};
@@ -121,10 +121,10 @@ class Read {
 						}
 					}
 				}).catch(() => {
-					return recursive(I);
+					return recursive();
 				});
 			}
-			return recursive(this);
+			return recursive();
 		});
 	}
 	// @see common.js > url_from_url_from_hash
