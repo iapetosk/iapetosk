@@ -10,6 +10,7 @@ import request from "@/modules/request";
 import worker from "@/statics/worker";
 
 import { StaticEvent } from "@/statics";
+import { ipcEvent } from "@/modules/listener";
 import { PartialOptions, RequestProgress } from "@/modules/request";
 
 export enum TaskJob {
@@ -115,7 +116,7 @@ export class Download {
 				worker.set(task.id, { ...task });
 			}
 			observer.on(TaskJob.CREATE, (index: number) => {
-				if (task.status !== TaskStatus.WORKING || !storage.get_data(String(task.id))) {
+				if (task.status !== TaskStatus.WORKING || !storage.exist(String(task.id))) {
 					update("status", TaskStatus.NONE);
 					return observer.emit(TaskJob.DESTROY);
 				}
@@ -127,20 +128,22 @@ export class Download {
 				// make a request
 				request.GET(task.files[files[index]].url, { ...task.options, headers: { ...task.options.headers, ...task.files[files[index]].written ? { "content-range": `bytes=${task.files[files[index]].written}-` } : {} } }, "binary",
 					(chunk, progress) => {
-						writable.write(chunk);
-						task.files[files[index]].size = progress[RequestProgress.TOTAL_SIZE];
-						task.files[files[index]].written += chunk.toString("binary").length;
-						update("files", task.files);
-					}).then(() => {
-						writable.end();
-
-						if (task.status !== TaskStatus.WORKING || !storage.get_data(String(task.id))) {
+						if (task.status !== TaskStatus.WORKING || !storage.exist(String(task.id))) {
 							update("status", TaskStatus.NONE);
 							return observer.emit(TaskJob.DESTROY);
 						}
+						// update size, written
+						task.files[files[index]].size = progress[RequestProgress.TOTAL_SIZE];
+						task.files[files[index]].written += chunk.toString("binary").length;
+						// write file
+						writable.write(chunk);
+						update("files", task.files);
+					}).then(() => {
+						// stop writing
+						writable.end();
 						update("finished", task.finished + 1);
 
-						if (!!files[task.working] && task.working - task.finished < this.max_working) {
+						if (Boolean(files[task.working]) && task.working - task.finished < this.max_working) {
 							return observer.emit(TaskJob.CREATE, task.working);
 						}
 						if (task.finished === files.length) {
@@ -148,7 +151,7 @@ export class Download {
 							return observer.emit(TaskJob.DESTROY);
 						}
 					});
-				if (!!files[task.working] && task.working - task.finished < this.max_working) {
+				if (Boolean(files[task.working]) && task.working - task.finished < this.max_working) {
 					return observer.emit(TaskJob.CREATE, task.working);
 				}
 			});
@@ -162,6 +165,12 @@ export class Download {
 						break;
 					}
 				}
+				return resolve(task.status);
+			});
+			listener.on(ipcEvent.BEFORE_CLOSE, () => {
+				// stop observe
+				observer.removeAllListeners();
+				// resolve anyways
 				return resolve(task.status);
 			});
 			// register storage
@@ -184,7 +193,10 @@ export class Download {
 				update("status", TaskStatus.FINISHED);
 				return observer.emit(TaskJob.DESTROY);
 			}
-			// update status
+			// soft reset working, finished
+			task.working = 0;
+			task.finished = 0;
+			// hard update status
 			update("status", TaskStatus.WORKING);
 			// download recursivly
 			return observer.emit(TaskJob.CREATE, 0);

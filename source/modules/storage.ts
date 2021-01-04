@@ -85,11 +85,11 @@ class Storage {
 			path: path,
 			data: data === "@import" ? this.import(path) : {}
 		});
+		this.export(key);
 	}
 	public un_register(key: string) {
-		node_fs.unlink(this.get_path(key), () => {
-			this.delete(this.container, [...key.split(/\./)]);
-		});
+		node_fs.unlinkSync(this.get_path(key));
+		this.delete(this.container, [...key.split(/\./)]);
 	}
 	private import(key_or_path: string) {
 		try {
@@ -103,7 +103,7 @@ class Storage {
 		node_fs.writeFileSync(this.get_path(key), JSON.stringify(this.get_data(key)));
 	}
 	public exist(key: string) {
-		return !!this.return(this.container, [...key.split(/\./)]);
+		return Boolean(this.return(this.container, [...key.split(/\./)]));
 	}
 	public save() {
 		for (const key of Object.keys(this.container)) {
