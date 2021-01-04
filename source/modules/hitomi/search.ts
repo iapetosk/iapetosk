@@ -99,11 +99,11 @@ class Search {
 			for (let $index = 0; $index < URL[Prefix.POSITIVE].length + URL[Prefix.NEGATIVE].length; $index++) {
 				const shortcut = { prefix: $index < URL[Prefix.POSITIVE].length ? Prefix.POSITIVE : Prefix.NEGATIVE, url: [...URL[Prefix.POSITIVE], ...URL[Prefix.NEGATIVE]][$index] };
 
-				if (/^https:\/\/ltn.hitomi.la\/id\/([0-9]+)-[a-z]+\.nozomi$/.test(shortcut.url)) {
-					$(shortcut.prefix, [Number(/^https:\/\/ltn.hitomi.la\/id\/([0-9]+)-[a-z]+\.nozomi$/.exec(shortcut.url)![1])]);
+				if (/id\/([0-9]+)/.test(shortcut.url)) {
+					$(shortcut.prefix, [Number(/id\/([0-9]+)/.exec(shortcut.url)![1])]);
 				}
 				else if (SINGULAR || !this.collection[shortcut.url]) {
-					request.get(shortcut.url, { encoding: "binary", headers: SINGULAR ? { "range": `bytes=${index * per_page * 4}-${index * per_page * 4 + per_page * 4 - 1}` } : {} }).then((response) => {
+					request.GET(shortcut.url, { headers: SINGULAR ? { "range": `bytes=${index * per_page * 4}-${index * per_page * 4 + per_page * 4 - 1}` } : {} }, "binary").then((response) => {
 						switch (response.status.code) {
 							case 200:
 							case 206: {
@@ -126,7 +126,7 @@ class Search {
 		});
 	}
 	private unknown_1(response: RequestResponse) {
-		const binary: Buffer = new Buffer(response.encode, "binary");
+		const binary: Buffer = Buffer.from(response.encode, "binary");
 		const endian: DataView = new DataView(binary.buffer.slice(binary.byteOffset, binary.byteOffset + binary.byteLength));
 		const array: Array<number> = new Array(endian.byteLength / 4);
 

@@ -1,37 +1,26 @@
-import { app, session, BrowserWindow } from "electron";
+import { app, session, ipcMain, BrowserWindow } from "electron";
+
+import { ipcEvent } from "@/modules/listener";
 
 app.on("ready", () => {
 	// create window
 	const window = new BrowserWindow({
-		// icon
 		icon: "source/assets/icons/icon.ico",
-		// hide
 		show: false,
-		// borderless
 		frame: false,
-		// minimum width
 		minWidth: 775,
-		// minimum height
 		minHeight: 565,
-		// resize flash colour
 		backgroundColor: "#000000",
-		// renderer proccess controls
 		webPreferences: {
-			// allow interacts with node.js
-			nodeIntegration: true,
-			// https://github.com/electron/electron/blob/master/docs/breaking-changes.md#default-changed-enableremotemodule-defaults-to-false
-			enableRemoteModule: true
+			// allow renderer proccess interacts with nodejs
+			nodeIntegration: true
 		}
 	});
 	// webpack or ASAR
 	window.loadFile("build/index.html");
-	// show om ready
-	window.on("ready-to-show", () => {
-		window.show();
-	});
 	// development
 	if (!app.isPackaged) {
-		// live-reload
+		// hot-reload
 		require("fs").watch("build/renderer.js").on("change", () => {
 			window.reload();
 		});
@@ -40,5 +29,41 @@ app.on("ready", () => {
 	session.defaultSession.webRequest.onBeforeSendHeaders({ urls: ["*://*.hitomi.la/*"] }, (details, callback) => {
 		details.requestHeaders["referer"] = "https://hitomi.la/";
 		return callback({ requestHeaders: details.requestHeaders });
+	});
+	window.on("ready-to-show", () => {
+		window.show();
+	});
+	window.on("unresponsive", () => {
+		window.reload();
+	});
+	window.on("focus", () => {
+		window.webContents.send(ipcEvent.FOCUS);
+	});
+	window.on("blur", () => {
+		window.webContents.send(ipcEvent.BLUR);
+	});
+	window.on("maximize", () => {
+		window.webContents.send(ipcEvent.MAXIMIZE);
+	});
+	window.on("unmaximize", () => {
+		window.webContents.send(ipcEvent.UNMAXIMIZE);
+	});
+	window.on("enter-full-screen", () => {
+		window.webContents.send(ipcEvent.ENTER_FULL_SCREEN);
+	});
+	window.on("leave-full-screen", () => {
+		window.webContents.send(ipcEvent.LEAVE_FULL_SCREEN);
+	});
+	ipcMain.on(ipcEvent.CLOSE, () => {
+		app.exit();
+	});
+	ipcMain.on(ipcEvent.MINIMIZE, () => {
+		window.minimize();
+	});
+	ipcMain.on(ipcEvent.MAXIMIZE, () => {
+		window.maximize();
+	});
+	ipcMain.on(ipcEvent.UNMAXIMIZE, () => {
+		window.unmaximize();
 	});
 });

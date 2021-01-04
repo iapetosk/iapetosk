@@ -1,25 +1,33 @@
-import * as fs from "fs";
-import * as tls from "tls";
-import * as path from "path";
-import * as http from "http";
-import * as https from "https";
+import * as node_tls from "tls";
+import * as node_http from "http";
+import * as node_https from "https";
 
-import settings from "@/modules/configure";
+import settings from "@/modules/settings";
 
-import { TaskFile } from "@/modules/download";
-
-export type RequestOptions = PartialOptions & PrivateOptions & {
-	url: string,
-	method: "GET" | "PUT" | "POST" | "DELETE";
+export type RequestOptions = {
+	request: {
+		url: string,
+		method: RequestMethods,
+		charset: BufferEncoding;
+	},
+	partial: PartialOptions,
+	private: PrivateOptions;
 };
 export type PartialOptions = {
 	agent?: boolean,
-	headers?: Record<string, any>,
-	encoding?: "binary" | "ascii" | "utf8" | "base64" | "hex",
+	headers?: Record<string, string>,
 	max_redirects?: number;
 };
 export type PrivateOptions = {
 	redirects?: number;
+};
+export type RequestMethods = "GET" | "PUT" | "POST" | "DELETE";
+export enum RequestProgress {
+	TOTAL_SIZE,
+	PER_SECOND,
+	REMAINING,
+	RECEIVED,
+	PROGRESS
 };
 export type RequestResponse = {
 	encode: string,
@@ -30,157 +38,95 @@ export type RequestResponse = {
 	headers: Record<string, string | string[] | undefined>;
 };
 class Request {
-	readonly agent = new https.Agent({});
-	private max_redirects: number;
-	constructor(max_redirects: number) {
-		// default properties
-		this.max_redirects = max_redirects;
-		// @ts-ignore
-		this.agent.createConnection = (options, callback): tls.TLSSocket => {
-			return tls.connect({ ...options, servername: undefined }, callback);
-		};
+	readonly http_agent = new node_http.Agent({});
+	readonly https_agent = new node_https.Agent({});
+	constructor() {
+		for (const protocol of ["http", "https"]) {
+			// @ts-ignore
+			this[protocol + "_agent"].createConnection = (options, callback): tls.TLSSocket => {
+				return node_tls.connect({ ...options, servername: undefined }, callback);
+			};
+		}
 	}
-	public async send(options: RequestOptions, file?: TaskFile) {
-		const I: Request = this;
+	private send(options: RequestOptions, callback?: (chunk: any, progress: Record<RequestProgress, number>) => void) {
+		const I = this;
 		return new Promise<RequestResponse>((resolve, reject) => {
 			function recursive(options: RequestOptions) {
-				// content
 				const chunks: Buffer[] = [];
-				// send request
-				(I.SSL(options.url) ? https : http).request({
-					agent: options.agent ? undefined : I.agent,
-					method: options.method,
-					headers: options.headers,
-					protocol: I.SSL(options.url) ? "https:" : "http:",
-					...I.parse(options.url)
-				}, (response) => {
-					// redirects
-					if ((options.max_redirects || I.max_redirects) > (options.redirects || 0)) {
-						// clone original options
-						const override: {
-							changed: number,
-							options: RequestOptions;
-						} = {
-							changed: 0,
-							options: new Proxy({ ...options }, {
-								set(target: RequestOptions, key: never, value: never) {
-									// is changed!
-									override.changed++;
-									// update property
-									target[key] = value;
-									// approve
-									return true;
-								}
-							})
-						};
-						// new location
-						if (response.headers.location) {
-							override.options.url = response.headers.location || options.url;
-						}
-						// DDOS protection services
-						/*
-						if (response.headers.server) {
-							switch (response.headers.server) {
-								case "cloudflare": {
-									override.options.headers = {
-										"referer": options.url,
-										"cookie": utility.cookie_encode({ "__cfduid": utility.cookie_decode([...(response.headers["set-cookie"] || []), ...([options.headers?.cookie] || [])].join(";\u0020"))["__cfduid"] })
-									};
-									break;
-								}
-							}
-						}
-						*/
-						if (override.changed) {
-							// subtract by one
-							override.options.redirects = override.options.redirects ? override.options.redirects + 1 : 1;
-							// return new instance
-							return recursive({ ...override.options });
-						}
-					}
-					// encoding
-					if (options.encoding) {
-						response.setEncoding(options.encoding);
-					}
-					// file
-					if (file) {
-						// generates directory recursively
-						fs.mkdirSync(path.dirname(file.path), { recursive: true });
-						// content-length should be defined
-						if (response.headers["content-length"]) {
-							file.size = Number(response.headers["content-length"]);
-						}
-						var writable: fs.WriteStream = fs.createWriteStream(file.path);
-					}
-					response.on("data", (chunk) => {
-						// content
-						chunks.push(Buffer.from(chunk, "binary"));
-						// file
-						if (file) {
-							file.written += chunk.length;
-							writable.write(chunk);
-						}
-					});
-					response.on("end", () => {
-						// file
-						if (file) {
-							writable.end();
-						}
-						const buffer: Buffer = Buffer.concat(chunks);
 
-						// debug
-						/*
-						console.log({
-							// addition
-							options: options,
-							// request response
-							encode: buffer.toString(options.encoding),
-							status: {
-								code: response.statusCode,
-								message: response.statusMessage
-							},
-							headers: response.headers
-						});
-						*/
+				(I.isHTTPS(options.request.url) ? node_https : node_http).request({
+					agent: options.partial.agent ? undefined : I.isHTTPS(options.request.url) ? I.https_agent : I.http_agent,
+					method: options.request.method,
+					headers: options.partial.headers,
+					protocol: I.isHTTPS(options.request.url) ? "https:" : "http:",
+					...I.parseURL(options.request.url)
+				}, (client) => {
+					// redirect
+					if ((options.partial.max_redirects || settings.request.max_redirects) > (options.private.redirects || 0) && client.headers["location"]) {
+						return recursive({ ...options, private: { ...options.private, redirects: options.private.redirects ?  options.private.redirects + 1 : 1 } });
+					}
+					if (callback) {
+						var L = Number(client.headers["content-length"]), R = 0, T = Date.now();
+					}
+					client.on("data", (chunk) => {
+						if (callback) {
+							// increase R
+							R += chunk.toString(options.request.charset).length;
+							// callback
+							callback(chunk,
+								{
+									[RequestProgress.TOTAL_SIZE]: L,
+									[RequestProgress.PER_SECOND]: R / (Date.now() - T) / 1000,
+									[RequestProgress.REMAINING]: L - R,
+									[RequestProgress.RECEIVED]: R,
+									[RequestProgress.PROGRESS]: R / L
+								}
+							);
+						}
+						chunks.push(chunk);
+					});
+					client.once("end", () => {
 						return resolve({
-							encode: buffer.toString(options.encoding),
+							encode: Buffer.concat(chunks).toString(options.request.charset),
 							status: {
-								code: response.statusCode,
-								message: response.statusMessage
+								code: client.statusCode,
+								message: client.statusMessage
 							},
-							headers: response.headers
+							headers: client.headers
 						});
 					});
-					response.on("error", (error) => {
-						// reject ERROR
+					client.once("close", () => {
+						return reject(false);
+					});
+					client.once("error", (error) => {
 						return reject(error);
 					});
 				}).end();
 			}
 			return recursive(options);
 		});
-	};
-	public async get(url: string, options: PartialOptions = {}, file?: TaskFile) {
-		return this.send({ url: url, method: "GET", ...options }, file);
 	}
-	public async put(url: string, options: PartialOptions = {}, file?: TaskFile) {
-		return this.send({ url: url, method: "PUT", ...options }, file);
-	}
-	public async post(url: string, options: PartialOptions = {}, file?: TaskFile) {
-		return this.send({ url: url, method: "POST", ...options }, file);
-	}
-	public async delete(url: string, options: PartialOptions = {}, file?: TaskFile) {
-		return this.send({ url: url, method: "DELETE", ...options }, file);
-	}
-	public parse(url: string) {
-		const component: string[] = (url === decodeURI(url) ? encodeURI(url) : url).replace(/https?:\/\//, "").split(/\//);
+	private parseURL(url: string) {
+		const fragment: string[] = (url === decodeURI(url) ? encodeURI(url) : url).replace(/https?:\/\//, "").split(/\//);
 		return {
-			host: component[0],
-			path: ["", ...component.slice(1)].join("/")
+			host: fragment[0],
+			path: ["", ...fragment.slice(1)].join("/")
 		};
 	}
-	public SSL(url: string) {
+	private isHTTPS(url: string) {
 		return /^https/.test(url);
 	}
+	public GET(url: string, options: PartialOptions = {}, charset: BufferEncoding = "utf-8", callback?: (chunk: any, progress: Record<RequestProgress, number>) => void) {
+		return this.send({ request: { url: url, method: "GET", charset: charset }, partial: { ...options }, private: {} }, callback);
+	}
+	public PUT(url: string, options: PartialOptions = {}, charset: BufferEncoding = "utf-8", callback?: (chunk: any, progress: Record<RequestProgress, number>) => void) {
+		return this.send({ request: { url: url, method: "PUT", charset: charset }, partial: { ...options }, private: {} }, callback);
+	}
+	public POST(url: string, options: PartialOptions = {}, charset: BufferEncoding = "utf-8", callback?: (chunk: any, progress: Record<RequestProgress, number>) => void) {
+		return this.send({ request: { url: url, method: "POST", charset: charset }, partial: { ...options }, private: {} }, callback);
+	}
+	public DELETE(url: string, options: PartialOptions = {}, charset: BufferEncoding = "utf-8", callback?: (chunk: any, progress: Record<RequestProgress, number>) => void) {
+		return this.send({ request: { url: url, method: "DELETE", charset: charset }, partial: { ...options }, private: {} }, callback);
+	}
 }
-export default (new Request(settings.request.max_redirects));
+export default (new Request());

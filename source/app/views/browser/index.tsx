@@ -10,7 +10,7 @@ import read from "@/modules/hitomi/read";
 import filter from "@/modules/hitomi/filter";
 import search from "@/modules/hitomi/search";
 import suggest from "@/modules/hitomi/suggest";
-import settings from "@/modules/configure";
+import settings from "@/modules/settings";
 import utility from "@/modules/utility";
 
 import { QueryProps } from "@/app/components/query";

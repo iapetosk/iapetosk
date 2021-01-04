@@ -7,11 +7,11 @@ export type Suggestion = {
 	value: string,
 	count: number;
 }[];
-export type SearchBinary = {
+export type SuggestBinary = {
 	index: number,
 	bytes: DataView;
 };
-export type SearchBundle = {
+export type SuggestBundle = {
 	index: Uint8Array[],
 	value: [number, number][],
 	child: number[];
@@ -31,7 +31,7 @@ class Suggest {
 	private serial = 0;
 	constructor() {
 		for (const namespace of ["tagindex"]) {
-			request.get(`https://ltn.hitomi.la/${namespace}/version?_=${new Date().getTime()}`).then((response) => {
+			request.GET(`https://ltn.hitomi.la/${namespace}/version?_=${new Date().getTime()}`).then((response) => {
 				this.version[namespace as "tagindex" | "galleries" | "languages" | "nozomiurl"] = response.encode;
 			});
 		}
@@ -44,8 +44,9 @@ class Suggest {
 	}
 	// @see search.js > get_suggestions_for_query
 	private unknown_0(query: string) {
+		const I = this;
 		return new Promise<Suggestion>((resolve, reject) => {
-			const I = this, [field, value] = /:/.test(query) ? query.split(/:/) : ["global", query], serial: number = this.serial;
+			const [field, value] = /:/.test(query) ? query.split(/:/) : ["global", query], serial: number = this.serial;
 
 			function condition() {
 				if (serial && serial !== I.serial) {
@@ -70,12 +71,12 @@ class Suggest {
 	}
 	// @see search.js > decode_node
 	private unknown_2(bytes: Uint8Array) {
-		const bundle: SearchBundle = {
+		const bundle: SuggestBundle = {
 			index: [],
 			value: [],
 			child: []
 		};
-		const binary: SearchBinary = {
+		const binary: SuggestBinary = {
 			bytes: new DataView(bytes.buffer),
 			index: 0
 		};
@@ -111,7 +112,6 @@ class Suggest {
 
 			bundle.value.push([offset, length]);
 		}
-
 		for (let index = 0; index < 17; index++) {
 			// @ts-ignore
 			bundle.child.push(binary.bytes.getUint64(binary.index, false));
@@ -123,7 +123,7 @@ class Suggest {
 	// @see search.js > get_node_at_address
 	private unknown_3(field: string, adress: number) {
 		const I = this;
-		return new Promise<SearchBundle>((resolve, reject) => {
+		return new Promise<SuggestBundle>((resolve, reject) => {
 			function recursive() {
 				switch (I.version.tagindex.length) {
 					case 0: {
@@ -150,13 +150,13 @@ class Suggest {
 	// @see search.js > get_url_at_range
 	private unknown_4(url: string, range: [number, number]) {
 		return new Promise<Uint8Array>((resolve, reject) => {
-			request.get(url, { encoding: "binary", headers: { "range": `bytes=${range[0]}-${range[1]}` } }).then((response) => {
-				return resolve(new Uint8Array(new Buffer(response.encode, "binary")));
+			request.GET(url, { headers: { "range": `bytes=${range[0]}-${range[1]}` } }, "binary").then((response) => {
+				return resolve(new Uint8Array(Buffer.from(response.encode, "binary")));
 			});
 		});
 	}
 	// @see search.js > B_search
-	private unknown_5(field: string, key: Uint8Array, bundle: SearchBundle) {
+	private unknown_5(field: string, key: Uint8Array, bundle: SuggestBundle) {
 		return new Promise<[number, number]>((resolve, reject) => {
 			function mystery_0(first: Uint8Array, second: Uint8Array): [boolean, boolean] {
 				for (let index = 0; index < (first.byteLength < second.byteLength ? first.byteLength : second.byteLength); index++) {
@@ -168,7 +168,7 @@ class Suggest {
 				}
 				return [true, true];
 			}
-			function mystery_1(key: Uint8Array, bundle: SearchBundle): [boolean, number] {
+			function mystery_1(key: Uint8Array, bundle: SuggestBundle): [boolean, number] {
 				let value: [boolean, boolean] = [true, false];
 
 				for (let index = 0; index < bundle.index.length; index++) {
@@ -182,7 +182,7 @@ class Suggest {
 				}
 				return [true, 0];
 			}
-			function mystery_2(bundle: SearchBundle) {
+			function mystery_2(bundle: SuggestBundle) {
 				for (let index = 0; index < bundle.child.length; index++) {
 					if (bundle.child[index]) {
 						return false;
@@ -190,10 +190,7 @@ class Suggest {
 				}
 				return true;
 			}
-			if (!bundle) {
-				return reject();
-			}
-			if (!bundle.index.length) {
+			if (!bundle || !bundle.index.length) {
 				return reject();
 			}
 			const [exist, index] = mystery_1(key, bundle);
@@ -203,7 +200,7 @@ class Suggest {
 			} else if (mystery_2(bundle)) {
 				return reject();
 			}
-			if (bundle.child[index] == 0) {
+			if (!bundle.child[index]) {
 				return reject();
 			}
 			this.unknown_3(field, bundle.child[index]).then((bundle) => {
@@ -223,7 +220,7 @@ class Suggest {
 				return resolve([]);
 			}
 			this.unknown_4(`https://ltn.hitomi.la/tagindex/${field}.${this.version.tagindex}.data`, [offset, offset + length - 1]).then((response) => {
-				const binary: SearchBinary = {
+				const binary: SuggestBinary = {
 					bytes: new DataView(response.buffer),
 					index: 0
 				};
@@ -240,7 +237,6 @@ class Suggest {
 						value: "",
 						count: 0
 					});
-
 					const field_size = binary.bytes.getInt32(binary.index, false);
 
 					binary.index += 4;

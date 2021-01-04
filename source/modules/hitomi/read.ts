@@ -51,7 +51,7 @@ class Read {
 			const object: Record<string, any> = {};
 
 			function recursive() {
-				request.get(`https://ltn.hitomi.la/galleryblock/${id}.html`).then((response) => {
+				request.GET(`https://ltn.hitomi.la/galleryblock/${id}.html`).then((response) => {
 					const parsed = new DOMParser().parseFromString(response.encode, "text/html");
 
 					for (const [index, value] of (utility.parse(parsed, "td") as string[]).entries()) {
@@ -100,7 +100,7 @@ class Read {
 		const I = this;
 		return new Promise<GalleryJS>((resolve, reject) => {
 			function recursive() {
-				request.get(`https://ltn.hitomi.la/galleries/${id}.js`).then((response) => {
+				request.GET(`https://ltn.hitomi.la/galleries/${id}.js`).then((response) => {
 					switch (response.status.code) {
 						case 404: {
 							return reject();

@@ -1,12 +1,18 @@
-import * as fs from "fs";
-import * as path from "path";
+import { ipcRenderer } from "electron";
+
+import * as node_fs from "fs";
+import * as node_path from "path";
+
+import listener from "@/modules/listener";
+
+import { ipcEvent } from "@/modules/listener";
 
 export enum StoragePreset {
 	SETTINGS = "settings"
 };
 export type StorageState = {
 	path: string,
-	data: any;
+	data: Record<string, string | boolean | number | object> | "@import";
 };
 class Storage {
 	private container: (
@@ -16,6 +22,19 @@ class Storage {
 		for (const key of Object.keys(storage)) {
 			this.register(key, storage[key].path, storage[key].data);
 		}
+		// before close
+		listener.on(ipcEvent.BEFORE_CLOSE, () => {
+			// save all
+			this.save();
+			// close
+			ipcRenderer.send(ipcEvent.CLOSE);
+		});
+		// every ~ ms
+		setInterval(() => {
+			// save all
+			this.save();
+		},
+		1000 * 60 * 5);
 	}
 	private define(object: Record<string, any>, array: string[], data: any) {
 		for (const [index, value] of array.entries()) {
@@ -54,39 +73,42 @@ class Storage {
 	}
 	public set_path(key: string, path: StorageState["path"]) {
 		this.define(this.container, [...key.split(/\./), "path"], path);
-		this.export(key);
 	}
 	public get_data(key: string) {
 		return this.return(this.container, [...key.split(/\./), "data"]);
 	}
 	public set_data(key: string, data: StorageState["data"]) {
 		this.define(this.container, [...key.split(/\./), "data"], data);
-		this.export(key);
 	}
 	public register(key: string, path: StorageState["path"], data: StorageState["data"]) {
 		this.define(this.container, [...key.split(/\./)], {
 			path: path,
 			data: data === "@import" ? this.import(path) : {}
 		});
-		this.export(key);
 	}
 	public un_register(key: string) {
-		fs.unlinkSync(this.get_path(key));
-		this.delete(this.container, [...key.split(/\./)]);
+		node_fs.unlink(this.get_path(key), () => {
+			this.delete(this.container, [...key.split(/\./)]);
+		});
 	}
-	public import(key: string): any {
+	private import(key_or_path: string) {
 		try {
-			return JSON.parse(fs.readFileSync(this.get_path(key) || key, "utf8"));
+			return JSON.parse(node_fs.readFileSync(this.get_path(key_or_path) || key_or_path, "utf-8"));
 		} catch {
-			return {};
+			return {} as StorageState["data"];
 		}
 	}
-	public export(key: string) {
-		fs.mkdirSync(path.dirname(this.get_path(key)), { recursive: true });
-		fs.writeFileSync(this.get_path(key), JSON.stringify(this.get_data(key)));
+	private export(key: string) {
+		node_fs.mkdirSync(node_path.dirname(this.get_path(key)), { recursive: true });
+		node_fs.writeFileSync(this.get_path(key), JSON.stringify(this.get_data(key)));
 	}
 	public exist(key: string) {
 		return !!this.return(this.container, [...key.split(/\./)]);
+	}
+	public save() {
+		for (const key of Object.keys(this.container)) {
+			this.export(key);
+		}
 	}
 }
 export default (new Storage({

@@ -4,7 +4,7 @@ import { StoragePreset } from "@/modules/storage";
 
 export type Configure = {
 	browser: {
-		resolution: "low" | "medium" | "high",
+		resolution: "lowest" | "medium" | "highest",
 		censor: boolean;
 	},
 	query: {
@@ -22,6 +22,9 @@ export type Configure = {
 	request: {
 		max_redirects: number;
 	},
+	storage: {
+		auto_save: number
+	},
 	download: {
 		folder: string,
 		directory: string,
@@ -31,7 +34,7 @@ export type Configure = {
 };
 const boilerplate: Configure = {
 	browser: {
-		resolution: "low",
+		resolution: "lowest",
 		censor: true
 	},
 	query: {
@@ -58,6 +61,9 @@ const boilerplate: Configure = {
 	},
 	request: {
 		max_redirects: 10
+	},
+	storage: {
+		auto_save: 1000 * 60 * 5
 	},
 	download: {
 		folder: "{id}",

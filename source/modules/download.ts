@@ -1,16 +1,16 @@
-import * as fs from "fs";
-import * as path from "path";
-import * as events from "events";
+import * as node_fs from "fs";
+import * as node_path from "path";
+import * as node_events from "events";
 
 import read from "@/modules/hitomi/read";
-import settings from "@/modules/configure";
+import settings from "@/modules/settings";
 import listener from "@/modules/listener";
 import storage from "@/modules/storage";
 import request from "@/modules/request";
 import worker from "@/statics/worker";
 
 import { StaticEvent } from "@/statics";
-import { PartialOptions } from "@/modules/request";
+import { PartialOptions, RequestProgress } from "@/modules/request";
 
 export enum TaskJob {
 	CREATE = "create",
@@ -68,10 +68,10 @@ export class Download {
 		this.max_threads = max_threads;
 		this.max_working = max_working;
 		listener.on(StaticEvent.WORKER, ($index: number, $new: Task | undefined) => {
-			// bundle is removed
-			if (storage.get_data(String($index))) {
+			// bundle exist
+			if (storage.exist(String($index))) {
 				// update storage
-				storage.set_data(String($index), $new);
+				storage.set_data(String($index), { ...$new });
 			}
 			// else alone is enough
 			else if ($new?.status !== TaskStatus.QUEUED) {
@@ -80,13 +80,13 @@ export class Download {
 			}
 		});
 		// if folder exists
-		if (fs.existsSync(TaskFolder.BUNDLES)) {
+		if (node_fs.existsSync(TaskFolder.BUNDLES)) {
 			// loop files within
-			for (const file of fs.readdirSync(TaskFolder.BUNDLES)) {
+			for (const file of node_fs.readdirSync(TaskFolder.BUNDLES)) {
 				// check if file is .json
-				if (fs.statSync(path.join(TaskFolder.BUNDLES, file)).isFile() && path.extname(file) === ".json") {
+				if (node_fs.statSync(node_path.join(TaskFolder.BUNDLES, file)).isFile() && node_path.extname(file) === ".json") {
 					// read task from .json
-					storage.register(file.split(/\./)[0], path.join(TaskFolder.BUNDLES, file), "@import");
+					storage.register(file.split(/\./)[0], node_path.join(TaskFolder.BUNDLES, file), "@import");
 
 					const task: Task = storage.get_data(file.split(/\./)[0]);
 
@@ -106,7 +106,7 @@ export class Download {
 		}
 	}
 	public create(task: Task) {
-		const observer = new events.EventEmitter, files: number[] = [];
+		const observer = new node_events.EventEmitter, files: number[] = [];
 		return new Promise<TaskStatus>((resolve, reject) => {
 			function update(key: "id" | "from" | "title" | "files" | "status" | "options" | "working" | "finished", value: any) {
 				// update task
@@ -120,21 +120,34 @@ export class Download {
 					return observer.emit(TaskJob.DESTROY);
 				}
 				update("working", task.working + 1);
-				request.get(task.files[files[index]].url, { ...task.options, headers: { ...task.options.headers, ...task.files[files[index]].written ? { "content-range": `bytes=${task.files[files[index]].written}-` } : {} } }, task.files[files[index]]).then(() => {
-					if (task.status !== TaskStatus.WORKING || !storage.get_data(String(task.id))) {
-						update("status", TaskStatus.NONE);
-						return observer.emit(TaskJob.DESTROY);
-					}
-					update("finished", task.finished + 1);
+				// generates directory recursively
+				node_fs.mkdirSync(node_path.dirname(task.files[files[index]].path), { recursive: true });
+				// create WriteStream
+				const writable = node_fs.createWriteStream(task.files[files[index]].path);
+				// make a request
+				request.GET(task.files[files[index]].url, { ...task.options, headers: { ...task.options.headers, ...task.files[files[index]].written ? { "content-range": `bytes=${task.files[files[index]].written}-` } : {} } }, "binary",
+					(chunk, progress) => {
+						writable.write(chunk);
+						task.files[files[index]].size = progress[RequestProgress.TOTAL_SIZE];
+						task.files[files[index]].written += chunk.toString("binary").length;
+						update("files", task.files);
+					}).then(() => {
+						writable.end();
 
-					if (!!files[task.working] && task.working - task.finished < this.max_working) {
-						return observer.emit(TaskJob.CREATE, task.working);
-					}
-					if (task.finished === files.length) {
-						update("status", TaskStatus.FINISHED);
-						return observer.emit(TaskJob.DESTROY);
-					}
-				});
+						if (task.status !== TaskStatus.WORKING || !storage.get_data(String(task.id))) {
+							update("status", TaskStatus.NONE);
+							return observer.emit(TaskJob.DESTROY);
+						}
+						update("finished", task.finished + 1);
+
+						if (!!files[task.working] && task.working - task.finished < this.max_working) {
+							return observer.emit(TaskJob.CREATE, task.working);
+						}
+						if (task.finished === files.length) {
+							update("status", TaskStatus.FINISHED);
+							return observer.emit(TaskJob.DESTROY);
+						}
+					});
 				if (!!files[task.working] && task.working - task.finished < this.max_working) {
 					return observer.emit(TaskJob.CREATE, task.working);
 				}
@@ -153,7 +166,7 @@ export class Download {
 			});
 			// register storage
 			if (!storage.exist(String(task.id))) {
-				storage.register(String(task.id), path.join(TaskFolder.BUNDLES, String(task.id) + ".json"), task);
+				storage.register(String(task.id), node_path.join(TaskFolder.BUNDLES, String(task.id) + ".json"), { ...task });
 			}
 			// task counts reached its limit
 			if (this.max_threads <= worker.filter({ key: "status", value: TaskStatus.WORKING }).length) {
@@ -183,7 +196,7 @@ export class Download {
 			storage.un_register(String(id));
 			// remove worker
 			worker.set(id, undefined);
-			fs.rmdir(path.join(TaskFolder.DOWNLOADS, String(id)), { recursive: true }, () => {
+			node_fs.rmdir(node_path.join(TaskFolder.DOWNLOADS, String(id)), { recursive: true }, () => {
 				return resolve();
 			});
 		});
@@ -196,7 +209,7 @@ export class Download {
 						return read.script(Number(/([0-9]+).html$/.exec(url)![1])).then((script) => {
 							return resolve(
 								new Task(url, script.title, script.files.map((value, index) => {
-									return new TaskFile(value.url, path.join(TaskFolder.DOWNLOADS, String(script.id), `${index}.${value.url.split(/\./).pop()}`));
+									return new TaskFile(value.url, node_path.join(TaskFolder.DOWNLOADS, String(script.id), `${index}.${value.url.split(/\./).pop()}`));
 								}), { headers: { "referer": "https://hitomi.la" } }, script.id)
 							);
 						});

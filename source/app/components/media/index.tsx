@@ -1,10 +1,10 @@
 import * as React from "react";
-import { remote } from "electron";
 
 import "./index.scss";
 
 import read from "@/modules/hitomi/read";
 import listener from "@/modules/listener";
+import storage from "@/modules/storage";
 import router from "@/statics/router";
 
 import { StaticEvent } from "@/statics";
@@ -13,7 +13,6 @@ import { Viewport } from "@/statics/router";
 import { GalleryJS } from "@/modules/hitomi/read";
 
 import LazyLoad from "@/app/components/lazyload";
-import storage from "@/modules/storage";
 
 export type MediaProps = {};
 export type MediaState = {
@@ -75,7 +74,7 @@ class Media extends React.Component<MediaProps, MediaState> {
 				<section id="scrollable" class="scroll-y">
 					{this.state.script?.files.map((file, index) => {
 						return (
-							<LazyLoad src={task && task.files[index].size === task.files[index].written ? `${remote.app.isPackaged ? `${remote.app.getPath("exe")}/` : ""}../${task.files[index].path}` : file.url} width={file.width} height={file.height} key={index}></LazyLoad>
+							<LazyLoad src={task && task.files[index].size === task.files[index].written ? "../" + task.files[index].path : file.url} width={file.width} height={file.height} key={index}></LazyLoad>
 						);
 					})}
 				</section>

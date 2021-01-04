@@ -1,5 +1,6 @@
+import { ipcRenderer } from "electron";
+
 import * as React from "react";
-import { remote } from "electron";
 
 import "./index.scss";
 
@@ -12,8 +13,7 @@ import router from "@/statics/router";
 
 import { StaticEvent } from "@/statics";
 import { Viewport } from "@/statics/router";
-
-const $window = remote.getCurrentWindow();
+import { ipcEvent } from "@/modules/listener";
 
 export type AppProps = {};
 export type AppState = {
@@ -32,10 +32,10 @@ class App extends React.Component<AppProps, AppState> {
 		listener.on(StaticEvent.ROUTER, ($new: Viewport) => {
 			this.setState({ ...this.state, view: $new.view });
 		});
-		$window.on("enter-full-screen", () => {
+		ipcRenderer.on(ipcEvent.ENTER_FULL_SCREEN, () => {
 			this.setState({ ...this.state, fullscreen: true });
 		});
-		$window.on("leave-full-screen", () => {
+		ipcRenderer.on(ipcEvent.LEAVE_FULL_SCREEN, () => {
 			this.setState({ ...this.state, fullscreen: false });
 		});
 	}
