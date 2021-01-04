@@ -36,14 +36,14 @@ class Paging extends React.Component<PagingProps, PagingState> {
 	}
 	public render() {
 		return (
-			<section id="paging" class={utility.inline({ "contrast": true, "center": true, "enable": this.props.enable })}>
-				<button id="first" class={utility.inline({ "un_draggable": true, "enable": this.props.options.index !== 0 })}
+			<section id="paging" class={utility.inline({ "enable": this.props.enable, "contrast": true, "center": true })}>
+				<button id="first" class={utility.inline({ "enable": this.props.options.index !== 0, "un_draggable": true })}
 					onClick={() => {
 						this.props.handler.click(0);
 					}}
 					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/first.svg") }}>
 				</button>
-				<button id="backward" class={utility.inline({ "un_draggable": true, "enable": this.props.options.index !== 0 })}
+				<button id="backward" class={utility.inline({ "enable": this.props.options.index !== 0, "un_draggable": true })}
 					onClick={() => {
 						this.props.handler.click(utility.clamp(this.props.options.index - 1, 0, this.props.options.size - 1));
 					}}
@@ -51,20 +51,20 @@ class Paging extends React.Component<PagingProps, PagingState> {
 				</button>
 				{[...new Array<number>(Math.min(this.props.options.metre, this.props.options.size))].map((value, index) => {
 					return (
-						<button class={utility.inline({ "un_draggable": true, "enable": true, "active": this.props.options.index === this.get_offset(index) })} key={index}
+						<button class={utility.inline({ "enable": true, "active": this.props.options.index === this.get_offset(index), "un_draggable": true })} key={index}
 							onClick={() => {
 								this.props.handler.click(this.get_offset(index));
 							}}
 						>{this.get_offset(index) + 1}</button>
 					);
 				})}
-				<button id="forward" class={utility.inline({ "un_draggable": true, "enable": this.props.options.index !== this.props.options.size - 1 })}
+				<button id="forward" class={utility.inline({ "enable": this.props.options.index !== this.props.options.size - 1, "un_draggable": true })}
 					onClick={() => {
 						this.props.handler.click(utility.clamp(this.props.options.index + 1, 0, this.props.options.size - 1));
 					}}
 					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/forward.svg") }}>
 				</button>
-				<button id="last" class={utility.inline({ "un_draggable": true, "enable": this.props.options.index !== this.props.options.size - 1 })}
+				<button id="last" class={utility.inline({ "enable": this.props.options.index !== this.props.options.size - 1, "un_draggable": true })}
 					onClick={() => {
 						this.props.handler.click(this.props.options.size - 1);
 					}}

@@ -1,3 +1,5 @@
+import { ipcRenderer } from "electron";
+
 import * as React from "react";
 
 import "./index.scss";
@@ -8,15 +10,18 @@ import storage from "@/modules/storage";
 import router from "@/statics/router";
 
 import { StaticEvent } from "@/statics";
-import { Task } from "@/modules/download";
 import { Viewport } from "@/statics/router";
+import { Task } from "@/modules/download";
+import { ipcEvent } from "@/modules/listener";
 import { GalleryJS } from "@/modules/hitomi/read";
 
 import LazyLoad from "@/app/components/lazyload";
+import utility from "@/modules/utility";
 
 export type MediaProps = {};
 export type MediaState = {
-	script?: GalleryJS;
+	script?: GalleryJS,
+	fullscreen: boolean;
 };
 
 class Media extends React.Component<MediaProps, MediaState> {
@@ -25,7 +30,7 @@ class Media extends React.Component<MediaProps, MediaState> {
 	constructor(props: MediaProps) {
 		super(props);
 		this.props = props;
-		this.state = { script: undefined };
+		this.state = { script: undefined, fullscreen: false };
 
 		listener.on(StaticEvent.ROUTER, ($new: Viewport) => {
 			switch ($new.view) {
@@ -41,12 +46,18 @@ class Media extends React.Component<MediaProps, MediaState> {
 				this.setState({ ...this.state, script: script });
 			});
 		});
+		ipcRenderer.on(ipcEvent.ENTER_FULL_SCREEN, () => {
+			this.setState({ ...this.state, fullscreen: true });
+		});
+		ipcRenderer.on(ipcEvent.LEAVE_FULL_SCREEN, () => {
+			this.setState({ ...this.state, fullscreen: false });
+		});
 	}
 	public render() {
 		const task: Task | undefined = storage.get_data(String(this.state.script?.id));
 		return (
 			<section id="media">
-				<section id="navigation" class="contrast center-x">
+				<section id="navigation" class={utility.inline({ "enable": !this.state.fullscreen, "contrast": true, "center-x": true })}>
 					{[
 						{
 							HTML: require(`!html-loader!@/assets/icons/return.svg`),

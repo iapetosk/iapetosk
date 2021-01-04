@@ -68,7 +68,7 @@ class Query extends React.Component<QueryProps, QueryState> {
 						}
 					}}
 				></input>
-				<section id="dropdown" class={utility.inline({ "contrast": true, "active": this.state.focus && this.state.suggest.length > 0 })}>
+				<section id="dropdown" class={utility.inline({ "active": this.state.focus && this.state.suggest.length > 0, "contrast": true })}>
 					{this.state.suggest.map((suggestion, index) => {
 						return (
 							<legend key={index} class="center-y" data-count={suggestion.count}

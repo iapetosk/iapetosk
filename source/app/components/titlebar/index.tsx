@@ -50,7 +50,7 @@ class TitleBar extends React.Component<TitleBarProps, TitleBarState> {
 	}
 	public render() {
 		return (
-			<section id="titlebar" class={utility.inline({ "draggable": true, "contrast": true, "enable": this.props.enable })}>
+			<section id="titlebar" class={utility.inline({ "enable": this.props.enable, "draggable": true, "contrast": true })}>
 				<button id="focus" class="un_draggable"
 					onClick={() => {
 						ipcRenderer.send(ipcEvent.MINIMIZE);

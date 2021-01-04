@@ -6,7 +6,7 @@
 	grid-template-areas:
 	"navigation scrollable";
 	grid-template-rows: 1fr;
-	grid-template-columns: var(--navigation_width) 1fr;
+	grid-template-columns: auto 1fr;
 	> #scrollable {
 		grid-area: scrollable;
 		> img {
@@ -25,6 +25,7 @@
 		display: flex;
 		flex-direction: column;
 		grid-area: navigation;
+		width: var(--navigation_width);
 		border-width: 0px;
 		border-right-width: thin;
 		background-color: var(--colour_1);
@@ -34,6 +35,9 @@
 				width: 17.5px;
 				height: 17.5px;
 			}
+		}
+		&:not(.enable) {
+			display: none;
 		}
 	}
 }
