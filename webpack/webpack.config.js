@@ -60,6 +60,15 @@ const main = {
 		filename: "main.js"
 	}
 };
+const preload = {
+	...boilerplate,
+	target: "electron-preload",
+	entry: resolve_path("electron", "preload.ts"),
+	output: {
+		...boilerplate.output,
+		filename: "preload.js"
+	}
+};
 const renderer = {
 	...boilerplate,
 	target: "electron-renderer",
@@ -77,5 +86,6 @@ const renderer = {
 };
 module.exports = {
 	main: main,
+	preload: preload,
 	renderer: renderer
 };

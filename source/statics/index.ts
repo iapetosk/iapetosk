@@ -1,5 +1,3 @@
-import listener from "@/modules/listener";
-
 export enum StaticEvent {
 	ROUTER = "route",
 	WORKER = "worker"
@@ -26,9 +24,9 @@ export class StaticHandler<state> {
 				// assign
 				this.state = $new;
 				// debug
-				console.log(this.event, $new, $old);
-				// listener ($new, $old)
-				listener.emit(this.event, $new, $old);
+				console.log(this.event, [$new, $old]);
+				// listener [$new, $old]
+				window.static.emit(this.event, [$new, $old]);
 				break
 			}
 		}

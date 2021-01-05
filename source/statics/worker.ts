@@ -1,7 +1,5 @@
-import listener from "@/modules/listener";
-
-import { StaticEvent, StaticHandler } from "@/statics";
 import { Task } from "@/modules/download";
+import { StaticEvent, StaticHandler } from "@/statics";
 
 class Worker extends StaticHandler<Record<string, Task>> {
 
@@ -24,9 +22,9 @@ class Worker extends StaticHandler<Record<string, Task>> {
 					delete this["state"][$index];
 				}
 				// debug
-				console.log(this["event"], $index, $new, $old);
-				// listener ($index, $new, $old)
-				listener.emit(this["event"], $index, $new, $old);
+				console.log(this["event"], [$index, $new, $old]);
+				// listener [$index, $new, $old]
+				window.static.emit(this["event"], [$index, $new, $old]);
 				break;
 			}
 		}

@@ -21,7 +21,8 @@
 		"esnext"
 	],
 	"files": [
-		"source/typings/merge.ts"
+		"source/typings/merge.ts",
+		"source/typings/window.ts"
 	],
 	"include": [
 		"**/*.ts",

@@ -1,22 +1,16 @@
 import * as node_fs from "fs";
 import * as node_path from "path";
-import * as node_events from "events";
 
 import read from "@/modules/hitomi/read";
 import settings from "@/modules/settings";
-import listener from "@/modules/listener";
 import storage from "@/modules/storage";
 import request from "@/modules/request";
 import worker from "@/statics/worker";
 
+import { BridgeEvent } from "@/common";
 import { StaticEvent } from "@/statics";
-import { ipcEvent } from "@/modules/listener";
 import { PartialOptions, RequestProgress } from "@/modules/request";
 
-export enum TaskJob {
-	CREATE = "create",
-	DESTROY = "destroy"
-};
 export enum TaskStatus {
 	NONE,
 	FINISHED,
@@ -68,16 +62,18 @@ export class Download {
 	constructor(max_threads: number, max_working: number) {
 		this.max_threads = max_threads;
 		this.max_working = max_working;
-		listener.on(StaticEvent.WORKER, ($index: number, $new: Task | undefined) => {
-			// bundle exist
-			if (storage.exist(String($index))) {
-				// update storage
-				storage.set_data(String($index), { ...$new });
-			}
-			// else alone is enough
-			else if ($new?.status !== TaskStatus.QUEUED) {
-				// remove
-				this.remove($index);
+		window.static.on(StaticEvent.WORKER, (args) => {
+			const [$index, $new, $old] = args as [number, Task | undefined, Task | undefined];
+
+			if (storage.exist(String($index)) && !$old) {
+				// first time removed
+				if (!$new) {
+					// remove
+					this.remove($index);
+				} else {
+					// update storage
+					storage.set_data(String($index), { ...$new });
+				}
 			}
 		});
 		// if folder exists
@@ -107,18 +103,21 @@ export class Download {
 		}
 	}
 	public create(task: Task) {
-		const observer = new node_events.EventEmitter, files: number[] = [];
+		const I = this;
 		return new Promise<TaskStatus>((resolve, reject) => {
+			const files: number[] = [];
 			function update(key: "id" | "from" | "title" | "files" | "status" | "options" | "working" | "finished", value: any) {
+				if (!worker.get()[task.id]) {
+					return destroy();
+				}
 				// update task
 				task[key] = value as never;
 				// update worker
 				worker.set(task.id, { ...task });
 			}
-			observer.on(TaskJob.CREATE, (index: number) => {
-				if (task.status !== TaskStatus.WORKING || !storage.exist(String(task.id))) {
-					update("status", TaskStatus.NONE);
-					return observer.emit(TaskJob.DESTROY);
+			function spawn(index: number): void {
+				if (!worker.get()[task.id]) {
+					return destroy();
 				}
 				update("working", task.working + 1);
 				// generates directory recursively
@@ -128,9 +127,8 @@ export class Download {
 				// make a request
 				request.GET(task.files[files[index]].url, { ...task.options, headers: { ...task.options.headers, ...task.files[files[index]].written ? { "content-range": `bytes=${task.files[files[index]].written}-` } : {} } }, "binary",
 					(chunk, progress) => {
-						if (task.status !== TaskStatus.WORKING || !storage.exist(String(task.id))) {
-							update("status", TaskStatus.NONE);
-							return observer.emit(TaskJob.DESTROY);
+						if (!worker.get()[task.id]) {
+							return destroy();
 						}
 						// update size, written
 						task.files[files[index]].size = progress[RequestProgress.TOTAL_SIZE];
@@ -143,33 +141,29 @@ export class Download {
 						writable.end();
 						update("finished", task.finished + 1);
 
-						if (Boolean(files[task.working]) && task.working - task.finished < this.max_working) {
-							return observer.emit(TaskJob.CREATE, task.working);
+						if (Boolean(files[task.working]) && task.working - task.finished < I.max_working) {
+							return spawn(task.working);
 						}
 						if (task.finished === files.length) {
 							update("status", TaskStatus.FINISHED);
-							return observer.emit(TaskJob.DESTROY);
+							return destroy();
 						}
 					});
-				if (Boolean(files[task.working]) && task.working - task.finished < this.max_working) {
-					return observer.emit(TaskJob.CREATE, task.working);
+				if (Boolean(files[task.working]) && task.working - task.finished < I.max_working) {
+					return spawn(task.working);
 				}
-			});
-			observer.once(TaskJob.DESTROY, () => {
-				// stop observe
-				observer.removeAllListeners();
+			};
+			function destroy() {
 				// start queued task
 				if (task.status !== TaskStatus.QUEUED) {
 					for (const queued of worker.filter({ key: "status", value: TaskStatus.QUEUED })) {
-						this.create(queued);
+						I.create(queued);
 						break;
 					}
 				}
 				return resolve(task.status);
-			});
-			listener.on(ipcEvent.BEFORE_CLOSE, () => {
-				// stop observe
-				observer.removeAllListeners();
+			}
+			window.bridge.on(BridgeEvent.BEFORE_CLOSE, () => {
 				// resolve anyways
 				return resolve(task.status);
 			});
@@ -180,7 +174,7 @@ export class Download {
 			// task counts reached its limit
 			if (this.max_threads <= worker.filter({ key: "status", value: TaskStatus.WORKING }).length) {
 				update("status", TaskStatus.QUEUED);
-				return observer.emit(TaskJob.DESTROY);
+				return destroy();
 			}
 			// scan unfinished files
 			for (let index = 0; index < task.files.length; index++) {
@@ -191,45 +185,43 @@ export class Download {
 			// task is finished
 			if (!files.length) {
 				update("status", TaskStatus.FINISHED);
-				return observer.emit(TaskJob.DESTROY);
+				return destroy();
 			}
-			// soft reset working, finished
+			// soft update
+			task.status = TaskStatus.WORKING;
 			task.working = 0;
 			task.finished = 0;
-			// hard update status
-			update("status", TaskStatus.WORKING);
+			// hard update
+			worker.set(task.id, { ...task });
 			// download recursivly
-			return observer.emit(TaskJob.CREATE, 0);
+			return spawn(0);
 		});
 	}
 	public remove(id: number) {
 		return new Promise<void>((resolve, reject) => {
 			// remove storage
 			storage.un_register(String(id));
+			// remove directory
+			node_fs.rmdirSync(node_path.join(TaskFolder.DOWNLOADS, String(id)), { recursive: true });
 			// remove worker
 			worker.set(id, undefined);
-			node_fs.rmdir(node_path.join(TaskFolder.DOWNLOADS, String(id)), { recursive: true }, () => {
-				return resolve();
-			});
+			// resolve
+			return resolve();
 		});
 	}
 	public evaluate(url: string) {
 		return new Promise<Task>((resolve, reject) => {
 			for (const RegExp of [/^https?:\/\/hitomi.la\/galleries\/([\d]+).html$/, /^https?:\/\/hitomi.la\/(reader|manga|doujinshi|gamecg|cg)\/([\D\d]+)-([\D\d]+)-([\d]+).html$/]) {
-				switch (RegExp.test(url)) {
-					case true: {
-						return read.script(Number(/([0-9]+).html$/.exec(url)![1])).then((script) => {
-							return resolve(
-								new Task(url, script.title, script.files.map((value, index) => {
-									return new TaskFile(value.url, node_path.join(TaskFolder.DOWNLOADS, String(script.id), `${index}.${value.url.split(/\./).pop()}`));
-								}), { headers: { "referer": "https://hitomi.la" } }, script.id)
-							);
-						});
-					}
-					case false: {
-						return reject();
-					}
+				if (RegExp.test(url)) {
+					return read.script(Number(/([0-9]+).html$/.exec(url)![1])).then((script) => {
+						return resolve(
+							new Task(url, script.title, script.files.map((value, index) => {
+								return new TaskFile(value.url, node_path.join(TaskFolder.DOWNLOADS, String(script.id), `${index}.${value.url.split(/\./).pop()}`));
+							}), { headers: { "referer": "https://hitomi.la" } }, script.id)
+						);
+					});
 				}
+				return reject();
 			}
 		});
 	}

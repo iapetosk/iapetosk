@@ -55,20 +55,19 @@ class Request {
 				const chunks: Buffer[] = [];
 
 				(I.isHTTPS(options.request.url) ? node_https : node_http).request({
-					agent: options.partial.agent ? undefined : I.isHTTPS(options.request.url) ? I.https_agent : I.http_agent,
 					method: options.request.method,
 					headers: options.partial.headers,
 					protocol: I.isHTTPS(options.request.url) ? "https:" : "http:",
 					...I.parseURL(options.request.url)
-				}, (client) => {
+				}, (response) => {
 					// redirect
-					if ((options.partial.max_redirects || settings.request.max_redirects) > (options.private.redirects || 0) && client.headers["location"]) {
+					if ((options.partial.max_redirects || settings.request.max_redirects) > (options.private.redirects || 0) && response.headers["location"]) {
 						return recursive({ ...options, private: { ...options.private, redirects: options.private.redirects ?  options.private.redirects + 1 : 1 } });
 					}
 					if (callback) {
-						var L = Number(client.headers["content-length"]), R = 0, T = Date.now();
+						var L = Number(response.headers["content-length"]), R = 0, T = Date.now();
 					}
-					client.on("data", (chunk) => {
+					response.on("data", (chunk) => {
 						if (callback) {
 							// increase R
 							R += chunk.toString(options.request.charset).length;
@@ -85,20 +84,20 @@ class Request {
 						}
 						chunks.push(chunk);
 					});
-					client.once("end", () => {
+					response.once("end", () => {
 						return resolve({
 							encode: Buffer.concat(chunks).toString(options.request.charset),
 							status: {
-								code: client.statusCode,
-								message: client.statusMessage
+								code: response.statusCode,
+								message: response.statusMessage
 							},
-							headers: client.headers
+							headers: response.headers
 						});
 					});
-					client.once("close", () => {
+					response.once("close", () => {
 						return reject(false);
 					});
-					client.once("error", (error) => {
+					response.once("error", (error) => {
 						return reject(error);
 					});
 				}).end();

@@ -1,5 +1,3 @@
-import { ipcRenderer } from "electron";
-
 import * as React from "react";
 
 import "./index.scss";
@@ -8,12 +6,11 @@ import TitleBar from "@/app/components/titlebar";
 import Browser from "@/app/views/browser";
 import Reader from "@/app/views/reader";
 
-import listener from "@/modules/listener";
 import router from "@/statics/router";
 
+import { BridgeEvent } from "@/common";
 import { StaticEvent } from "@/statics";
 import { Viewport } from "@/statics/router";
-import { ipcEvent } from "@/modules/listener";
 
 export type AppProps = {};
 export type AppState = {
@@ -29,13 +26,15 @@ class App extends React.Component<AppProps, AppState> {
 		this.props = props;
 		this.state = { view: router.get().view, fullscreen: false };
 
-		listener.on(StaticEvent.ROUTER, ($new: Viewport) => {
+		window.static.on(StaticEvent.ROUTER, (args) => {
+			const [$new, $old] = args as [Viewport, Viewport];
+
 			this.setState({ ...this.state, view: $new.view });
 		});
-		ipcRenderer.on(ipcEvent.ENTER_FULL_SCREEN, () => {
+		window.bridge.on(BridgeEvent.ENTER_FULL_SCREEN, () => {
 			this.setState({ ...this.state, fullscreen: true });
 		});
-		ipcRenderer.on(ipcEvent.LEAVE_FULL_SCREEN, () => {
+		window.bridge.on(BridgeEvent.LEAVE_FULL_SCREEN, () => {
 			this.setState({ ...this.state, fullscreen: false });
 		});
 	}

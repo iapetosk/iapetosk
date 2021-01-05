@@ -1,22 +1,19 @@
-import { ipcRenderer } from "electron";
-
 import * as React from "react";
 
 import "./index.scss";
 
+import LazyLoad from "@/app/components/lazyload";
+
 import read from "@/modules/hitomi/read";
-import listener from "@/modules/listener";
+import utility from "@/modules/utility";
 import storage from "@/modules/storage";
 import router from "@/statics/router";
 
+import { BridgeEvent } from "@/common";
 import { StaticEvent } from "@/statics";
-import { Viewport } from "@/statics/router";
 import { Task } from "@/modules/download";
-import { ipcEvent } from "@/modules/listener";
+import { Viewport } from "@/statics/router";
 import { GalleryJS } from "@/modules/hitomi/read";
-
-import LazyLoad from "@/app/components/lazyload";
-import utility from "@/modules/utility";
 
 export type MediaProps = {};
 export type MediaState = {
@@ -32,7 +29,9 @@ class Media extends React.Component<MediaProps, MediaState> {
 		this.props = props;
 		this.state = { script: undefined, fullscreen: false };
 
-		listener.on(StaticEvent.ROUTER, ($new: Viewport) => {
+		window.static.on(StaticEvent.ROUTER, (args) => {
+			const [$new, $old] = args as [Viewport, Viewport];
+
 			switch ($new.view) {
 				case "reader": {
 					this.setState({ ...this.state, script: undefined });
@@ -46,10 +45,10 @@ class Media extends React.Component<MediaProps, MediaState> {
 				this.setState({ ...this.state, script: script });
 			});
 		});
-		ipcRenderer.on(ipcEvent.ENTER_FULL_SCREEN, () => {
+		window.bridge.on(BridgeEvent.ENTER_FULL_SCREEN, () => {
 			this.setState({ ...this.state, fullscreen: true });
 		});
-		ipcRenderer.on(ipcEvent.LEAVE_FULL_SCREEN, () => {
+		window.bridge.on(BridgeEvent.LEAVE_FULL_SCREEN, () => {
 			this.setState({ ...this.state, fullscreen: false });
 		});
 	}
@@ -85,7 +84,7 @@ class Media extends React.Component<MediaProps, MediaState> {
 				<section id="scrollable" class="scroll-y">
 					{this.state.script?.files.map((file, index) => {
 						return (
-							<LazyLoad src={task && task.files[index].size === task.files[index].written ? `${process.env.npm_package_version ? "" : `${process.execPath}/`}../${task.files[index].path}` : file.url} width={file.width} height={file.height} key={index}></LazyLoad>
+							<LazyLoad src={task && task.files[index].size === task.files[index].written ? `${window.API.isPackaged() ? "" : `${window.API.getPath()}/`}../${task.files[index].path}` : file.url} width={file.width} height={file.height} key={index}></LazyLoad>
 						);
 					})}
 				</section>

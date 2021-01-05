@@ -1,13 +1,10 @@
-import { ipcRenderer } from "electron";
-
 import * as React from "react";
 
 import "./index.scss";
 
 import utility from "@/modules/utility";
-import listener from "@/modules/listener";
 
-import { ipcEvent } from "@/modules/listener";
+import { BridgeEvent } from "@/common";
 
 export type TitleBarProps = {
 	enable: boolean;
@@ -26,22 +23,22 @@ class TitleBar extends React.Component<TitleBarProps, TitleBarState> {
 		this.props = props;
 		this.state = { focus: false, maximize: false, fullscreen: false };
 
-		ipcRenderer.on(ipcEvent.FOCUS, () => {
+		window.bridge.on(BridgeEvent.FOCUS, () => {
 			this.setState({ ...this.state, focus: true });
 		});
-		ipcRenderer.on(ipcEvent.BLUR, () => {
+		window.bridge.on(BridgeEvent.BLUR, () => {
 			this.setState({ ...this.state, focus: false });
 		});
-		ipcRenderer.on(ipcEvent.MAXIMIZE, () => {
+		window.bridge.on(BridgeEvent.MAXIMIZE, () => {
 			this.setState({ ...this.state, maximize: true });
 		});
-		ipcRenderer.on(ipcEvent.UNMAXIMIZE, () => {
+		window.bridge.on(BridgeEvent.UNMAXIMIZE, () => {
 			this.setState({ ...this.state, maximize: false });
 		});
-		ipcRenderer.on(ipcEvent.ENTER_FULL_SCREEN, () => {
+		window.bridge.on(BridgeEvent.ENTER_FULL_SCREEN, () => {
 			this.setState({ ...this.state, fullscreen: true });
 		});
-		ipcRenderer.on(ipcEvent.LEAVE_FULL_SCREEN, () => {
+		window.bridge.on(BridgeEvent.LEAVE_FULL_SCREEN, () => {
 			this.setState({ ...this.state, fullscreen: false });
 		});
 	}
@@ -53,23 +50,23 @@ class TitleBar extends React.Component<TitleBarProps, TitleBarState> {
 			<section id="titlebar" class={utility.inline({ "enable": this.props.enable, "draggable": true, "contrast": true })}>
 				<button id="focus" class="un_draggable"
 					onClick={() => {
-						ipcRenderer.send(ipcEvent.MINIMIZE);
+						window.API.minimize();
 					}}
 					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/focus.svg`) }}>
 				</button>
 				<button id="maximize" class="un_draggable"
 					onClick={() => {
 						if (this.state.maximize) {
-							ipcRenderer.send(ipcEvent.UNMAXIMIZE);
+							window.API.unmaximize();
 						} else {
-							ipcRenderer.send(ipcEvent.MAXIMIZE);
+							window.API.maximize();
 						}
 					}}
 					dangerouslySetInnerHTML={{ __html: require(this.state.maximize ? "!html-loader!@/assets/icons/minimize.svg" : "!html-loader!@/assets/icons/maximize.svg") }}>
 				</button>
 				<button id="close" class="un_draggable"
 					onClick={() => {
-						listener.emit(ipcEvent.BEFORE_CLOSE);
+						window.bridge.emit(BridgeEvent.BEFORE_CLOSE);
 					}}
 					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/close.svg`) }}>
 				</button>

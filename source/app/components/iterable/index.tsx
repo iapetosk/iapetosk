@@ -7,7 +7,6 @@ import LazyLoad from "@/app/components/lazyload";
 import * as path from "path";
 import * as process from "child_process";
 
-import listener from "@/modules/listener";
 import download from "@/modules/download";
 import utility from "@/modules/utility";
 import worker from "@/statics/worker";
@@ -52,7 +51,9 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 		this.props = props;
 		this.state = Object.assign({}, ...Object.values(worker.get()).map((task) => { return { [task.id]: { status: { task: task.status } } }; }));
 
-		listener.on(StaticEvent.WORKER, ($index: number, $new: Task | undefined) => {
+		window.static.on(StaticEvent.WORKER, (args) => {
+			const [$index, $new] = args as [number, Task | undefined, Task | undefined];
+			
 			switch ($new ? $new.status : TaskStatus.NONE) {
 				case this.state[$index]?.status?.task: {
 					break;
@@ -131,7 +132,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 											{
 												HTML: require(`!html-loader!@/assets/icons/open.svg`),
 												click: () => {
-													process.exec(`start "" "${path.join(TaskFolder.DOWNLOADS, String(gallery.id))}"`);
+													process.exec(`start "" "${path.resolve(TaskFolder.DOWNLOADS, String(gallery.id))}"`);
 												}
 										}] : []),
 										...(!this.state[gallery.id]?.status?.task ? [

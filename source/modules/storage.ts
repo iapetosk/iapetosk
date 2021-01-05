@@ -1,11 +1,7 @@
-import { ipcRenderer } from "electron";
-
 import * as node_fs from "fs";
 import * as node_path from "path";
 
-import listener from "@/modules/listener";
-
-import { ipcEvent } from "@/modules/listener";
+import { BridgeEvent } from "@/common";
 
 export enum StoragePreset {
 	SETTINGS = "settings"
@@ -15,19 +11,17 @@ export type StorageState = {
 	data: Record<string, string | boolean | number | object> | "@import";
 };
 class Storage {
-	private container: (
-		Record<string, StorageState>
-	) = {};
+	private container: Record<string, StorageState> = {};
 	constructor(storage: Storage["container"]) {
 		for (const key of Object.keys(storage)) {
 			this.register(key, storage[key].path, storage[key].data);
 		}
 		// before close
-		listener.on(ipcEvent.BEFORE_CLOSE, () => {
+		window.bridge.on(BridgeEvent.BEFORE_CLOSE, () => {
 			// save all
 			this.save();
-			// close
-			ipcRenderer.send(ipcEvent.CLOSE);
+			// upvote
+			window.bridge.emit(BridgeEvent.CLOSE, (["storage"]));
 		});
 		// every ~ ms
 		setInterval(() => {
