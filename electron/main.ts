@@ -13,7 +13,7 @@ app.on("ready", () => {
 		backgroundColor: "#000000",
 		webPreferences: {
 			// webpack or ASAR
-			preload: require("path").resolve("build/preload.js"),
+			preload: require("path").resolve(__dirname, "preload.js"),
 			// allow renderer interacts with nodejs
 			nodeIntegration: true,
 			// isolate preload
