@@ -6,18 +6,16 @@ import LazyLoad from "@/app/components/lazyload";
 
 import read from "@/modules/hitomi/read";
 import utility from "@/modules/utility";
-import storage from "@/modules/storage";
+import worker from "@/statics/worker";
 import router from "@/statics/router";
 
 import { BridgeEvent } from "@/common";
 import { StaticEvent } from "@/statics";
-import { Task } from "@/modules/download";
 import { Viewport } from "@/statics/router";
-import { GalleryJS } from "@/modules/hitomi/read";
 
 export type MediaProps = {};
 export type MediaState = {
-	script?: GalleryJS,
+	files: string[],
 	fullscreen: boolean;
 };
 
@@ -27,22 +25,35 @@ class Media extends React.Component<MediaProps, MediaState> {
 	constructor(props: MediaProps) {
 		super(props);
 		this.props = props;
-		this.state = { script: undefined, fullscreen: false };
+		this.state = { files: [], fullscreen: false };
 
 		window.static.on(StaticEvent.ROUTER, (args) => {
 			const [$new, $old] = args as [Viewport, Viewport];
 
 			switch ($new.view) {
 				case "reader": {
-					this.setState({ ...this.state, script: undefined });
+					this.setState({ ...this.state, files: [] });
 					break;
 				}
 				default: {
 					break;
 				}
 			}
-			read.script($new.options as number).then((script) => {
-				this.setState({ ...this.state, script: script });
+			read.script($new.options as number).then(async (script) => {
+				const files = [];
+
+				for (let index = 0; index < script.files.length; index++) {
+					if (worker.get()[script.id] && worker.get()[script.id].files[index].written === worker.get()[script.id].files[index].size) {
+						if (await window.API.is_packaged().then((packaged) => { return packaged; })) {
+							files.push(`${await window.API.get_path().then((path) => { return path; })}/${worker.get()[script.id]?.files[index].path}`);
+						} else {
+							files.push(`../${worker.get()[script.id]?.files[index].path}`);
+						}
+					} else {
+						files.push(script.files[index].url);
+					}
+				}
+				this.setState({ ...this.state, files: files });
 			});
 		});
 		window.bridge.on(BridgeEvent.ENTER_FULL_SCREEN, () => {
@@ -53,7 +64,6 @@ class Media extends React.Component<MediaProps, MediaState> {
 		});
 	}
 	public render() {
-		const task: Task | undefined = storage.get_data(String(this.state.script?.id));
 		return (
 			<section id="media">
 				<section id="navigation" class={utility.inline({ "enable": !this.state.fullscreen, "contrast": true, "center-x": true })}>
@@ -62,12 +72,6 @@ class Media extends React.Component<MediaProps, MediaState> {
 							HTML: require(`!html-loader!@/assets/icons/return.svg`),
 							click: () => {
 								router.set({ view: "browser", options: undefined });
-							}
-						},
-						{
-							HTML: require(`!html-loader!@/assets/icons/copy.svg`),
-							click: () => {
-								navigator.clipboard.writeText(`https://hitomi.la/galleries/${this.state.script?.id}.html`);
 							}
 						}
 					].map((button, index) => {
@@ -82,9 +86,9 @@ class Media extends React.Component<MediaProps, MediaState> {
 					})}
 				</section>
 				<section id="scrollable" class="scroll-y">
-					{this.state.script?.files.map((file, index) => {
+					{this.state.files.map((file, index) => {
 						return (
-							<LazyLoad src={task && task.files[index].size === task.files[index].written ? `${window.API.isPackaged() ? "" : `${window.API.getPath()}/`}../${task.files[index].path}` : file.url} width={file.width} height={file.height} key={index}></LazyLoad>
+							<LazyLoad src={file} key={index}></LazyLoad>
 						);
 					})}
 				</section>

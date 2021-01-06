@@ -65,7 +65,7 @@ export class Download {
 		window.static.on(StaticEvent.WORKER, (args) => {
 			const [$index, $new, $old] = args as [number, Task | undefined, Task | undefined];
 
-			if (storage.exist(String($index)) && !$old) {
+			if (storage.exist(String($index)) && $old) {
 				// first time removed
 				if (!$new) {
 					// remove
@@ -189,8 +189,7 @@ export class Download {
 			}
 			// soft update
 			task.status = TaskStatus.WORKING;
-			task.working = 0;
-			task.finished = 0;
+			task.working = task.finished;
 			// hard update
 			worker.set(task.id, { ...task });
 			// download recursivly
