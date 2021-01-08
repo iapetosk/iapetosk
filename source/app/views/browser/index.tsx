@@ -6,6 +6,8 @@ import Query from "@/app/components/query";
 import Iterable from "@/app/components/iterable";
 import Paging from "@/app/components/paging";
 
+import DiscordRPC from "@/modules/discordRPC";
+
 import read from "@/modules/hitomi/read";
 import filter from "@/modules/hitomi/filter";
 import search from "@/modules/hitomi/search";
@@ -98,22 +100,22 @@ class Browser extends React.Component<BrowserProps> {
 					}
 				}
 			} : {
-				query: {
-					...this.state.query,
-					enable: false,
-				},
-				iterable: {
-					...this.state.iterable,
-					options: {
-						...this.state.iterable.options,
-						blocks: []
+					query: {
+						...this.state.query,
+						enable: false,
+					},
+					iterable: {
+						...this.state.iterable,
+						options: {
+							...this.state.iterable.options,
+							blocks: []
+						}
+					},
+					paging: {
+						...this.state.paging,
+						enable: false
 					}
-				},
-				paging: {
-					...this.state.paging,
-					enable: false
-				}
-			})
+				})
 		});
 	}
 	public set_query(value: BrowserState["query"]) {
@@ -138,6 +140,21 @@ class Browser extends React.Component<BrowserProps> {
 		this.set_session({ history: [[settings.query.input, 0]], version: 0 });
 	}
 	public render() {
+		if (this.props.enable) {
+			// RPC
+			DiscordRPC.set_activity({
+				details: this.state.query.options.input,
+				...(this.state.iterable.options.blocks.length ? {
+					state: "Browsing",
+					partySize: this.state.paging.options.index + 1,
+					partyMax: this.state.paging.options.size
+				} : {
+					state: "Fetching",
+					partySize: undefined,
+					partyMax: undefined
+				})
+			});
+		}
 		return (
 			<section id="browser" class={utility.inline({ "enable": this.props.enable, "left": true })}>
 				<section id="scrollable" class="scroll-y">

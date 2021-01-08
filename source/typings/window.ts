@@ -1,4 +1,4 @@
-import { API_COMMAND, BridgeEvent} from "@/common";
+import { BridgeEvent, API_COMMAND } from "@/common";
 import { StaticEvent } from "@/statics";
 
 declare global {

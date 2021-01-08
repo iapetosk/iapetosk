@@ -36,7 +36,7 @@
 				object-fit: cover;
 				transition: visibility 500ms, opacity var(--transition);
 				will-change: visibility, opacity;
-				&.censored {
+				&.censorship {
 					filter: blur(10px);
 				}
 			}
@@ -91,6 +91,13 @@
 							&:hover {
 								border-color: var(--colour_9);
 								background-color: var(--colour_5);
+							}
+							&.censorship {
+								border-color: var(--colour_1);
+								background-color: var(--colour_error);
+								> #value {
+									color: var(--colour_1);
+								}
 							}
 						}
 					}

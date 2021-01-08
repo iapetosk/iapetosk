@@ -1,7 +1,7 @@
 class Utility {
-	public index_of<type>(array: (type | RegExp)[], value: type) {
-		for (let index = 0; index < array.length; index++) {
-			if (array[index] instanceof RegExp ? (array[index] as RegExp).test(String(value)) : array[index] === value) {
+	public index_of<type>(value: type[], match: RegExp) {
+		for (let index = 0; index < value.length; index++) {
+			if (match instanceof RegExp ? match.test(String(value[index])) : value[index] === match) {
 				return index;
 			}
 		}

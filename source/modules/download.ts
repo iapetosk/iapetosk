@@ -66,10 +66,10 @@ export class Download {
 			const [$index, $new, $old] = args as [number, Task | undefined, Task | undefined];
 
 			if (storage.exist(String($index)) && $old) {
-				// first time removed
+				// first time destroyed
 				if (!$new) {
-					// remove
-					this.remove($index);
+					// destroy
+					this.destroy($index);
 				} else {
 					// update storage
 					storage.set_data(String($index), { ...$new });
@@ -82,11 +82,16 @@ export class Download {
 			for (const file of node_fs.readdirSync(TaskFolder.BUNDLES)) {
 				// check if file is .json
 				if (node_fs.statSync(node_path.join(TaskFolder.BUNDLES, file)).isFile() && node_path.extname(file) === ".json") {
-					// read task from .json
-					storage.register(file.split(/\./)[0], node_path.join(TaskFolder.BUNDLES, file), "@import");
-
-					const task: Task = storage.get_data(file.split(/\./)[0]);
-
+					/*
+					0: name
+					1: extension
+					*/
+					const [ID] = file.split(/\./) as [string, string];
+					// register task from .json
+					storage.register(ID, node_path.join(TaskFolder.BUNDLES, file), "@import");
+					// create task from .json
+					const task: Task = storage.get_data(ID);
+					// restart download
 					switch (task.status) {
 						case TaskStatus.NONE:
 						case TaskStatus.WORKING: {
@@ -116,9 +121,7 @@ export class Download {
 				worker.set(task.id, { ...task });
 			}
 			function spawn(index: number): void {
-				if (!worker.get()[task.id]) {
-					return destroy();
-				}
+				// update
 				update("working", task.working + 1);
 				// generates directory recursively
 				node_fs.mkdirSync(node_path.dirname(task.files[files[index]].path), { recursive: true });
@@ -127,24 +130,20 @@ export class Download {
 				// make a request
 				request.GET(task.files[files[index]].url, { ...task.options, headers: { ...task.options.headers, ...task.files[files[index]].written ? { "content-range": `bytes=${task.files[files[index]].written}-` } : {} } }, "binary",
 					(chunk, progress) => {
-						if (!worker.get()[task.id]) {
-							return destroy();
-						}
-						// update size, written
-						task.files[files[index]].size = progress[RequestProgress.TOTAL_SIZE];
-						task.files[files[index]].written += chunk.toString("binary").length;
 						// write file
 						writable.write(chunk);
-						update("files", task.files);
+						update("files", { ...task.files, [files[index]]: { ...task.files[files[index]], size: progress[RequestProgress.TOTAL_SIZE], written: task.files[files[index]].written + chunk.length } });
 					}).then(() => {
 						// stop writing
 						writable.end();
+						// update
 						update("finished", task.finished + 1);
 
 						if (Boolean(files[task.working]) && task.working - task.finished < I.max_working) {
 							return spawn(task.working);
 						}
 						if (task.finished === files.length) {
+							// update
 							update("status", TaskStatus.FINISHED);
 							return destroy();
 						}
@@ -187,16 +186,16 @@ export class Download {
 				update("status", TaskStatus.FINISHED);
 				return destroy();
 			}
-			// soft update
-			task.status = TaskStatus.WORKING;
-			task.working = task.finished;
-			// hard update
+			// declare worker
 			worker.set(task.id, { ...task });
+			// update
+			update("status", TaskStatus.WORKING);
+			update("working", task.finished);
 			// download recursivly
 			return spawn(0);
 		});
 	}
-	public remove(id: number) {
+	public destroy(id: number) {
 		return new Promise<void>((resolve, reject) => {
 			// remove storage
 			storage.un_register(String(id));

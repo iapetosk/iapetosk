@@ -5,6 +5,8 @@ import * as ReactDOM from "react-dom";
 
 import App from "@/app";
 
+import DiscordRPC from "@/modules/discordRPC";
+
 import { BridgeEvent } from "@/common";
 
 const upvotes: Record<string, boolean> = {};
@@ -47,3 +49,15 @@ window.bridge.on(BridgeEvent.CLOSE, (args) => {
 	}
 });
 ReactDOM.render(<App/>, document.getElementById("app"));
+
+// RPC
+DiscordRPC.set_activity({
+	details: "Starting...",
+	startTimestamp: Date.now(),
+	largeImageKey: "waifu_material",
+	largeImageText: "Sombian#7963",
+	smallImageKey: "discord",
+	smallImageText: "discord.gg/Gp7tWCe",
+	partyId: "https://github.com/Any-Material",
+	instance: true
+});

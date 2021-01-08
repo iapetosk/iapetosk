@@ -42,6 +42,10 @@ const [languages_english, languages_local] = [
 	["all", "indonesian", "catalan", "cebuano", "czech", "danish", "german", "estonian", "english", "spanish", "esperanto", "french", "italian", "latin", "hungarian", "dutch", "norwegian", "polish", "portuguese", "romanian", "albanian", "slovak", "finnish", "swedish", "tagalog", "vietnamese", "turkish", "greek", "mongolian", "russian", "ukrainian", "hebrew", "arabic", "persian", "thai", "korean", "chinese", "japanese"],
 	["all", "Bahasa Indonesia", "català", "Cebuano", "Čeština", "Dansk", "Deutsch", "eesti", "English", "Español", "Esperanto", "Français", "Italiano", "Latina", "magyar", "Nederlands", "norsk", "polski", "Português", "română", "shqip", "Slovenčina", "Suomi", "Svenska", "Tagalog", "tiếng việt", "Türkçe", "Ελληνικά", "Монгол", "Русский", "Українська", "עברית", "العربية", "فارسی", "ไทย", "한국어", "中文", "日本語"]
 ];
+const censorship = new RegExp("(" + [
+	"guro", "ryona", "snuff", "blood", "torture", "amputee", "cannibalism"
+// RegExp seperator
+].join("|") + ")");
 
 class Iterable extends React.Component<IterableProps, IterableState> {
 	public props: IterableProps;
@@ -75,7 +79,9 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 					return (
 						<section id="gallery" class={utility.inline({ "contrast": true, [TaskStatus[this.state[gallery.id]?.status?.task || TaskStatus.NONE]]: true })} key={index}>
 							<section id="upper" class={utility.inline({ "contrast": true, [UpperSection[this.state[gallery.id]?.html?.upper || UpperSection.INTERACTS]]: true })}>
-								<LazyLoad src={gallery.thumbnail[0]}></LazyLoad>
+								{/* thumbnail */}
+								<LazyLoad id="thumbnail" class={utility.inline({ "censorship": gallery.tags ? !isNaN(utility.index_of(gallery.tags, censorship)) : false })} src={gallery.thumbnail[0]}></LazyLoad>
+								{/* intels */}
 								<section id="discovery" class="fluid">
 									<section id="interacts">
 										<button id="triangle" class="contrast"
@@ -94,7 +100,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 													// @ts-ignore
 													utility.wrap(gallery[key]).map((value, index) => {
 														return (
-															<button id="key" class="contrast center" key={index}>
+															<button id="key" class={utility.inline({ "contrast": true, "center": true, "censorship": censorship.test(value) })} key={index}>
 																<mark id="value" class="eclipse"
 																onMouseUp={(event) => {
 																	const [$key, $value] = [/tags/.test(key) ? /♂/.test(value) ? "male" : /♀/.test(value) ? "female" : "tag" : key, /language/.test(key) ? languages_english[utility.index_of(languages_local, value)] : value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_")];
@@ -111,6 +117,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 									})}
 									</section>
 								</section>
+								{/* buttons */}
 								<section id="interacts" class="contrast center fluid">
 									{[
 										{
@@ -123,7 +130,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 										{
 											HTML: require(`!html-loader!@/assets/icons/delete.svg`),
 											click: () => {
-												download.remove(gallery.id).then(() => {
+												download.destroy(gallery.id).then(() => {
 													// TODO: none
 												});
 											}
@@ -170,10 +177,12 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 									})}
 								</section>
 							</section>
+							{/* intels */}
 							<section id="lower" class="center-y">
 								<legend id="title" class="eclipse">{gallery.title}</legend>
 								<legend id="id" class="center">#{gallery.id}</legend>
 							</section>
+							{/* status */}
 							<section id="status" class={utility.inline({ "active": Object.keys({ ...this.state[gallery.id]?.status }).length > 0  })}>
 								{[
 									{

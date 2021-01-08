@@ -3,7 +3,9 @@ import * as React from "react";
 import "./index.scss";
 
 export type LazyLoadProps = {
+	id?: string,
 	src: string,
+	class?: string,
 	width?: number,
 	height?: number;
 };
@@ -23,7 +25,7 @@ class LazyLoad extends React.Component<LazyLoadProps, LazyLoadState> {
 	}
 	public render() {
 		return (
-			<img src={base64} width={this.props.width} height={this.props.height} loading="lazy"
+			<img id={this.props.id} src={base64} class={this.props.class} width={this.props.width} height={this.props.height} loading="lazy"
 				onLoad={(event) => {
 					// @ts-ignore
 					if (event.target.src === this.props.src) {
