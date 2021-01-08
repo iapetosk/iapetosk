@@ -35,7 +35,7 @@ class Reader extends React.Component<ReaderProps> {
 
 			switch ($new.view) {
 				case "reader": {
-					this.setState({ ...this.state, media: { ...this.state.media, files: [] } });
+					this.setState({ ...this.state, script: undefined, media: { ...this.state.media, files: [] } });
 					read.script($new.options as number).then(async (script) => {
 						const files = [];
 
