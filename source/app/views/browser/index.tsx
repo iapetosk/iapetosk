@@ -144,7 +144,7 @@ class Browser extends React.Component<BrowserProps> {
 			// RPC
 			DiscordRPC.set_activity({
 				details: this.state.query.options.input,
-				...(this.state.iterable.options.blocks.length ? {
+				...(this.state.paging.enable ? {
 					state: "Browsing",
 					partySize: this.state.paging.options.index + 1,
 					partyMax: this.state.paging.options.size
