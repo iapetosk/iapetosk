@@ -111,6 +111,8 @@ export class Download {
 		const I = this;
 		return new Promise<TaskStatus>((resolve, reject) => {
 			const files: number[] = [];
+			// declare worker
+			worker.set(task.id, { ...task });
 			function update(key: "id" | "from" | "title" | "files" | "status" | "options" | "working" | "finished", value: any) {
 				if (!worker.get()[task.id]) {
 					return destroy();
@@ -186,8 +188,6 @@ export class Download {
 				update("status", TaskStatus.FINISHED);
 				return destroy();
 			}
-			// declare worker
-			worker.set(task.id, { ...task });
 			// update
 			update("status", TaskStatus.WORKING);
 			update("working", task.finished);
