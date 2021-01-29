@@ -35,7 +35,7 @@ class Search {
 						if (tag[0] !== Prefix.EXCLUDE && tag[1] === Field.LANGUAGE && tag[2] === "all") {
 							singular++;
 						} else {
-							singular--;
+							return false;
 						}
 					}
 				}
@@ -132,6 +132,9 @@ class Search {
 					}
 					compute(filter[x][y][0], "global", nozomi.array.local);
 				}
+			}
+			if (!nozomi.array.global.length) {
+				compute(Prefix.INCLUDE, "global", await retrieve([Prefix.INCLUDE, Field.LANGUAGE, "all"]));
 			}
 			return resolve({
 				array: nozomi.array.global,
