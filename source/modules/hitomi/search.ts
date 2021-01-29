@@ -1,7 +1,7 @@
 import request from "@/modules/request";
 
 import { RequestResponse } from "@/modules/request";
-import { Prefix, Tag, Keyword } from "@/modules/hitomi/filter";
+import { Prefix, Field, Tag, Computable } from "@/modules/hitomi/filter";
 
 export type GalleryList = {
 	size: number,
@@ -10,123 +10,138 @@ export type GalleryList = {
 };
 
 class Search {
-	private index_all = "https://ltn.hitomi.la/index-all.nozomi";
 	private collection: Record<string, number[]> = {};
-	constructor() {
-		// TODO: none
-	}
-	public get(filter: Keyword, index: number, per_page: number) {
+	public get(filter: Computable, index: number, per_page: number) {
 		return this.unknown_0(filter, index, per_page);
 	}
-	private unknown_0(filter: Keyword, index: number, per_page: number) {
-		// array of gallery array
-		let array: number[] = [];
-		// length of gallery array
-		let size: number = 0;
-		// request counts
-		let count: number = 0;
-		// request adresses
-		const URL: Record<Prefix, string[]> = {
-			[Prefix.POSITIVE]: [],
-			[Prefix.NEGATIVE]: []
+	private unknown_0(filter: Computable, index: number, per_page: number) {
+		// instance
+		const I = this;
+		// result
+		const nozomi = {
+			array: {
+				local: new Array<number>(),
+				global: new Array<number>()
+			},
+			size: 0,
+			singular: is_SINGULAR()
 		};
-		return new Promise<GalleryList>((resolve, reject) => {
-			for (const tag of Object.keys(filter)) {
-				switch (tag) {
-					case "language": {
-						if (Object.values(filter).map((value) => { return value.length; }).reduce(($old, $new) => { return $old + $new; }, 0) - filter.language.length > 0) {
-							break;
-						}
-						for (let index = 0; index < filter[tag as Tag].length; index++) {
-							URL[filter[tag as Tag][index].prefix].push(`https://ltn.hitomi.la/index-${filter[tag as Tag][index].value}.nozomi`);
-						}
-						break;
-					}
-					default: {
-						for (let index = 0; index < filter[tag as Tag].length; index++) {
-							for (const language of filter.language.length ? filter.language : [{ prefix: Prefix.POSITIVE, value: "all" }]) {
-								URL[filter[tag as Tag][index].prefix].push(`https://ltn.hitomi.la/${tag === "male" || tag === "female" ? "tag" : tag}/${tag === "male" || tag === "female" ? `${tag}:${filter[tag as Tag][index].value}` : filter[tag as Tag][index].value}-${filter[tag as Tag][index].prefix === Prefix.POSITIVE && language.prefix === Prefix.POSITIVE ? language.value : "all"}.nozomi`);
-							}
-						}
-						break;
-					}
-				}
-			}
-			if (URL[Prefix.POSITIVE].length === 0) {
-				URL[Prefix.POSITIVE].unshift(this.index_all);
-			}
-			console.log(URL);
+		function is_SINGULAR() {
+			let singular = 0;
 
-			const SINGULAR: boolean = URL[Prefix.POSITIVE].length === 1 && URL[Prefix.NEGATIVE].length === 0 && URL[Prefix.POSITIVE][0] === this.index_all;
-
-			function $(prefix: Prefix, $array: number[]) {
-				const collection: Set<number> = new Set($array);
-				// increase slot
-				count++;
-				// determine prefix
-				switch (prefix) {
-					case Prefix.POSITIVE: {
-						if (array.length) {
-							const $size: number = array.length;
-							array = array.filter((id) => collection.has(id));
-							size -= SINGULAR ? $size - array.length : 0;
+			for (const group of filter) {
+				for (const [prefix, tags] of group) {
+					for (const tag of tags) {
+						if (tag[0] !== Prefix.EXCLUDE && tag[1] === Field.LANGUAGE && tag[2] === "all") {
+							singular++;
 						} else {
-							array = $array;
+							singular--;
 						}
-						break;
 					}
-					case Prefix.NEGATIVE: {
-						array = array.filter((id) => !collection.has(id));
-						break;
-					}
-				}
-				// none-async resolve
-				if (count === URL[Prefix.POSITIVE].length + URL[Prefix.NEGATIVE].length) {
-					// debug
-					console.table({
-						positive: URL[Prefix.POSITIVE],
-						negative: URL[Prefix.NEGATIVE],
-						singular: SINGULAR
-					});
-					// return
-					return resolve({
-						size: size + (SINGULAR ? 0 : array.length),
-						array: array,
-						singular: SINGULAR
-					});
-				}
-			};
-			for (let $index = 0; $index < URL[Prefix.POSITIVE].length + URL[Prefix.NEGATIVE].length; $index++) {
-				const shortcut = { prefix: $index < URL[Prefix.POSITIVE].length ? Prefix.POSITIVE : Prefix.NEGATIVE, url: [...URL[Prefix.POSITIVE], ...URL[Prefix.NEGATIVE]][$index] };
-
-				if (/id\/([0-9]+)/.test(shortcut.url)) {
-					$(shortcut.prefix, [Number(/id\/([0-9]+)/.exec(shortcut.url)![1])]);
-				}
-				else if (SINGULAR || !this.collection[shortcut.url]) {
-					request.GET(shortcut.url, { headers: SINGULAR ? { "range": `bytes=${index * per_page * 4}-${index * per_page * 4 + per_page * 4 - 1}` } : {} }, "binary").then((response) => {
-						switch (response.status.code) {
-							case 200:
-							case 206: {
-								const array = this.unknown_1(response);
-								// if only INDEX_ALL assigned
-								if (SINGULAR) {
-									size += Number((response.headers["content-range"]! as string).replace(/^bytes\s[0-9]+-[0-9]+\//, "")) / 4;
-								} else {
-									this.collection[shortcut.url] = array;
-								}
-								$(shortcut.prefix, array);
-								break;
-							}
-						}
-					});
-				} else {
-					$(shortcut.prefix, this.collection[shortcut.url]);
 				}
 			}
+			return singular === 1;
+		}
+		function get_URL(tag: Tag) {
+			const [prefix, field, value] = tag;
+
+			switch (field) {
+				case Field.LANGUAGE: {
+					return `https://ltn.hitomi.la/index-${value}.nozomi`;
+				}
+				case Field.MALE:
+				case Field.FEMALE: {
+					return `https://ltn.hitomi.la/tag/${field}:${value}-all.nozomi`;
+				}
+				default: {
+					return `https://ltn.hitomi.la/${field}/${value}-all.nozomi`;
+				}
+			}
+		}
+		async function retrieve(tag: Tag) {
+			const [prefix, field, value] = tag;
+
+			switch (field) {
+				case Field.ID: {
+					return [Number(value)];
+				}
+				default: {
+					const URL = get_URL(tag);
+
+					if (!I.collection[URL]) {
+						await request.GET(URL, { headers: nozomi.singular ? { "range": `bytes=${index * per_page * 4}-${index * per_page * 4 + per_page * 4 - 1}` } : {} }, "binary").then((response) => {
+							switch (response.status.code) {
+								case 200: // full
+								case 206: // partitial
+									{
+										if (nozomi.singular) {
+											// full length
+											nozomi.size = Number((response.headers["content-range"]! as string).replace(/^bytes\s[0-9]+-[0-9]+\//, "")) / 4;
+											// return without save
+											return I.unknown_1(response);
+										}
+										I.collection[URL] = I.unknown_1(response);
+										break;
+									}
+							}
+						});
+					}
+					return I.collection[URL];
+				}
+			}
+		}
+		function compute(prefix: Prefix, scope: "global" | "local", array: number[]) {
+			switch (prefix) {
+				case Prefix.AND: {
+					if (!nozomi.array[scope].length) {
+						nozomi.array[scope] = [...nozomi.array[scope], ...array];
+						break;
+					}
+				}
+				case Prefix.EXCLUDE: {
+					const collection = new Set(array);
+					nozomi.array[scope].filter((id) => { return (prefix === Prefix.AND) === collection.has(id); });
+					break;
+				}
+				case Prefix.INCLUDE: {
+					nozomi.array[scope] = [...nozomi.array[scope], ...array];
+					break;
+				}
+			}
+		}
+		return new Promise<GalleryList>(async (resolve, reject) => {
+			/*
+			follows are URL format.
+
+			https://ltn.hitomi.la/index-{language}.nozomi
+			https://ltn.hitomi.la/{field}/{value}-{language}.nozomi
+
+			in conclusion, it's possible to optimize request response by provide specific {language} scope.
+			however this will make extra complexity in understanding of codes thus I decided to do not.
+			*/
+			for (let x = 0; x < filter.length; x++) {
+				for (let y = 0; y < filter[x].length; y++) {
+					// avoid undefined
+					if (!filter[x][y]) {
+						continue;
+					}
+					nozomi.array.local = [];
+
+					for (let z = 0; z < filter[x][y][1].length; z++) {
+						compute(filter[x][y][1][z][0], "local", await retrieve(filter[x][y][1][z]));
+					}
+					compute(filter[x][y][0], "global", nozomi.array.local);
+				}
+			}
+			return resolve({
+				array: nozomi.array.global,
+				size: nozomi.singular ? nozomi.size : nozomi.array.global.length,
+				singular: nozomi.singular
+			});
 		});
 	}
 	private unknown_1(response: RequestResponse) {
-		const binary: Buffer = Buffer.from(response.encode, "binary");
+		const binary: Buffer = new Buffer(response.encode, "binary");
 		const endian: DataView = new DataView(binary.buffer.slice(binary.byteOffset, binary.byteOffset + binary.byteLength));
 		const array: Array<number> = new Array(endian.byteLength / 4);
 

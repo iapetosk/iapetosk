@@ -127,15 +127,24 @@ class Read {
 			return recursive();
 		});
 	}
-	// @see common.js > url_from_url_from_hash
+	/**
+	 * @memberof common.js
+	 * @see url_from_url_from_hash
+	*/
 	private unknown_0(id: number, image: GalleryFile, directory?: string, extension?: string, subdomain?: string) {
 		return this.unknown_3(this.unknown_5(id, image, directory, extension), subdomain);
 	}
-	// @see common.js > subdomain_from_galleryid
+	/**
+	 * @memberof common.js
+	 * @see subdomain_from_galleryid
+	*/
 	private unknown_1(value: number, number_of_frontends: number) {
 		return String.fromCharCode(97 + (value % number_of_frontends));
 	}
-	// @see common.js > subdomain_from_url
+	/**
+	 * @memberof common.js
+	 * @see subdomain_from_url
+	*/
 	private unknown_2(url: string, subdomain: string = "b") {
 		const match = /\/[0-9a-f]\/([0-9a-f]{2})\//.exec(url);
 
@@ -149,18 +158,27 @@ class Read {
 		}
 		return subdomain;
 	}
-	// @see common.js > url_from_url
+	/**
+	 * @memberof common.js
+	 * @see url_from_url
+	*/
 	private unknown_3(url: string, subdomain?: string) {
 		return url.replace(/\/\/..?\.hitomi\.la\//, `//${this.unknown_2(url, subdomain)}.hitomi.la/`);
 	}
-	// @see common.js > full_path_from_hash
+	/**
+	 * @memberof common.js
+	 * @see full_path_from_hash
+	*/
 	private unknown_4(hash: string) {
 		if (hash.length < 3) {
 			return hash;
 		}
 		return hash.replace(/^.*(..)(.)$/, "$2/$1/" + hash);
 	}
-	// @see common.js > url_from_hash
+	/**
+	 * @memberof common.js
+	 * @see url_from_hash
+	*/
 	private unknown_5(id: number, image: GalleryFile, directory?: string, extension?: string) {
 		extension = extension || directory || image.name.split(/\./).pop();
 		directory = directory || "images";

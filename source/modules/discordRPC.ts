@@ -21,7 +21,9 @@ export type RichPresence = {
 	instance?: boolean;
 };
 
-// https://discord.com/developers/applications/<application_id>/information
+/**
+ * https://discord.com/developers/applications/{application_id}/information
+ */
 class DiscordRPC {
 	private activity: RichPresence = {};
 	readonly client = new RPC.Client({ transport: "ipc" });

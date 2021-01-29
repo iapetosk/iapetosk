@@ -1,4 +1,4 @@
-import request from "../request";
+import request from "@/modules/request";
 
 import { sha256 } from "js-sha256";
 
@@ -31,7 +31,7 @@ class Suggest {
 	private serial = 0;
 	constructor() {
 		for (const namespace of ["tagindex"]) {
-			request.GET(`https://ltn.hitomi.la/${namespace}/version?_=${new Date().getTime()}`).then((response) => {
+			request.GET(`https://ltn.hitomi.la/${namespace}/version?_=${Date.now()}`).then((response) => {
 				this.version[namespace as "tagindex" | "galleries" | "languages" | "nozomiurl"] = response.encode;
 			});
 		}
@@ -42,7 +42,10 @@ class Suggest {
 	public get(query: string) {
 		return this.unknown_0(query.replace(/_/g, "\u0020"));
 	}
-	// @see search.js > get_suggestions_for_query
+	/**
+	 * @memberof search.js
+	 * @see get_suggestions_for_query
+	*/
 	private unknown_0(query: string) {
 		const I = this;
 		return new Promise<Suggestion>((resolve, reject) => {
@@ -65,11 +68,17 @@ class Suggest {
 			});
 		});
 	}
-	// @see searchlib.js > hash_term
+	/**
+	 * @memberof searchlib.js
+	 * @see hash_term
+	 */
 	private unknown_1(value: string) {
 		return new Uint8Array(sha256.array(value).slice(0, 4));
 	}
-	// @see search.js > decode_node
+	/**
+	 * @memberof search.js
+	 * @see decode_node
+	*/
 	private unknown_2(bytes: Uint8Array) {
 		const bundle: SuggestBundle = {
 			index: [],
@@ -120,7 +129,10 @@ class Suggest {
 		}
 		return bundle;
 	}
-	// @see search.js > get_node_at_address
+	/**
+	 * @memberof search.js
+	 * @see get_node_at_adress
+	*/
 	private unknown_3(field: string, adress: number) {
 		const I = this;
 		return new Promise<SuggestBundle>((resolve, reject) => {
@@ -147,7 +159,10 @@ class Suggest {
 			return recursive();
 		});
 	}
-	// @see search.js > get_url_at_range
+	/**
+	 * @memberof search.js
+	 * @see get_url_at_range
+	*/
 	private unknown_4(url: string, range: [number, number]) {
 		return new Promise<Uint8Array>((resolve, reject) => {
 			request.GET(url, { headers: { "range": `bytes=${range[0]}-${range[1]}` } }, "binary").then((response) => {
@@ -155,7 +170,10 @@ class Suggest {
 			});
 		});
 	}
-	// @see search.js > B_search
+	/**
+	 * @memberof search.js
+	 * @see B_search
+	*/
 	private unknown_5(field: string, key: Uint8Array, bundle: SuggestBundle) {
 		return new Promise<[number, number]>((resolve, reject) => {
 			function mystery_0(first: Uint8Array, second: Uint8Array): [boolean, boolean] {
@@ -210,7 +228,10 @@ class Suggest {
 			});
 		});
 	}
-	// @see search.js > get_suggestions_from_data
+	/**
+	 * @memberof search.js
+	 * @see get_suggestions_from_data
+	*/
 	private unknown_6(field: string, bytes: [number, number]) {
 		const suggest: Suggestion = [];
 		return new Promise<Suggestion>((resolve, reject) => {

@@ -1,5 +1,5 @@
 class Utility {
-	public index_of<type>(value: type[], match: RegExp) {
+	public index_of<type>(value: type[], match: type | RegExp) {
 		for (let index = 0; index < value.length; index++) {
 			if (match instanceof RegExp ? match.test(String(value[index])) : value[index] === match) {
 				return index;
@@ -32,7 +32,6 @@ class Utility {
 		(value instanceof Document ? value : new DOMParser().parseFromString(value, "text/html")).querySelectorAll(selector).forEach((element, index) => {
 			array[index] = attribute ? element.getAttribute(attribute)! : (element as HTMLElement).innerText;
 		});
-
 		return this.unwrap(array);
 	}
 	public extract(value: string, selector: string, type: "string" | "number" | "array" | "object") {

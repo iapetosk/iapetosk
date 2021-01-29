@@ -40,7 +40,7 @@ window.bridge.on(BridgeEvent.CLOSE, (args) => {
 	const [$vote] = args as [string];
 
 	if (upvotes[$vote]) {
-		throw new Error(`DUPLICATED VOTE: ${$vote}`);
+		throw new Error();
 	} else {
 		upvotes[$vote] = true;
 	}
@@ -49,7 +49,6 @@ window.bridge.on(BridgeEvent.CLOSE, (args) => {
 	}
 });
 ReactDOM.render(<App/>, document.getElementById("app"));
-
 // RPC
 DiscordRPC.set_activity({
 	details: "Starting...",
