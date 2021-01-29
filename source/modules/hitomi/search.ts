@@ -100,7 +100,7 @@ class Search {
 				}
 				case Prefix.EXCLUDE: {
 					const collection = new Set(array);
-					nozomi.array[scope].filter((id) => { return (prefix === Prefix.AND) === collection.has(id); });
+					nozomi.array[scope] = nozomi.array[scope].filter((id) => { return (prefix === Prefix.AND) === collection.has(id); });
 					break;
 				}
 				case Prefix.INCLUDE: {

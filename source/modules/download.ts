@@ -134,6 +134,7 @@ export class Download {
 					(chunk, progress) => {
 						// write file
 						writable.write(chunk);
+						// update
 						update("files", { ...task.files, [files[index]]: { ...task.files[files[index]], size: progress[RequestProgress.TOTAL_SIZE], written: task.files[files[index]].written + chunk.length } });
 					}).then(() => {
 						// stop writing
