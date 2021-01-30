@@ -13,7 +13,9 @@ export enum Field {
 	GROUP = "group",
 	TAG = "tag",
 	MALE = "male",
-	FEMALE = "female"
+	FEMALE = "female",
+	// custom
+	STATUS = "status"
 };
 export type Tag = [
 	Prefix,
@@ -27,27 +29,9 @@ export type Computable = [
 
 const [TAG, PRF] = [
 	// TAG
-	new RegExp([
-		"^",
-		"(",
-		Object.values(Prefix).join("|").replace(/[+]/g, "\\$&"),
-		")",
-		"(",
-		Object.values(Field).join("|"),
-		")",
-		":",
-		"(",
-		"[a-zA-Z0-9_]+",
-		")",
-		"$"
-	].join("")),
+	new RegExp(["^", "(", Object.values(Prefix).join("|").replace(/[+]/g, "\\$&"), ")", "(", Object.values(Field).join("|"), ")", ":", "(", "[a-zA-Z0-9_]+", ")", "$"].join("")),
 	// PRF
-	new RegExp([
-		"(",
-		Object.values(Prefix).join("|").replace(/[+]/g, "\\$&"),
-		")",
-		"$"
-	].join(""))
+	new RegExp(["(", Object.values(Prefix).join("|").replace(/[+]/g, "\\$&"), ")", "$"].join(""))
 ];
 
 class Filter {

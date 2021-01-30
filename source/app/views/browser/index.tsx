@@ -149,10 +149,10 @@ class Browser extends React.Component<BrowserProps> {
 					partySize: this.state.paging.options.index + 1,
 					partyMax: this.state.paging.options.size
 				} : {
-					state: "Fetching",
-					partySize: undefined,
-					partyMax: undefined
-				})
+						state: "Fetching",
+						partySize: undefined,
+						partyMax: undefined
+					})
 			});
 		}
 		return (

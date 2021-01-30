@@ -62,7 +62,7 @@ class Request {
 				}, (response) => {
 					// redirect
 					if ((options.partial.max_redirects || settings.request.max_redirects) > (options.private.redirects || 0) && response.headers["location"]) {
-						return recursive({ ...options, private: { ...options.private, redirects: options.private.redirects ?  options.private.redirects + 1 : 1 } });
+						return recursive({ ...options, private: { ...options.private, redirects: options.private.redirects ? options.private.redirects + 1 : 1 } });
 					}
 					if (callback) {
 						var L = Number(response.headers["content-length"]), R = 0, T = Date.now();

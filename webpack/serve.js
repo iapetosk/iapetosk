@@ -13,19 +13,19 @@ const compiler_main = webpack({
 	mode: "development",
 	watch: true,
 	devtool: "eval-cheap-module-source-map"
-}, () => {});
+}, () => { });
 const compiler_preload = webpack({
 	...preload,
 	mode: "development",
 	watch: true,
 	devtool: "eval-cheap-module-source-map"
-}, () => {});
+}, () => { });
 const compiler_renderer = webpack({
 	...renderer,
 	mode: "development",
 	watch: true,
 	devtool: "eval-cheap-module-source-map"
-}, () => {});
+}, () => { });
 compiler_main.hooks.done.tap("done", () => {
 	compiled.main = true;
 	start();

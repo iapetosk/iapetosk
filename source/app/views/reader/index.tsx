@@ -73,11 +73,11 @@ class Reader extends React.Component<ReaderProps> {
 					partySize: undefined,
 					partyMax: undefined
 				} : {
-					details: undefined,
-					state: "Fetching",
-					partySize: undefined,
-					partyMax: undefined
-				})
+						details: undefined,
+						state: "Fetching",
+						partySize: undefined,
+						partyMax: undefined
+					})
 			});
 		}
 		return (

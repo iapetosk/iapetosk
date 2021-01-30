@@ -11,7 +11,7 @@ export type Configure = {
 		input: string;
 	},
 	iterable: {
-		discovery: string[]
+		discovery: string[];
 	},
 	paging: {
 		metre: number;
@@ -23,7 +23,7 @@ export type Configure = {
 		max_redirects: number;
 	},
 	storage: {
-		auto_save: number
+		auto_save: number;
 	},
 	download: {
 		folder: string,
@@ -72,7 +72,7 @@ const boilerplate: Configure = {
 		max_working: 5
 	}
 },
-settings: Configure = storage.get_data(StoragePreset.SETTINGS);
+	settings: Configure = storage.get_data(StoragePreset.SETTINGS);
 
 function recursive($new: Record<string, any>, $old: Record<string, any>) {
 	for (const key of Object.keys($new)) {

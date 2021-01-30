@@ -15,7 +15,7 @@ export class StaticHandler<state> {
 	protected $set($new: state) {
 		// backup
 		const $old = this.$get();
-		
+
 		switch ($new) {
 			case $old: {
 				break;
@@ -27,7 +27,7 @@ export class StaticHandler<state> {
 				console.log(this.event, [$new, $old]);
 				// listener [$new, $old]
 				window.static.emit(this.event, [$new, $old]);
-				break
+				break;
 			}
 		}
 	}

@@ -26,12 +26,12 @@ export type IterableProps = {
 export type IterableState = {
 	[key: number]: {
 		status: {
-			task: TaskStatus
+			task: TaskStatus;
 		},
 		html: {
-			upper: UpperSection
-		}
-	}
+			upper: UpperSection;
+		};
+	};
 };
 export enum UpperSection {
 	INTERACTS,
@@ -42,10 +42,7 @@ const [languages_english, languages_local] = [
 	["all", "indonesian", "catalan", "cebuano", "czech", "danish", "german", "estonian", "english", "spanish", "esperanto", "french", "italian", "latin", "hungarian", "dutch", "norwegian", "polish", "portuguese", "romanian", "albanian", "slovak", "finnish", "swedish", "tagalog", "vietnamese", "turkish", "greek", "mongolian", "russian", "ukrainian", "hebrew", "arabic", "persian", "thai", "korean", "chinese", "japanese"],
 	["all", "Bahasa Indonesia", "català", "Cebuano", "Čeština", "Dansk", "Deutsch", "eesti", "English", "Español", "Esperanto", "Français", "Italiano", "Latina", "magyar", "Nederlands", "norsk", "polski", "Português", "română", "shqip", "Slovenčina", "Suomi", "Svenska", "Tagalog", "tiếng việt", "Türkçe", "Ελληνικά", "Монгол", "Русский", "Українська", "עברית", "العربية", "فارسی", "ไทย", "한국어", "中文", "日本語"]
 ];
-const censorship = new RegExp("(" + [
-	"guro", "ryona", "snuff", "blood", "torture", "amputee", "cannibalism"
-// RegExp seperator
-].join("|") + ")");
+const censorship = new RegExp("(" + ["guro", "ryona", "snuff", "blood", "torture", "amputee", "cannibalism"].join("|") + ")");
 
 class Iterable extends React.Component<IterableProps, IterableState> {
 	public props: IterableProps;
@@ -57,7 +54,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 
 		window.static.on(StaticEvent.WORKER, (args) => {
 			const [$index, $new] = args as [number, Task | undefined, Task | undefined];
-			
+
 			switch ($new ? $new.status : TaskStatus.NONE) {
 				case this.state[$index]?.status?.task: {
 					break;
@@ -91,30 +88,30 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 										</button>
 									</section>
 									<section id="scrollable" class="scroll-y">
-									{(this.state[gallery.id]?.html?.upper === undefined ? [] : this.props.options.discovery).map((key, index) => {
-										// @ts-ignore
-										if (gallery[key] && utility.wrap(gallery[key]).length) {
-											return (
-												<legend id="bundle" key={index}>
-													{key}:{
-													// @ts-ignore
-													utility.wrap(gallery[key]).map((value, index) => {
-														return (
-															<button id="key" class={utility.inline({ "contrast": true, "center": true, "censorship": censorship.test(value) })} key={index}>
-																<mark id="value" class="eclipse"
-																onMouseUp={(event) => {
-																	const [$key, $value] = [/tags/.test(key) ? /♂/.test(value) ? "male" : /♀/.test(value) ? "female" : "tag" : key, /language/.test(key) ? languages_english[utility.index_of(languages_local, value)] : value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_")];
-																	this.props.handler.click(event.button, $key, $value);
-																}}>
-																{value}</mark>
-															</button>
-														);
-													})}
-												</legend>
-											);
-										}
-										return undefined;
-									})}
+										{(this.state[gallery.id]?.html?.upper === undefined ? [] : this.props.options.discovery).map((key, index) => {
+											// @ts-ignore
+											if (gallery[key] && utility.wrap(gallery[key]).length) {
+												return (
+													<legend id="bundle" key={index}>
+														{key}:{
+															// @ts-ignore
+															utility.wrap(gallery[key]).map((value, index) => {
+																return (
+																	<button id="key" class={utility.inline({ "contrast": true, "center": true, "censorship": censorship.test(value) })} key={index}>
+																		<mark id="value" class="eclipse"
+																			onMouseUp={(event) => {
+																				const [$key, $value] = [/tags/.test(key) ? /♂/.test(value) ? "male" : /♀/.test(value) ? "female" : "tag" : key, /language/.test(key) ? languages_english[utility.index_of(languages_local, value)] : value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_")];
+																				this.props.handler.click(event.button, $key, $value);
+																			}}>
+																			{value}</mark>
+																	</button>
+																);
+															})}
+													</legend>
+												);
+											}
+											return undefined;
+										})}
 									</section>
 								</section>
 								{/* buttons */}
@@ -127,32 +124,32 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 											}
 										},
 										...(this.state[gallery.id]?.status?.task === TaskStatus.WORKING || this.state[gallery.id]?.status?.task === TaskStatus.FINISHED || this.state[gallery.id]?.status?.task === TaskStatus.QUEUED ? [
-										{
-											HTML: require(`!html-loader!@/assets/icons/delete.svg`),
-											click: () => {
-												download.destroy(gallery.id).then(() => {
-													// TODO: none
-												});
-											}
-										}] : []),
+											{
+												HTML: require(`!html-loader!@/assets/icons/delete.svg`),
+												click: () => {
+													download.destroy(gallery.id).then(() => {
+														// TODO: none
+													});
+												}
+											}] : []),
 										...(this.state[gallery.id]?.status?.task === TaskStatus.WORKING || this.state[gallery.id]?.status?.task === TaskStatus.FINISHED ? [
 											{
 												HTML: require(`!html-loader!@/assets/icons/open.svg`),
 												click: () => {
 													process.exec(`start "" "${path.resolve(TaskFolder.DOWNLOADS, String(gallery.id))}"`);
 												}
-										}] : []),
+											}] : []),
 										...(!this.state[gallery.id]?.status?.task ? [
-										{
-											HTML: require(`!html-loader!@/assets/icons/download.svg`),
-											click: () => {
-												download.evaluate(`https://hitomi.la/galleries/${gallery.id}.html`).then((task) => {
-													download.create(task).then(() => {
-														// TODO: none
+											{
+												HTML: require(`!html-loader!@/assets/icons/download.svg`),
+												click: () => {
+													download.evaluate(`https://hitomi.la/galleries/${gallery.id}.html`).then((task) => {
+														download.create(task).then(() => {
+															// TODO: none
+														});
 													});
-												});
-											}
-										}] : []),
+												}
+											}] : []),
 										{
 											HTML: require(`!html-loader!@/assets/icons/copy.svg`),
 											click: () => {
@@ -183,7 +180,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 								<legend id="id" class="center">#{gallery.id}</legend>
 							</section>
 							{/* status */}
-							<section id="status" class={utility.inline({ "active": Object.keys({ ...this.state[gallery.id]?.status }).length > 0  })}>
+							<section id="status" class={utility.inline({ "active": Object.keys({ ...this.state[gallery.id]?.status }).length > 0 })}>
 								{[
 									{
 										type: "ribbon",

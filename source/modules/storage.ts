@@ -27,8 +27,7 @@ class Storage {
 		setInterval(() => {
 			// save all
 			this.save();
-		},
-		1000 * 60 * 5);
+		}, 1000 * 60 * 5);
 	}
 	private define(object: Record<string, any>, array: string[], data: any) {
 		for (const [index, value] of array.entries()) {

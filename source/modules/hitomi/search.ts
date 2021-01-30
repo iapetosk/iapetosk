@@ -1,8 +1,9 @@
 import request from "@/modules/request";
+import worker from "@/statics/worker";
 
+import { TaskStatus } from "@/modules/download";
 import { RequestResponse } from "@/modules/request";
 import { Prefix, Field, Tag, Computable } from "@/modules/hitomi/filter";
-
 export type GalleryList = {
 	size: number,
 	array: number[],
@@ -64,6 +65,15 @@ class Search {
 			switch (field) {
 				case Field.ID: {
 					return [Number(value)];
+				}
+				case Field.STATUS: {
+					// @ts-ignore
+					const status: TaskStatus | undefined = TaskStatus[value.toUpperCase()];
+
+					if (status === undefined) {
+						return [];
+					}
+					return worker.filter({ key: "status", value: status }).map((task) => { return task.id; });
 				}
 				default: {
 					const URL = get_URL(tag);

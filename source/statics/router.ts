@@ -2,7 +2,7 @@ import { StaticEvent, StaticHandler } from "@/statics";
 
 export type Viewport = {
 	view: string,
-	options: any
+	options: any;
 };
 
 class Router extends StaticHandler<Viewport> {
