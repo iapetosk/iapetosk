@@ -1,6 +1,6 @@
 # READ ME
 
-*Waifu Material* is **Downloader** / **Reader**  for [hitomi.la](https://hitomi.la).<br>
+*Waifu Material* is a **Downloader** / **Reader**  for [hitomi.la](https://hitomi.la).<br>
 
 ## 1. Fullscreen **Shortcut**
 
@@ -21,7 +21,7 @@ Prefix can be used simply by insert it at the start of either search term or a g
 
 #### **AND**
 
-It computes the **common ground** with the one this prefix is appended and from the previous result.<br>
+It computes the **common ground** with the one this prefix is appended from the previous result.<br>
 *If no previous result has found, it works as same as `INCLUDE`.*
 
 #### **INCLUDE** (+)
