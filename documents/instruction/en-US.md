@@ -2,13 +2,13 @@
 
 *Waifu Material* is a **Downloader** / **Reader**  for [hitomi.la](https://hitomi.la).<br>
 
-## 1. Fullscreen **Shortcut**
+## 1. Fullscreen Shortcut
 
 Press <kbd>F11</kbd> will **enter** fullscreen.<br>
 Press <kbd>F11</kbd> again will **leave** fullscreen.<br>
 Also, upon **enter**ing fullscreen, both **titlebar**, and **paging** will become invisible.<br>
 
-## 2. Arrow-key **Interactions**
+## 2. Arrow-key Interactions
 
 It is an extra interaction for **paging**.<br>
 Press <kbd><</kbd> will increase, and <kbd>></kbd> will decrease **paging** index by **1**.<br>
@@ -19,16 +19,16 @@ App offers special search terms `id:<number>`, and `status:<NONE/FINISHED/WORKIN
 As for prefixes, there are `AND`, `INCLUDE`, and `EXCLUDE`.<br>
 Prefix can be used simply by insert it at the start of either search term or a group, and is default of `AND`.<br>
 
-#### **AND**
+#### AND
 
 It computes the **common ground** with the one this prefix is appended from the previous result.<br>
 *If no previous result has found, it works as same as `INCLUDE`.*
 
-#### **INCLUDE** (+)
+#### INCLUDE (+)
 
 It **adds** the result of a search term this prefix is appended from previous result.<br>
 
-#### **EXCLUDE** (-)
+#### EXCLUDE (-)
 
 It **removes** the result of a search term this prefix is appended from previous result.<br>
 
@@ -42,4 +42,4 @@ Followings are example of search terms, prefixes, and grouping.<br>
 ```
 tag:uncensored -(type:manga -(language:korean))
 ```
-*computes uncensored galleries translated into Korean.*<br>
+*computes uncensored (non-manga) galleries translated into Korean.*<br>
