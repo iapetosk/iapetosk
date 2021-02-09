@@ -1,6 +1,6 @@
 # READ ME
 
-*Waifu Material* is *Downloader / Reader*  for [hitomi.la](https://hitomi.la).<br>
+*Waifu Material* is **Downloader** / **Reader**  for [hitomi.la](https://hitomi.la).<br>
 
 ## 1. Fullscreen **Shortcut**
 
@@ -15,7 +15,7 @@ Press <kbd><</kbd> will increase, and <kbd>></kbd> will decrease **paging** inde
 
 ## 3. Search Terms, Prefixes, and Grouping
 
-App offers special search terms `id:<number>`, and `status:<`[TaskStatus](../../source/modules/download.ts)`>`.<br>
+App offers special search terms `id:<number>`, and `status:<NONE/FINISHED/WORKING/QUEUED/PAUSED/ERROR>`.<br>
 As for prefixes, there are `AND`, `INCLUDE`, and `EXCLUDE`.<br>
 Prefix can be used simply by insert it at the start of either search term or a group, and is default of `AND`.<br>
 
@@ -32,7 +32,7 @@ It **adds** the result of a search term this prefix is appended from previous re
 
 It **removes** the result of a search term this prefix is appended from previous result.<br>
 
-Also, it's possible to grouping search terms by putting inside `()`, and group can stacks.<br>
+Also, it's possible to grouping search terms by putting inside `()`, and groups can stack.<br>
 Computed result within a group affect outer result depends on group's prefix.<br>
 Followings are example of search terms, prefixes, and grouping.<br>
 ```
