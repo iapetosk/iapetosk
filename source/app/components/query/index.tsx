@@ -57,6 +57,7 @@ class Query extends React.Component<QueryProps, QueryState> {
 					enable={this.props.enable}
 					options={{
 						type: "input",
+						value: this.props.options.input,
 						items: this.state.suggest.map((suggest) => {
 							return [`${suggest.index}:${suggest.value}`, String(suggest.count)];
 						}),

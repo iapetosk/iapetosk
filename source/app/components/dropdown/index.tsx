@@ -8,6 +8,7 @@ export type DropDownProps = {
 	enable: boolean,
 	options: {
 		type: "input" | "select",
+		value: string,
 		items: [string, string][],
 		highlight: string;
 	},
@@ -47,7 +48,7 @@ class DropDown extends React.Component<DropDownProps, DropDownState> {
 	public render() {
 		return (
 			<section id="dropdown">
-				<input class="contrast" ref={this.refer.input} placeholder={this.state.focus && this.props.options.items.length > 0 && !isNaN(this.state.index) ? this.props.options.items[this.state.index][0] : undefined} readOnly={!this.props.enable || this.props.options.type === "select"}
+				<input class="contrast" ref={this.refer.input} readOnly={!this.props.enable || this.props.options.type === "select"} placeholder={this.props.options.value} defaultValue={this.props.options.value}
 					onFocus={() => {
 						this.setState({ ...this.state, focus: true });
 					}}
