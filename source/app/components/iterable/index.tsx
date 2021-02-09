@@ -77,7 +77,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 						<section id="gallery" class={utility.inline({ "contrast": true, [TaskStatus[this.state[gallery.id]?.status?.task || TaskStatus.NONE]]: true })} key={index}>
 							<section id="upper" class={utility.inline({ "contrast": true, [UpperSection[this.state[gallery.id]?.html?.upper || UpperSection.INTERACTS]]: true })}>
 								{/* thumbnail */}
-								<LazyLoad id="thumbnail" class={utility.inline({ "censorship": gallery.tags ? !isNaN(utility.index_of(gallery.tags, censorship)) : false })} src={gallery.thumbnail[0]}></LazyLoad>
+								<LazyLoad class={utility.inline({ "censorship": gallery.tags ? !isNaN(utility.index_of(gallery.tags, censorship)) : false })} src={gallery.thumbnail[0]}></LazyLoad>
 								{/* intels */}
 								<section id="discovery" class="fluid">
 									<section id="interacts">

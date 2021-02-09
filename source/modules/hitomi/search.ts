@@ -12,10 +12,10 @@ export type GalleryList = {
 
 class Search {
 	private collection: Record<string, number[]> = {};
-	public get(filter: Computable, index: number, per_page: number) {
-		return this.unknown_0(filter, index, per_page);
+	public get([computable, count]: [Computable, number], index: number, per_page: number) {
+		return this.unknown_0([computable, count], index, per_page);
 	}
-	private unknown_0(filter: Computable, index: number, per_page: number) {
+	private unknown_0([computable, count]: [Computable, number], index: number, per_page: number) {
 		// instance
 		const I = this;
 		// result
@@ -30,9 +30,13 @@ class Search {
 		function is_SINGULAR() {
 			let singular = 0;
 
-			for (const group of filter) {
-				for (const [prefix, tags] of group) {
-					for (const tag of tags) {
+			for (const group of computable) {
+				for (const fragment of group) {
+					// avoid undefined
+					if (!fragment) {
+						continue;
+					}
+					for (const tag of fragment[0]) {
 						if (tag[0] !== Prefix.EXCLUDE && tag[1] === Field.LANGUAGE && tag[2] === "all") {
 							singular++;
 						} else {
@@ -129,18 +133,18 @@ class Search {
 			in conclusion, it's possible to optimize request response by provide specific {language} scope.
 			however this will make extra complexity in understanding of codes thus I decided to do not.
 			*/
-			for (let x = 0; x < filter.length; x++) {
-				for (let y = 0; y < filter[x].length; y++) {
+			for (let x = 0; x < computable.length; x++) {
+				for (let y = 0; y < computable[x].length; y++) {
 					// avoid undefined
-					if (!filter[x][y]) {
+					if (!computable[x][y]) {
 						continue;
 					}
 					nozomi.array.local = [];
 
-					for (let z = 0; z < filter[x][y][1].length; z++) {
-						compute(filter[x][y][1][z][0], "local", await retrieve(filter[x][y][1][z]));
+					for (let z = 0; z < computable[x][y][1].length; z++) {
+						compute(computable[x][y][1][z][0], "local", await retrieve(computable[x][y][1][z]));
 					}
-					compute(filter[x][y][0], "global", nozomi.array.local);
+					compute(computable[x][y][0], "global", nozomi.array.local);
 				}
 			}
 			if (!nozomi.array.global.length) {

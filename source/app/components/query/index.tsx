@@ -2,7 +2,8 @@ import * as React from "react";
 
 import "./index.scss";
 
-import utility from "@/modules/utility";
+import DropDown from "@/app/components/dropdown";
+
 import suggest from "@/modules/hitomi/suggest";
 
 import { Suggestion } from "@/modules/hitomi/suggest";
@@ -12,7 +13,7 @@ export type QueryProps = {
 	options: {
 		input: string;
 	},
-	handler: Record<"keydown", (value: string) => void>;
+	handler: Record<"confirm", (value: string) => void>;
 };
 export type QueryState = {
 	focus: boolean,
@@ -22,76 +23,65 @@ export type QueryState = {
 class Query extends React.Component<QueryProps, QueryState> {
 	public props: QueryProps;
 	public state: QueryState;
-	public refer: Record<"input", HTMLElement | undefined>;
+	public refer: { dropdown: React.RefObject<DropDown>; };
 	constructor(props: QueryProps) {
 		super(props);
 		this.props = props;
-		this.state = { focus: false, suggest: [] };
-		this.refer = { input: undefined };
+		this.state = {
+			focus: false,
+			suggest: []
+		};
+		this.refer = {
+			dropdown: React.createRef()
+		};
 	}
-	public get_input() {
-		return this.refer.input as HTMLInputElement;
+	public get() {
+		return this.refer.dropdown.current?.get();
 	}
-	public get_query() {
-		return this.get_input().value.toLowerCase().split(/\s+/).pop()!.split(/:/).pop()!;
+	public set(value: string) {
+		if (this.refer.dropdown.current) {
+			this.refer.dropdown.current?.set(value);
+		}
+	}
+	public query() {
+		return this.get()?.toLowerCase().split(/\s+/).pop()!.split(/:/).pop()!;
 	}
 	static getDerivedStateFromProps($new: QueryProps, $old: QueryProps) {
 		return $new;
 	}
-	public componentDidMount() {
-		this.refer.input = document.querySelector("#query > #input") as HTMLElement;
-	}
 	public render() {
 		return (
 			<section id="query">
-				<input id="input" class="contrast" defaultValue={this.props.options.input} placeholder={this.props.options.input} disabled={!this.props.enable} autoComplete="off"
-					onFocus={() => {
-						this.setState({ ...this.state, focus: true });
+				<DropDown
+					ref={this.refer.dropdown}
+					enable={this.props.enable}
+					options={{
+						type: "input",
+						items: this.state.suggest.map((suggest) => {
+							return [`${suggest.index}:${suggest.value}`, String(suggest.count)];
+						}),
+						highlight: this.query()
 					}}
-					onBlur={() => {
-						this.setState({ ...this.state, focus: false });
-					}}
-					onChange={() => {
-						this.setState({ ...this.state, suggest: [] }, () => {
-							suggest.up();
-							suggest.get(this.get_query()).then((suggestion) => {
-								this.setState({ ...this.state, suggest: suggestion });
+					handler={{
+						choose: (value) => {
+							this.setState({ ...this.state, suggest: [] }, () => {
+								suggest.up();
+								this.set([...this.get()!.split(/\s+/).slice(0, -1), value.replace(/\s+/g, "_")].join("\u0020"));
 							});
-						});
-					}}
-					onKeyDown={(event) => {
-						switch (event.key) {
-							case "Enter": {
-								this.props.handler.keydown(this.get_input().value);
-								break;
-							}
+						},
+						change: () => {
+							this.setState({ ...this.state, suggest: [] }, () => {
+								suggest.up();
+								suggest.get(this.query()).then((suggestion) => {
+									this.setState({ ...this.state, suggest: suggestion });
+								});
+							});
+						},
+						confirm: () => {
+							this.props.handler.confirm(this.get()!);
 						}
 					}}
-				></input>
-				<section id="dropdown" class={utility.inline({ "active": this.state.focus && this.state.suggest.length > 0, "contrast": true })}>
-					{this.state.suggest.map((suggestion, index) => {
-						return (
-							<legend key={index} class="center-y" data-count={suggestion.count}
-								onClick={() => {
-									this.setState({ ...this.state, suggest: [] }, () => {
-										suggest.up();
-										this.get_input().value = this.get_input().value.split(/\s+/).map((value, index, array) => {
-											return index < array.length - 1 ? value : `${suggestion.index}:${suggestion.value.replace(/\s+/g, "_")}`;
-										}).join("\u0020");
-									});
-								}}
-							>
-								{suggestion.index}:
-								{[...suggestion.value.split(this.get_query())].map((value, index, array) => {
-									return ([
-										value,
-										index < array.length - 1 ? <strong key={index}>{this.get_query()}</strong> : undefined
-									]);
-								})}
-							</legend>
-						);
-					})}
-				</section>
+				></DropDown>
 			</section>
 		);
 	}

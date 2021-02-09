@@ -4,12 +4,13 @@ import "./index.scss";
 
 import Media from "@/app/components/media";
 
-import DiscordRPC from "@/modules/discordRPC";
+import DiscordRPC from "@/modules/discord.rpc";
 
 import utility from "@/modules/utility";
 import worker from "@/statics/worker";
 import read, { GalleryJS } from "@/modules/hitomi/read";
 
+import { API_COMMAND } from "@/common";
 import { StaticEvent } from "@/statics";
 import { MediaProps } from "@/app/components/media";
 import { Viewport } from "@/statics/router";
@@ -28,7 +29,12 @@ class Reader extends React.Component<ReaderProps> {
 	constructor(props: ReaderProps) {
 		super(props);
 		this.props = props;
-		this.state = { script: undefined, media: { files: [] } };
+		this.state = {
+			script: undefined,
+			media: {
+				files: []
+			}
+		};
 
 		window.static.on(StaticEvent.ROUTER, (args) => {
 			const [$new, $old] = args as [Viewport, Viewport];
@@ -41,8 +47,8 @@ class Reader extends React.Component<ReaderProps> {
 
 						for (let index = 0; index < script.files.length; index++) {
 							if (worker.get()[script.id] && worker.get()[script.id].files[index].written === worker.get()[script.id].files[index].size) {
-								if (await window.API.is_packaged().then((packaged) => { return packaged; })) {
-									files.push(`${await window.API.get_path().then((path) => { return path; })}/${worker.get()[script.id]?.files[index].path}`);
+								if (await window.API(API_COMMAND.IS_PACKAGED).then((packaged) => { return packaged; })) {
+									files.push(`${await window.API(API_COMMAND.GET_PATH).then((path) => { return path; })}/${worker.get()[script.id]?.files[index].path}`);
 								} else {
 									files.push(`../${worker.get()[script.id]?.files[index].path}`);
 								}
@@ -73,11 +79,11 @@ class Reader extends React.Component<ReaderProps> {
 					partySize: undefined,
 					partyMax: undefined
 				} : {
-						details: undefined,
-						state: "Fetching",
-						partySize: undefined,
-						partyMax: undefined
-					})
+					details: undefined,
+					state: "Fetching",
+					partySize: undefined,
+					partyMax: undefined
+				})
 			});
 		}
 		return (

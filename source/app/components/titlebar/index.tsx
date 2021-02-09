@@ -4,7 +4,7 @@ import "./index.scss";
 
 import utility from "@/modules/utility";
 
-import { BridgeEvent } from "@/common";
+import { BridgeEvent, API_COMMAND } from "@/common";
 
 export type TitleBarProps = {
 	enable: boolean;
@@ -21,7 +21,11 @@ class TitleBar extends React.Component<TitleBarProps, TitleBarState> {
 	constructor(props: TitleBarProps) {
 		super(props);
 		this.props = props;
-		this.state = { focus: false, maximize: false, fullscreen: false };
+		this.state = {
+			focus: false,
+			maximize: false,
+			fullscreen: false
+		};
 
 		window.bridge.on(BridgeEvent.FOCUS, () => {
 			this.setState({ ...this.state, focus: true });
@@ -50,16 +54,16 @@ class TitleBar extends React.Component<TitleBarProps, TitleBarState> {
 			<section id="titlebar" class={utility.inline({ "enable": this.props.enable, "draggable": true, "contrast": true })}>
 				<button id="focus" class="un_draggable"
 					onClick={() => {
-						window.API.minimize();
+						window.API(API_COMMAND.MINIMIZE);
 					}}
 					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/focus.svg`) }}>
 				</button>
 				<button id="maximize" class="un_draggable"
 					onClick={() => {
 						if (this.state.maximize) {
-							window.API.unmaximize();
+							window.API(API_COMMAND.UNMAXIMIZE);
 						} else {
-							window.API.maximize();
+							window.API(API_COMMAND.MAXIMIZE);
 						}
 					}}
 					dangerouslySetInnerHTML={{ __html: require(this.state.maximize ? "!html-loader!@/assets/icons/minimize.svg" : "!html-loader!@/assets/icons/maximize.svg") }}>

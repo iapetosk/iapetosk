@@ -1,6 +1,6 @@
 import { app, session, BrowserWindow, ipcMain } from "electron";
 
-import { API_COMMAND, BridgeEvent } from "@/common";
+import { BridgeEvent, API_COMMAND } from "@/common";
 
 app.on("ready", () => {
 	// create window

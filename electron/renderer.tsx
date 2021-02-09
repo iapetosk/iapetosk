@@ -5,9 +5,9 @@ import * as ReactDOM from "react-dom";
 
 import App from "@/app";
 
-import DiscordRPC from "@/modules/discordRPC";
+import DiscordRPC from "@/modules/discord.rpc";
 
-import { BridgeEvent } from "@/common";
+import { BridgeEvent, API_COMMAND } from "@/common";
 
 const upvotes: Record<string, boolean> = {};
 
@@ -45,7 +45,7 @@ window.bridge.on(BridgeEvent.CLOSE, (args) => {
 		upvotes[$vote] = true;
 	}
 	if (["storage"].every((item) => { return upvotes[item]; })) {
-		window.API.close();
+		window.API(API_COMMAND.CLOSE);
 	}
 });
 ReactDOM.render(<App />, document.getElementById("app"));

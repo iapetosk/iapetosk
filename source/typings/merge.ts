@@ -1,1 +1,1 @@
-declare type Merge<type_1st, type_2nd> = Omit<type_1st, keyof type_2nd> & type_2nd;
+declare type Merge<Type_1st, Type_2nd> = Omit<Type_1st, keyof Type_2nd> & Type_2nd;

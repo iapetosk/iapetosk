@@ -38,7 +38,7 @@ class Filter {
 	public get(value: string) {
 		const pre: string[][] = [[]], post: Computable = [[]];
 
-		let x = 0, y = 0;
+		let x = 0, y = 0, count = 0;
 
 		for (const chunk of value.split("")) {
 			switch (chunk) {
@@ -85,10 +85,12 @@ class Filter {
 						post[x][y] = [y ? PRF.exec(pre[x][y - 1])![1] as Prefix : Prefix.AND, []];
 					}
 					post[x][y][1].push([tag[1] as Prefix, tag[2] as Field, tag[3].replace(/_/g, "%20")]);
+
+					count++;
 				}
 			}
 		}
-		return post;
+		return [post, count] as [Computable, number];
 	}
 }
 export default (new Filter());

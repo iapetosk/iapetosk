@@ -6,7 +6,7 @@ import Query from "@/app/components/query";
 import Iterable from "@/app/components/iterable";
 import Paging from "@/app/components/paging";
 
-import DiscordRPC from "@/modules/discordRPC";
+import DiscordRPC from "@/modules/discord.rpc";
 
 import read from "@/modules/hitomi/read";
 import filter from "@/modules/hitomi/filter";
@@ -37,13 +37,57 @@ export type BrowserState = {
 class Browser extends React.Component<BrowserProps> {
 	public props: BrowserProps;
 	public state: BrowserState;
-	public refer: Record<"query" | "iterable" | "paging", React.RefObject<any>>;
+	public refer: { query: React.RefObject<Query>; iterable: React.RefObject<Iterable>; paging: React.RefObject<Paging>; };
 	constructor(props: BrowserProps) {
 		super(props);
 		this.props = props;
-		this.state = { query: { enable: true, options: { input: settings.query.input }, handler: { keydown: (value: string) => { this.set_query({ ...this.state.query, options: { ...this.state.query.options, input: value } }); } } }, iterable: { options: { blocks: [], discovery: settings.iterable.discovery }, handler: { "click": (button: number, key: string, value: string) => { if (!/title|date/.test(key) && !!button === new RegExp(`${key}:${value}`).test(this.refer.query.current.get_input().value)) { if (button === 0) { this.refer.query.current.get_input().value = [...this.refer.query.current.get_input().value.split(/\s+/), `${key}:${value}`].filter(($value) => { return $value; }).map(($value) => { return $value; }).join("\u0020"); } else if (button === 2) { this.refer.query.current.get_input().value = [...this.refer.query.current.get_input().value.split(/\s+/)].filter(($value) => { return $value; }).map(($value) => { return new RegExp(`${key}:${value}`).test($value) ? undefined : $value; }).join("\u0020"); } } } } }, paging: { enable: true, options: { size: 0, index: 0, metre: settings.paging.metre }, handler: { click: (value: number) => { this.set_paging({ ...this.state.paging, options: { ...this.state.paging.options, index: value } }); } } }, session: { history: [], version: 0 }, blocks: [[], 0] };
-		this.refer = { query: React.createRef(), iterable: React.createRef(), paging: React.createRef() };
-
+		this.state = {
+			query: {
+				enable: true,
+				options: {
+					input: settings.query.input
+				},
+				handler: {
+					confirm: (value) => {
+						return this.query_keydown(value);
+					}
+				}
+			},
+			iterable: {
+				options: {
+					blocks: [],
+					discovery: settings.iterable.discovery
+				},
+				handler: {
+					click: (button, key, value) => {
+						return this.iterable_click(button, key, value);
+					}
+				}
+			},
+			paging: {
+				enable: true,
+				options: {
+					size: 0,
+					index: 0,
+					metre: settings.paging.metre
+				},
+				handler: {
+					click: (value) => {
+						return this.paging_click(value);
+					}
+				}
+			},
+			session: {
+				history: [],
+				version: 0
+			},
+			blocks: [[], 0]
+		};
+		this.refer = {
+			query: React.createRef(),
+			iterable: React.createRef(),
+			paging: React.createRef()
+		};
 		window.addEventListener("keydown", (event) => {
 			if (this.props.enable && this.state.blocks.length && !document.querySelectorAll("input:focus").length) {
 				switch (event.key) {
@@ -58,6 +102,35 @@ class Browser extends React.Component<BrowserProps> {
 				}
 			}
 		});
+	}
+	public query_keydown(value: string) {
+		this.set_query({ ...this.state.query, options: { ...this.state.query.options, input: value } });
+	}
+	public iterable_click(button: number, key: string, value: string) {
+		switch (key) {
+			case "title":
+			case "date": {
+				break;
+			}
+			default: {
+				if (this.refer.query.current && Boolean(button) === new RegExp(`${key}:${value}`).test(this.refer.query.current.get()!)) {
+					switch (button) {
+						case 0: {
+							this.refer.query.current.set([...this.refer.query.current.get()!.split(/\s+/), `${key}:${value}`].filter(($value) => { return $value; }).map(($value) => { return $value; }).join("\u0020"));
+							break;
+						}
+						case 2: {
+							this.refer.query.current.set([...this.refer.query.current.get()!.split(/\s+/)].filter(($value) => { return $value; }).map(($value) => { return new RegExp(`${key}:${value}`).test($value) ? undefined : $value; }).join("\u0020"));
+							break;
+						}
+					}
+				}
+				break;
+			}
+		}
+	}
+	public paging_click(value: number) {
+		this.set_paging({ ...this.state.paging, options: { ...this.state.paging.options, index: value } });
 	}
 	public set_session(value: BrowserState["session"]) {
 		this.setState({ ...this.state, session: value }, () => {
@@ -100,22 +173,22 @@ class Browser extends React.Component<BrowserProps> {
 					}
 				}
 			} : {
-					query: {
-						...this.state.query,
-						enable: false,
-					},
-					iterable: {
-						...this.state.iterable,
-						options: {
-							...this.state.iterable.options,
-							blocks: []
-						}
-					},
-					paging: {
-						...this.state.paging,
-						enable: false
+				query: {
+					...this.state.query,
+					enable: false,
+				},
+				iterable: {
+					...this.state.iterable,
+					options: {
+						...this.state.iterable.options,
+						blocks: []
 					}
-				})
+				},
+				paging: {
+					...this.state.paging,
+					enable: false
+				}
+			})
 		});
 	}
 	public set_query(value: BrowserState["query"]) {
@@ -149,10 +222,10 @@ class Browser extends React.Component<BrowserProps> {
 					partySize: this.state.paging.options.index + 1,
 					partyMax: this.state.paging.options.size
 				} : {
-						state: "Fetching",
-						partySize: undefined,
-						partyMax: undefined
-					})
+					state: "Fetching",
+					partySize: undefined,
+					partyMax: undefined
+				})
 			});
 		}
 		return (

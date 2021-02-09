@@ -1,5 +1,5 @@
 class Utility {
-	public index_of<type>(value: type[], match: type | RegExp) {
+	public index_of<Type>(value: Type[], match: Type | RegExp) {
 		for (let index = 0; index < value.length; index++) {
 			if (match instanceof RegExp ? match.test(String(value[index])) : value[index] === match) {
 				return index;
@@ -20,10 +20,10 @@ class Utility {
 			}
 		}
 	}
-	public wrap<type>(content: type | type[]) {
+	public wrap<Type>(content: Type | Type[]) {
 		return content instanceof Array ? content : [content];
 	}
-	public unwrap<type>(value: type[]) {
+	public unwrap<Type>(value: Type[]) {
 		return value.length - 1.0 ? value : value[0];
 	}
 	public parse(value: Document | string, selector: string, attribute?: string) {

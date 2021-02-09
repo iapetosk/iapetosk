@@ -1,20 +1,9 @@
-import { BridgeEvent, API_COMMAND } from "@/common";
 import { StaticEvent } from "@/statics";
+import { BridgeEvent, API_COMMAND } from "@/common";
 
 declare global {
 	interface Window {
-		readonly API: {
-			[API_COMMAND.CLOSE]: () => Promise<void>,
-			[API_COMMAND.FOCUS]: () => Promise<void>,
-			[API_COMMAND.BLUR]: () => Promise<void>,
-			[API_COMMAND.MINIMIZE]: () => Promise<void>,
-			[API_COMMAND.MAXIMIZE]: () => Promise<void>,
-			[API_COMMAND.UNMAXIMIZE]: () => Promise<void>,
-			[API_COMMAND.ENTER_FULL_SCREEN]: () => Promise<void>,
-			[API_COMMAND.LEAVE_FULL_SCREEN]: () => Promise<void>,
-			[API_COMMAND.IS_PACKAGED]: () => Promise<boolean>,
-			[API_COMMAND.GET_PATH]: () => Promise<string>;
-		},
+		readonly API: (command: API_COMMAND) => Promise<any>,
 		readonly bridge: {
 			on: (event: BridgeEvent, callback: (args?: any[]) => void) => void,
 			emit: (event: BridgeEvent, args?: any[]) => void;

@@ -22,7 +22,9 @@ class Media extends React.Component<MediaProps, MediaState> {
 	constructor(props: MediaProps) {
 		super(props);
 		this.props = props;
-		this.state = { fullscreen: false };
+		this.state = {
+			fullscreen: false
+		};
 
 		window.bridge.on(BridgeEvent.ENTER_FULL_SCREEN, () => {
 			this.setState({ ...this.state, fullscreen: true });

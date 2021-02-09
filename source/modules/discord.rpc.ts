@@ -1,4 +1,3 @@
-
 // @ts-ignore
 import * as RPC from "discord-rpc";
 
