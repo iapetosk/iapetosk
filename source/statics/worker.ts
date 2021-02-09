@@ -29,8 +29,5 @@ class Worker extends StaticHandler<Record<string, Task>> {
 			}
 		}
 	}
-	public filter(condition?: { key: "id" | "from" | "title" | "files" | "status" | "options" | "working" | "finished", value: any; }) {
-		return condition ? Object.values(this["state"]).filter((task) => { return task[condition.key] == condition.value; }) : Object.values(this["state"]);
-	}
 }
 export default (new Worker({}, StaticEvent.WORKER));

@@ -158,7 +158,7 @@ export class Download {
 			function destroy() {
 				// start queued task
 				if (task.status !== TaskStatus.QUEUED) {
-					for (const queued of worker.filter({ key: "status", value: TaskStatus.QUEUED })) {
+					for (const queued of Object.values(worker.get()).filter(($task) => { return $task.status === TaskStatus.QUEUED; })) {
 						I.create(queued);
 						break;
 					}
@@ -174,7 +174,7 @@ export class Download {
 				storage.register(String(task.id), node_path.join(TaskFolder.BUNDLES, String(task.id) + ".json"), { ...task });
 			}
 			// task counts reached its limit
-			if (this.max_threads <= worker.filter({ key: "status", value: TaskStatus.WORKING }).length) {
+			if (this.max_threads <= Object.values(worker.get()).filter(($task) => { return $task.status === TaskStatus.WORKING; }).length) {
 				update("status", TaskStatus.QUEUED);
 				return destroy();
 			}

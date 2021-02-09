@@ -21,7 +21,7 @@ class Storage {
 			// save all
 			this.save();
 			// upvote
-			window.bridge.emit(BridgeEvent.CLOSE, (["storage"]));
+			window.bridge.emit(BridgeEvent.CLOSE, ["storage"]);
 		});
 		// every ~ ms
 		setInterval(() => {
@@ -76,7 +76,7 @@ class Storage {
 	public register(key: string, path: StorageState["path"], data: StorageState["data"]) {
 		this.define(this.container, [...key.split(/\./)], {
 			path: path,
-			data: data === "@import" ? this.import(path) : {}
+			data: data === "@import" ? this.import(path) : data
 		});
 		this.export(key);
 	}
