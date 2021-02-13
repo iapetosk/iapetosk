@@ -49,9 +49,6 @@ class DiscordRPC {
 		return this.activity;
 	}
 	public set_activity(activity: RichPresence, preserve: boolean = true) {
-		if (!this.available) {
-			return;
-		}
 		if (preserve) {
 			for (const key of Object.keys(activity)) {
 				// @ts-ignore
