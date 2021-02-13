@@ -21,3 +21,7 @@ export enum API_COMMAND {
 	IS_PACKAGED,
 	GET_PATH
 };
+export type CommonProps = {
+	id?: string,
+	class?: Record<string, boolean>
+};

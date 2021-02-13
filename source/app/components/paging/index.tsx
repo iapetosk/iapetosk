@@ -4,7 +4,9 @@ import "./index.scss";
 
 import utility from "@/modules/utility";
 
-export type PagingProps = {
+import { CommonProps } from "@/common";
+
+export type PagingProps = CommonProps & {
 	enable: boolean,
 	options: {
 		size: number,

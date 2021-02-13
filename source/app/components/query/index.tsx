@@ -6,9 +6,10 @@ import DropDown from "@/app/components/dropdown";
 
 import suggest from "@/modules/hitomi/suggest";
 
+import { CommonProps } from "@/common";
 import { Suggestion } from "@/modules/hitomi/suggest";
 
-export type QueryProps = {
+export type QueryProps = CommonProps & {
 	enable: boolean,
 	options: {
 		input: string;

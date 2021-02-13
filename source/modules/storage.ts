@@ -4,7 +4,7 @@ import * as node_path from "path";
 import { BridgeEvent } from "@/common";
 
 export enum StoragePreset {
-	SETTINGS = "settings"
+	CONFIG = "config"
 };
 export type StorageState = {
 	path: string,
@@ -105,8 +105,8 @@ class Storage {
 	}
 }
 export default (new Storage({
-	[StoragePreset.SETTINGS]: {
-		path: "./settings.json",
+	[StoragePreset.CONFIG]: {
+		path: "./config.json",
 		data: "@import"
 	}
 }));

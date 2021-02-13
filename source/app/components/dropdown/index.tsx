@@ -4,7 +4,9 @@ import "./index.scss";
 
 import utility from "@/modules/utility";
 
-export type DropDownProps = {
+import { CommonProps } from "@/common";
+
+export type DropDownProps = CommonProps & {
 	enable: boolean,
 	options: {
 		type: "input" | "select",

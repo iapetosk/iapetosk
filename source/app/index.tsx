@@ -8,11 +8,11 @@ import Reader from "@/app/views/reader";
 
 import router from "@/statics/router";
 
-import { BridgeEvent } from "@/common";
+import { BridgeEvent, CommonProps } from "@/common";
 import { StaticEvent } from "@/statics";
 import { Viewport } from "@/statics/router";
 
-export type AppProps = {};
+export type AppProps = CommonProps & {};
 export type AppState = {
 	view: string,
 	fullscreen: boolean;

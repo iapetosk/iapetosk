@@ -253,11 +253,11 @@ class Suggest {
 					return resolve([]);
 				}
 				for (let index = 0; index < suggests_size; index++) {
-					suggest[index] = ({
+					suggest[index] = {
 						index: "",
 						value: "",
 						count: 0
-					});
+					};
 					const field_size = binary.bytes.getInt32(binary.index, false);
 
 					binary.index += 4;

@@ -7,9 +7,9 @@ import LazyLoad from "@/app/components/lazyload";
 import utility from "@/modules/utility";
 import router from "@/statics/router";
 
-import { BridgeEvent } from "@/common";
+import { BridgeEvent, CommonProps } from "@/common";
 
-export type MediaProps = {
+export type MediaProps = CommonProps & {
 	files: string[];
 };
 export type MediaState = {
@@ -58,7 +58,7 @@ class Media extends React.Component<MediaProps, MediaState> {
 				<section id="scrollable" class="scroll-y">
 					{this.props.files.map((file, index) => {
 						return (
-							<LazyLoad src={file} key={index}></LazyLoad>
+							<LazyLoad src={file} class={{ "contrast": true }} key={index}></LazyLoad>
 						);
 					})}
 				</section>

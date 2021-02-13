@@ -5,7 +5,7 @@
 /debugs
 /bundles
 /downloads
-/settings.json
+/config.json
 # electron
 /build
 /releases

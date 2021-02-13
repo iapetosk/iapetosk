@@ -1,7 +1,9 @@
 // @ts-ignore
 import * as RPC from "discord-rpc";
 
-// https://discord.com/developers/docs/rich-presence/how-to
+/**
+ * @see https://discord.com/developers/docs/rich-presence/how-to
+ */
 export type RichPresence = {
 	state?: string,
 	details?: string,
@@ -21,24 +23,33 @@ export type RichPresence = {
 };
 
 /**
- * https://discord.com/developers/applications/{application_id}/information
+ * @see https://discord.com/developers/applications/{application_id}/information
  */
 class DiscordRPC {
+	private avilable: boolean = true;
 	private activity: RichPresence = {};
 	readonly client = new RPC.Client({ transport: "ipc" });
 	constructor(client_id: string) {
 		this.client.once("ready", () => {
 			this.update();
 		});
-		this.client.login({ clientId: client_id });
+		this.client.login({ clientId: client_id }).catch(() => {
+			this.avilable = false;
+		});
 	}
 	private update() {
+		if (!this.avilable) {
+			return;
+		}
 		this.client.setActivity(this.activity);
 	}
 	public get_activity() {
 		return this.activity;
 	}
 	public set_activity(activity: RichPresence, preserve: boolean = true) {
+		if (!this.avilable) {
+			return;
+		}
 		if (preserve) {
 			for (const key of Object.keys(activity)) {
 				// @ts-ignore

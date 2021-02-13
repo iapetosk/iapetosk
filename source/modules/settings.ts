@@ -1,11 +1,12 @@
 import storage from "@/modules/storage";
+import template from "@/assets/config.json";
 
 import { StoragePreset } from "@/modules/storage";
 
-export type Configure = {
+export type Config = {
 	browser: {
-		resolution: "lowest" | "medium" | "highest",
-		censor: boolean;
+		resolution: "L" | "M" | "H",
+		censorship: boolean;
 	},
 	query: {
 		input: string;
@@ -32,47 +33,7 @@ export type Configure = {
 		max_working: number;
 	};
 };
-const boilerplate: Configure = {
-	browser: {
-		resolution: "lowest",
-		censor: true
-	},
-	query: {
-		input: ""
-	},
-	iterable: {
-		discovery: [
-			"type",
-			"title",
-			"language",
-			"character",
-			"artist",
-			"series",
-			"group",
-			"tags",
-			"date"
-		]
-	},
-	paging: {
-		metre: 10,
-	},
-	hitomi: {
-		per_page: 25
-	},
-	request: {
-		max_redirects: 10
-	},
-	storage: {
-		auto_save: 1000 * 60 * 5
-	},
-	download: {
-		folder: "{id}",
-		directory: "./download",
-		max_threads: 5,
-		max_working: 5
-	}
-},
-	settings: Configure = storage.get_data(StoragePreset.SETTINGS);
+const settings: Config = storage.get_data(StoragePreset.CONFIG);
 
 function recursive($new: Record<string, any>, $old: Record<string, any>) {
 	for (const key of Object.keys($new)) {
@@ -82,19 +43,20 @@ function recursive($new: Record<string, any>, $old: Record<string, any>) {
 			} else {
 				$old[key] = $new[key];
 			}
-		} if ($old[key].constructor.name === "Object") {
+		}
+		if ($old[key].constructor.name === "Object") {
 			recursive($new[key], $old[key]);
 		}
 	}
 }
-recursive(boilerplate, settings);
+recursive(template, settings);
 
 export default new Proxy(settings, {
-	set(target: Configure, key: never, value: never) {
+	set(target: Config, key: never, value: never) {
 		// update property
 		target[key] = value;
 		// update storage
-		storage.set_data(StoragePreset.SETTINGS, target);
+		storage.set_data(StoragePreset.CONFIG, target);
 		// approve
 		return true;
 	}

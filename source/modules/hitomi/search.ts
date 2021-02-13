@@ -4,6 +4,7 @@ import worker from "@/statics/worker";
 import { TaskStatus } from "@/modules/download";
 import { RequestResponse } from "@/modules/request";
 import { Prefix, Field, Tag, Computable } from "@/modules/hitomi/filter";
+
 export type GalleryList = {
 	size: number,
 	array: number[],

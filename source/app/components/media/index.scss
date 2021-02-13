@@ -9,16 +9,19 @@
 	grid-template-columns: auto 1fr;
 	> #scrollable {
 		grid-area: scrollable;
-		> img {
+		> #lazyload {
 			margin: auto;
-			// scale up if possible
-			width: 1000px !important;
-			// keep the aspect ratio
-			height: auto !important;
-			// scale down if overflow
-			min-width: 535px !important;
-			// prevent overflow
-			max-width: 100% !important;
+			width: 1000px;
+			height: auto;
+			min-width: 535px;
+			max-width: 100%;
+			background-color: var(--colour_3);
+			&.contrast {
+				border-top-width: 0px;
+			}
+			&:last-child {
+				border-bottom-width: 0px;
+			}
 		}
 	}
 	> #navigation {

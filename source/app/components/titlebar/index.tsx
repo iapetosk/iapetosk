@@ -4,9 +4,9 @@ import "./index.scss";
 
 import utility from "@/modules/utility";
 
-import { BridgeEvent, API_COMMAND } from "@/common";
+import { BridgeEvent, API_COMMAND, CommonProps } from "@/common";
 
-export type TitleBarProps = {
+export type TitleBarProps = CommonProps & {
 	enable: boolean;
 };
 export type TitleBarState = {

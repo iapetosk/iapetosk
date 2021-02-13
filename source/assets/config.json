@@ -1,0 +1,40 @@
+{
+	"browser": {
+		"resolution": "lowest",
+		"censorship": true
+	},
+	"query": {
+		"input": ""
+	},
+	"iterable": {
+		"discovery": [
+			"type",
+			"title",
+			"language",
+			"character",
+			"artist",
+			"series",
+			"group",
+			"tags",
+			"date"
+		]
+	},
+	"paging": {
+		"metre": 10
+	},
+	"hitomi": {
+		"per_page": 25
+	},
+	"request": {
+		"max_redirects": 10
+	},
+	"storage": {
+		"auto_save": 300000
+	},
+	"download": {
+		"folder": "{id}",
+		"directory": "./download",
+		"max_threads": 5,
+		"max_working": 5
+	}
+}

@@ -2,9 +2,12 @@ import * as React from "react";
 
 import "./index.scss";
 
-export type LazyLoadProps = {
+import utility from "@/modules/utility";
+
+import { CommonProps } from "@/common";
+
+export type LazyLoadProps = CommonProps & {
 	src: string,
-	class?: string,
 	width?: number,
 	height?: number;
 };
@@ -26,37 +29,26 @@ class LazyLoad extends React.Component<LazyLoadProps, LazyLoadState> {
 	}
 	public render() {
 		return (
-			<img id="lazyload" src={base64} class={this.props.class} width={this.props.width} height={this.props.height} loading="lazy"
+			<img id="lazyload" src={base64} class={utility.inline({ ...this.props.class, "error": this.state.error === 5 })} width={this.props.width} height={this.props.height} loading="lazy"
 				onLoad={(event) => {
-					// @ts-ignore
-					if (event.target.src === this.props.src) {
-						// reset
+					if ((event.target as HTMLImageElement).src === this.props.src) {
 						this.setState({ ...this.state, error: 0 });
 					}
 					else if (this.state.error < 5) {
 						const observer: IntersectionObserver = new IntersectionObserver((entries) => {
 							for (const entry of entries) {
-								// target is within view
 								if (entry.isIntersecting) {
-									// @ts-ignore
-									event.target.src = this.props.src;
-									// stop observe
+									(event.target as HTMLImageElement).src = this.props.src;
 									return observer.disconnect();
 								}
 							}
 						});
-						observer.observe(event.target as Element);
-					}
-					else {
-						// @ts-ignore
-						event.target.style.display = "none";
+						observer.observe(event.target as HTMLImageElement);
 					}
 				}}
 				onError={(event) => {
-					// increase
 					this.setState({ ...this.state, error: this.state.error + 1 }, () => {
-						// @ts-ignore
-						event.target.src = base64;
+						(event.target as HTMLImageElement).src = base64;
 					});
 				}}
 			></img>

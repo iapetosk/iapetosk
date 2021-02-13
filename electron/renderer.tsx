@@ -48,7 +48,7 @@ window.bridge.on(BridgeEvent.CLOSE, (args) => {
 		window.API(API_COMMAND.CLOSE);
 	}
 });
-ReactDOM.render(<App />, document.getElementById("app"));
+ReactDOM.render(<App></App>, document.getElementById("app"));
 // RPC
 DiscordRPC.set_activity({
 	details: "Starting...",
