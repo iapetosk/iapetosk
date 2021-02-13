@@ -26,19 +26,21 @@ export type RichPresence = {
  * @see https://discord.com/developers/applications/{application_id}/information
  */
 class DiscordRPC {
-	private avilable: boolean = true;
+	private available: boolean = false;
 	private activity: RichPresence = {};
 	readonly client = new RPC.Client({ transport: "ipc" });
 	constructor(client_id: string) {
 		this.client.once("ready", () => {
 			this.update();
 		});
-		this.client.login({ clientId: client_id }).catch(() => {
-			this.avilable = false;
+		this.client.login({ clientId: client_id }).then(() => {
+			this.available = true;
+		}).catch(() => {
+			this.available = false;
 		});
 	}
 	private update() {
-		if (!this.avilable) {
+		if (!this.available) {
 			return;
 		}
 		this.client.setActivity(this.activity);
@@ -47,7 +49,7 @@ class DiscordRPC {
 		return this.activity;
 	}
 	public set_activity(activity: RichPresence, preserve: boolean = true) {
-		if (!this.avilable) {
+		if (!this.available) {
 			return;
 		}
 		if (preserve) {

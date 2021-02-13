@@ -1,6 +1,6 @@
 {
 	"browser": {
-		"resolution": "lowest",
+		"resolution": "L",
 		"censorship": true
 	},
 	"query": {
@@ -32,7 +32,7 @@
 		"auto_save": 300000
 	},
 	"download": {
-		"folder": "{id}",
+		"folder": "<id>",
 		"directory": "./download",
 		"max_threads": 5,
 		"max_working": 5

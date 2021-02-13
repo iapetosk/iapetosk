@@ -18,9 +18,9 @@ class Search {
 	}
 	private unknown_0([computable, count]: [Computable, number], index: number, per_page: number) {
 		// instance
-		const I = this;
+		const I = this,
 		// result
-		const nozomi = {
+		nozomi = {
 			array: {
 				local: new Array<number>(),
 				global: new Array<number>()
@@ -105,7 +105,7 @@ class Search {
 				}
 			}
 		}
-		function compute(prefix: Prefix, scope: "global" | "local", array: number[]) {
+		function compute(prefix: Prefix, scope: "local" | "global", array: number[]) {
 			switch (prefix) {
 				case Prefix.AND: {
 					if (!nozomi.array[scope].length) {
