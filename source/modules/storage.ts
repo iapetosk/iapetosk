@@ -62,13 +62,13 @@ class Storage {
 		}
 	}
 	public get_path(key: string) {
-		return this.return(this.container, [...key.split(/\./), "path"]);
+		return this.return(this.container, [...key.split(/\./), "path"]) as StorageState["path"];
 	}
 	public set_path(key: string, path: StorageState["path"]) {
 		this.define(this.container, [...key.split(/\./), "path"], path);
 	}
-	public get_data(key: string) {
-		return this.return(this.container, [...key.split(/\./), "data"]);
+	public get_data<Type>(key: string) {
+		return this.return(this.container, [...key.split(/\./), "data"]) as Type;
 	}
 	public set_data(key: string, data: StorageState["data"]) {
 		this.define(this.container, [...key.split(/\./), "data"], data);

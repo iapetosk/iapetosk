@@ -2,8 +2,6 @@ import * as node_tls from "tls";
 import * as node_http from "http";
 import * as node_https from "https";
 
-import settings from "@/modules/settings";
-
 export type RequestMethods = "GET" | "PUT" | "POST" | "DELETE";
 export type RequestOptions = {
 	request: {
@@ -61,7 +59,7 @@ class Request {
 					...I.parseURL(options.request.url)
 				}, (response) => {
 					// redirect
-					if ((options.partial.max_redirects || settings.request.max_redirects) > (options.private.redirects || 0) && response.headers.location) {
+					if (response.headers.location && (options.partial.max_redirects || 5) > (options.private.redirects || 0)) {
 						return recursive({ ...options, request: { ...options.request, url: response.headers.location }, private: { ...options.private, redirects: options.private.redirects ? options.private.redirects + 1 : 1 } });
 					}
 					if (callback) {

@@ -14,7 +14,7 @@ export type DropDownProps = CommonProps & {
 		items: [string, string][],
 		highlight: string;
 	},
-	handler: Record<"choose" | "change" | "confirm", (value: string) => void>;
+	handler?: Record<"choose" | "change" | "confirm", (value: string) => void>;
 };
 export type DropDownState = {
 	index: number,
@@ -58,7 +58,7 @@ class DropDown extends React.Component<DropDownProps, DropDownState> {
 						this.setState({ ...this.state, focus: false });
 					}}
 					onChange={(event) => {
-						this.props.handler.change(event.target.value);
+						this.props.handler?.change(event.target.value);
 					}}
 					onKeyDown={(event) => {
 						if (this.state.focus) {
@@ -81,9 +81,9 @@ class DropDown extends React.Component<DropDownProps, DropDownState> {
 								}
 								case "Enter": {
 									if (isNaN(this.state.index)) {
-										this.props.handler.confirm(this.get()!);
+										this.props.handler?.confirm(this.get()!);
 									} else {
-										this.props.handler.choose(this.props.options.items[this.state.index][0]);
+										this.props.handler?.choose(this.props.options.items[this.state.index][0]);
 									}
 									this.setState({ ...this.state, focus: !isNaN(this.state.index), index: NaN });
 									break;
@@ -97,7 +97,7 @@ class DropDown extends React.Component<DropDownProps, DropDownState> {
 						return (
 							<legend id="item" class={utility.inline({ "center-y": true, "active": this.state.index === index })} data-description={item[1]} key={index}
 								onClick={() => {
-									this.props.handler.choose(item[0]);
+									this.props.handler?.choose(item[0]);
 								}}>
 								{[...item[0].split(this.props.options.highlight)].map((value, index, array) => {
 									return ([

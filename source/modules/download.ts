@@ -90,7 +90,7 @@ export class Download {
 					// register task from .json
 					storage.register(ID, node_path.join(TaskFolder.BUNDLES, file), "@import");
 					// create task from .json
-					const task: Task = storage.get_data(ID);
+					const task = storage.get_data<Task>(ID);
 					// restart download
 					switch (task.status) {
 						case TaskStatus.NONE:
@@ -113,7 +113,7 @@ export class Download {
 			const files: number[] = [];
 			// declare worker
 			worker.set(task.id, { ...task });
-			function update(key: "id" | "from" | "title" | "files" | "status" | "options" | "working" | "finished", value: any) {
+			function update(key: keyof Task, value: Task[keyof Task]) {
 				if (!worker.get()[task.id]) {
 					return destroy();
 				}
@@ -225,4 +225,4 @@ export class Download {
 		});
 	}
 }
-export default (new Download(settings.download.max_threads, settings.download.max_working));
+export default (new Download(settings.get().download.max_threads, settings.get().download.max_working));

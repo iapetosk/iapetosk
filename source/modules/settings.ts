@@ -4,24 +4,20 @@ import template from "@/assets/config.json";
 import { StoragePreset } from "@/modules/storage";
 
 export type Config = {
-	browser: {
+	galleries: {
 		resolution: "L" | "M" | "H",
-		censorship: boolean;
-	},
-	query: {
-		input: string;
-	},
-	iterable: {
+		censorship: boolean,
 		discovery: string[];
 	},
 	paging: {
 		metre: number;
 	},
-	hitomi: {
-		per_page: number;
+	lazyload: {
+		retry: number;
 	},
-	request: {
-		max_redirects: number;
+	search: {
+		query: string,
+		per_page: number;
 	},
 	storage: {
 		auto_save: number;
@@ -33,31 +29,46 @@ export type Config = {
 		max_working: number;
 	};
 };
-const settings: Config = storage.get_data(StoragePreset.CONFIG);
-
-function recursive($new: Record<string, any>, $old: Record<string, any>) {
-	for (const key of Object.keys($new)) {
-		if ($old[key] === undefined) {
-			if ($new[key].constructor.name === "Object") {
-				$old[key] = {};
+class Settings {
+	private import = storage.get_data<Config>(StoragePreset.CONFIG);
+	// @ts-ignore
+	private settings: Config = {};
+	constructor() {
+		for (const section of Object.keys(template)) {
+			// @ts-ignore
+			if (this.import[section]) {
+				// @ts-ignore
+				for (const property of Object.keys(template[section])) {
+					// @ts-ignore
+					if (!this.settings[section]) {
+						// @ts-ignore
+						this.settings[section] = {};
+					}
+					// @ts-ignore
+					if (this.import[section][property]) {
+						// @ts-ignore
+						this.settings[section][property] = this.import[section][property];
+					} else {
+						// @ts-ignore
+						this.settings[section][property] = template[section][property];
+					}
+				}
 			} else {
-				$old[key] = $new[key];
+				// @ts-ignore
+				this.settings[section] = template[section];
 			}
 		}
-		if ($old[key].constructor.name === "Object") {
-			recursive($new[key], $old[key]);
-		}
+	}
+	public get() {
+		return { ...this.settings };
+	}
+	public set(key: keyof Config, value: Config[keyof Config]) {
+		// @ts-ignore
+		this.settings[key] = {
+			...template[key],
+			...value
+		};
+		storage.set_data(StoragePreset.CONFIG, this.settings);
 	}
 }
-recursive(template, settings);
-
-export default new Proxy(settings, {
-	set(target: Config, key: never, value: never) {
-		// update property
-		target[key] = value;
-		// update storage
-		storage.set_data(StoragePreset.CONFIG, target);
-		// approve
-		return true;
-	}
-});
+export default (new Settings());

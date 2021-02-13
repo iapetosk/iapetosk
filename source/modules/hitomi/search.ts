@@ -1,5 +1,5 @@
-import request from "@/modules/request";
 import worker from "@/statics/worker";
+import request from "@/modules/request";
 
 import { TaskStatus } from "@/modules/download";
 import { RequestResponse } from "@/modules/request";

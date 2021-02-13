@@ -26,7 +26,6 @@ class TitleBar extends React.Component<TitleBarProps, TitleBarState> {
 			maximize: false,
 			fullscreen: false
 		};
-
 		window.bridge.on(BridgeEvent.FOCUS, () => {
 			this.setState({ ...this.state, focus: true });
 		});

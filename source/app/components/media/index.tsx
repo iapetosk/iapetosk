@@ -10,7 +10,9 @@ import router from "@/statics/router";
 import { BridgeEvent, CommonProps } from "@/common";
 
 export type MediaProps = CommonProps & {
-	files: string[];
+	options: {
+		files: string[];
+	}
 };
 export type MediaState = {
 	fullscreen: boolean;
@@ -56,9 +58,9 @@ class Media extends React.Component<MediaProps, MediaState> {
 					})}
 				</section>
 				<section id="scrollable" class="scroll-y">
-					{this.props.files.map((file, index) => {
+					{this.props.options.files.map((file, index) => {
 						return (
-							<LazyLoad src={file} class={{ "contrast": true }} key={index}></LazyLoad>
+							<LazyLoad options={{ source: file }} class={{ "contrast": true }} key={index}></LazyLoad>
 						);
 					})}
 				</section>

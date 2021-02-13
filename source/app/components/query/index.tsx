@@ -12,9 +12,9 @@ import { Suggestion } from "@/modules/hitomi/suggest";
 export type QueryProps = CommonProps & {
 	enable: boolean,
 	options: {
-		input: string;
+		value: string;
 	},
-	handler: Record<"confirm", (value: string) => void>;
+	handler?: Record<"confirm", (value: string) => void>;
 };
 export type QueryState = {
 	focus: boolean,
@@ -58,7 +58,7 @@ class Query extends React.Component<QueryProps, QueryState> {
 					enable={this.props.enable}
 					options={{
 						type: "input",
-						value: this.props.options.input,
+						value: this.props.options.value,
 						items: this.state.suggest.map((suggest) => {
 							return [`${suggest.index}:${suggest.value}`, String(suggest.count)];
 						}),
@@ -80,7 +80,7 @@ class Query extends React.Component<QueryProps, QueryState> {
 							});
 						},
 						confirm: () => {
-							this.props.handler.confirm(this.get()!);
+							this.props.handler?.confirm(this.get()!);
 						}
 					}}
 				></DropDown>

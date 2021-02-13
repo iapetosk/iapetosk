@@ -32,7 +32,9 @@ class Reader extends React.Component<ReaderProps> {
 		this.state = {
 			script: undefined,
 			media: {
-				files: []
+				options: {
+					files: []
+				}
 			}
 		};
 
@@ -41,7 +43,7 @@ class Reader extends React.Component<ReaderProps> {
 
 			switch ($new.view) {
 				case "reader": {
-					this.setState({ ...this.state, script: undefined, media: { ...this.state.media, files: [] } });
+					this.setState({ ...this.state, script: undefined, media: { ...this.state.media, options: { ...this.state.media.options, files: [] } } });
 					read.script($new.options as number).then(async (script) => {
 						const files = [];
 
@@ -56,7 +58,7 @@ class Reader extends React.Component<ReaderProps> {
 								files.push(script.files[index].url);
 							}
 						}
-						this.setState({ ...this.state, script: script, media: { ...this.state.media, files: files } });
+						this.setState({ ...this.state, script: script, media: { ...this.state.media, options: { ...this.state.media.options, files: files } } });
 					});
 					break;
 				}
@@ -88,7 +90,7 @@ class Reader extends React.Component<ReaderProps> {
 		}
 		return (
 			<section id="reader" class={utility.inline({ "enable": this.props.enable, "right": true })}>
-				<Media files={this.state.media.files}></Media>
+				<Media options={{ files: this.state.media.options.files }}></Media>
 			</section>
 		);
 	}

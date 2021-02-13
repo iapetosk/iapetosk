@@ -1,12 +1,7 @@
 {
-	"browser": {
+	"galleries": {
 		"resolution": "L",
-		"censorship": true
-	},
-	"query": {
-		"input": ""
-	},
-	"iterable": {
+		"censorship": true,
 		"discovery": [
 			"type",
 			"title",
@@ -22,11 +17,12 @@
 	"paging": {
 		"metre": 10
 	},
-	"hitomi": {
-		"per_page": 25
+	"lazyload": {
+		"retry": 5
 	},
-	"request": {
-		"max_redirects": 10
+	"search": {
+		"query": "",
+		"per_page": 25
 	},
 	"storage": {
 		"auto_save": 300000

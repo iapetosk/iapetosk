@@ -7,6 +7,7 @@ import LazyLoad from "@/app/components/lazyload";
 import * as path from "path";
 import * as process from "child_process";
 
+import settings from "@/modules/settings";
 import download from "@/modules/download";
 import utility from "@/modules/utility";
 import worker from "@/statics/worker";
@@ -14,17 +15,17 @@ import router from "@/statics/router";
 
 import { CommonProps } from "@/common";
 import { StaticEvent } from "@/statics";
+import { Config } from "@/modules/settings";
 import { GalleryBlock } from "@/modules/hitomi/read";
 import { Task, TaskStatus, TaskFolder } from "@/modules/download";
 
-export type IterableProps = CommonProps & {
+export type GalleriesProps = CommonProps & {
 	options: {
-		blocks: GalleryBlock[],
-		discovery: string[];
+		blocks: GalleryBlock[];
 	},
-	handler: Record<"click", (button: number, key: string, value: string) => void>;
+	handler?: Record<"click", (button: number, key: string, value: string) => void>;
 };
-export type IterableState = {
+export type GalleriesState = {
 	[key: number]: {
 		status: {
 			task: TaskStatus;
@@ -45,10 +46,11 @@ const [languages_english, languages_local] = [
 ];
 const censorship = new RegExp("(" + ["guro", "ryona", "snuff", "blood", "torture", "amputee", "cannibalism"].join("|") + ")");
 
-class Iterable extends React.Component<IterableProps, IterableState> {
-	public props: IterableProps;
-	public state: IterableState;
-	constructor(props: IterableProps) {
+class Galleries extends React.Component<GalleriesProps, GalleriesState> {
+	readonly config: Config["galleries"] = settings.get().galleries;
+	public props: GalleriesProps;
+	public state: GalleriesState;
+	constructor(props: GalleriesProps) {
 		super(props);
 		this.props = props;
 		this.state = Object.assign({}, ...Object.values(worker.get()).map((task) => { return { [task.id]: { status: { task: task.status } } }; }));
@@ -67,19 +69,17 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 			}
 		});
 	}
-	static getDerivedStateFromProps($new: IterableProps, $old: IterableProps) {
+	static getDerivedStateFromProps($new: GalleriesProps, $old: GalleriesProps) {
 		return $new;
 	}
 	public render() {
 		return (
-			<section id="iterable">
+			<section id="galleries">
 				{this.props.options.blocks.map((gallery, index) => {
 					return (
 						<section id="gallery" class={utility.inline({ "contrast": true, [TaskStatus[this.state[gallery.id]?.status?.task || TaskStatus.NONE]]: true })} key={index}>
 							<section id="upper" class={utility.inline({ "contrast": true, [UpperSection[this.state[gallery.id]?.html?.upper || UpperSection.INTERACTS]]: true })}>
-								{/* thumbnail */}
-								<LazyLoad class={{ "censorship": gallery.tags ? !isNaN(utility.index_of(gallery.tags, censorship)) : false }} src={gallery.thumbnail[0]}></LazyLoad>
-								{/* intels */}
+								<LazyLoad class={{ "censorship": gallery.tags ? !isNaN(utility.index_of(gallery.tags, censorship)) : false }} options={{ source: gallery.thumbnail[0] }}></LazyLoad>
 								<section id="discovery" class="fluid">
 									<section id="interacts">
 										<button id="triangle" class="contrast"
@@ -89,7 +89,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 										</button>
 									</section>
 									<section id="scrollable" class="scroll-y">
-										{(this.state[gallery.id]?.html?.upper === undefined ? [] : this.props.options.discovery).map((key, index) => {
+										{(this.state[gallery.id]?.html?.upper === undefined ? [] : this.config.discovery).map((key, index) => {
 											// @ts-ignore
 											if (gallery[key] && utility.wrap(gallery[key]).length) {
 												return (
@@ -102,7 +102,7 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 																		<mark id="value" class="eclipse"
 																			onMouseUp={(event) => {
 																				const [$key, $value] = [/tags/.test(key) ? /♂/.test(value) ? "male" : /♀/.test(value) ? "female" : "tag" : key, /language/.test(key) ? languages_english[utility.index_of(languages_local, value)] : value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_")];
-																				this.props.handler.click(event.button, $key, $value);
+																				this.props.handler?.click(event.button, $key, $value);
 																			}}>
 																			{value}</mark>
 																	</button>
@@ -115,7 +115,6 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 										})}
 									</section>
 								</section>
-								{/* buttons */}
 								<section id="interacts" class="contrast center fluid">
 									{[
 										{
@@ -175,12 +174,10 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 									})}
 								</section>
 							</section>
-							{/* intels */}
 							<section id="lower" class="center-y">
 								<legend id="title" class="eclipse">{gallery.title}</legend>
 								<legend id="id" class="center">#{gallery.id}</legend>
 							</section>
-							{/* status */}
 							<section id="status" class={utility.inline({ "active": Object.keys({ ...this.state[gallery.id]?.status }).length > 0 })}>
 								{[
 									{
@@ -207,4 +204,4 @@ class Iterable extends React.Component<IterableProps, IterableState> {
 		);
 	}
 }
-export default Iterable;
+export default Galleries;

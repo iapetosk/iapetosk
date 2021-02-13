@@ -2,14 +2,17 @@ import * as React from "react";
 
 import "./index.scss";
 
+import settings from "@/modules/settings";
 import utility from "@/modules/utility";
 
 import { CommonProps } from "@/common";
+import { Config } from "@/modules/settings";
 
 export type LazyLoadProps = CommonProps & {
-	src: string,
-	width?: number,
-	height?: number;
+	options: {
+		source: string
+	},
+	handler?: Record<"loaded", () => void>;
 };
 export type LazyLoadState = {
 	error: number;
@@ -18,6 +21,7 @@ export type LazyLoadState = {
 const base64 = "data:image/gif;base64,R0lGODlhAQABAAAAACwAAAAAAQABAAA=";
 
 class LazyLoad extends React.Component<LazyLoadProps, LazyLoadState> {
+	readonly config: Config["lazyload"] = settings.get().lazyload;
 	public props: LazyLoadProps;
 	public state: LazyLoadState;
 	constructor(props: LazyLoadProps) {
@@ -29,16 +33,18 @@ class LazyLoad extends React.Component<LazyLoadProps, LazyLoadState> {
 	}
 	public render() {
 		return (
-			<img id="lazyload" src={base64} class={utility.inline({ ...this.props.class, "error": this.state.error === 5 })} width={this.props.width} height={this.props.height} loading="lazy"
+			<img id="lazyload" src={base64} class={utility.inline({ ...this.props.class, "error": this.state.error === this.config.retry })} loading="lazy"
 				onLoad={(event) => {
-					if ((event.target as HTMLImageElement).src === this.props.src) {
-						this.setState({ ...this.state, error: 0 });
+					if ((event.target as HTMLImageElement).src === this.props.options.source) {
+						this.setState({ ...this.state, error: 0 }, () => {
+							this.props.handler?.loaded();
+						});
 					}
-					else if (this.state.error < 5) {
+					else if (this.state.error < this.config.retry) {
 						const observer: IntersectionObserver = new IntersectionObserver((entries) => {
 							for (const entry of entries) {
 								if (entry.isIntersecting) {
-									(event.target as HTMLImageElement).src = this.props.src;
+									(event.target as HTMLImageElement).src = this.props.options.source;
 									return observer.disconnect();
 								}
 							}
