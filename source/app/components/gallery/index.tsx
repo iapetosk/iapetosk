@@ -56,11 +56,12 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 					<LazyLoad class={{ "censorship": this.props.options.gallery.tags ? !isNaN(utility.index_of(this.props.options.gallery.tags, censorship)) : false }} options={{ source: this.props.options.gallery.thumbnail[0] }}></LazyLoad>
 					<section id="discovery" class="fluid">
 						<section id="buttons">
-							<Button class={{ "contrast": true }} options={{ html: "" }} handler={{
-								click: () => {
-									this.setState({ ...this.state, toggle: "buttons" });
-								}
-							}}
+							<Button class={{ "contrast": true }} options={{ html: "" }}
+								handler={{
+									click: () => {
+										this.setState({ ...this.state, toggle: "buttons" });
+									}
+								}}
 							></Button>
 						</section>
 						<section id="scrollable" class="scroll-y">
@@ -95,7 +96,7 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 									router.set({ view: "reader", options: this.props.options.gallery.id });
 								}
 							},
-							...(utility.index_of([TaskStatus.WORKING, TaskStatus.FINISHED, TaskStatus.QUEUED], this.props.options.status) ? [
+							...(!isNaN(utility.index_of([TaskStatus.WORKING, TaskStatus.FINISHED, TaskStatus.QUEUED], this.props.options.status)) ? [
 								{
 									html: require(`@/assets/icons/delete.svg`),
 									click: () => {
@@ -104,14 +105,14 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 										});
 									}
 								}] : []),
-							...(utility.index_of([TaskStatus.WORKING, TaskStatus.QUEUED], this.props.options.status) ? [
+							...(!isNaN(utility.index_of([TaskStatus.WORKING, TaskStatus.QUEUED], this.props.options.status)) ? [
 								{
 									html: require(`@/assets/icons/open.svg`),
 									click: () => {
 										process.exec(`start "" "${path.resolve(TaskFolder.DOWNLOADS, String(this.props.options.gallery.id))}"`);
 									}
 								}] : []),
-							...(utility.index_of([TaskStatus.NONE], this.props.options.status) ? [
+							...(!isNaN(utility.index_of([TaskStatus.NONE], this.props.options.status)) ? [
 								{
 									html: require(`@/assets/icons/download.svg`),
 									click: () => {
@@ -136,11 +137,12 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 							}
 						].map(({ html, click }, index) => {
 							return (
-								<Button options={{ html: html }} key={index} handler={{
-									click: () => {
-										click();
-									}
-								}}
+								<Button options={{ html: html }} key={index}
+									handler={{
+										click: () => {
+											click();
+										}
+									}}
 								></Button>
 							);
 						})}

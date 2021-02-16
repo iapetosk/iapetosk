@@ -49,11 +49,12 @@ class MediaPlayer extends React.Component<MediaProps, MediaState> {
 						}
 					].map(({ value, click }, index) => {
 						return (
-							<Button options={{ html: value }} key={index} handler={{
-								click: () => {
-									click();
-								}
-							}}
+							<Button options={{ html: value }} key={index}
+								handler={{
+									click: () => {
+										click();
+									}
+								}}
 							></Button>
 						);
 					})}

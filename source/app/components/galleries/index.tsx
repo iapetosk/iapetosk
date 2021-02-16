@@ -36,7 +36,7 @@ class Galleries extends React.Component<GalleriesProps, GalleriesState> {
 			const [$index, $new] = args as [number, Task | undefined, Task | undefined];
 
 			switch ($new ? $new.status : TaskStatus.NONE) {
-				case this.state[$index].status: {
+				case this.state[$index]?.status: {
 					break;
 				}
 				default: {
@@ -54,7 +54,13 @@ class Galleries extends React.Component<GalleriesProps, GalleriesState> {
 			<section data-component="galleries" id={this.props.id} class={utility.inline({ ...this.props.class })}>
 				{this.props.options.blocks.map((gallery, index) => {
 					return (
-						<Gallery options={{ gallery: gallery, status: this.state[gallery.id] ? this.state[gallery.id].status : TaskStatus.NONE }}></Gallery>
+						<Gallery options={{ gallery: gallery, status: this.state[gallery.id] ? this.state[gallery.id].status : TaskStatus.NONE }} key={index}
+							handler={{
+								click: (button, key, value) => {
+									this.props.handler?.click(button, key, value);
+								}
+							}}
+						></Gallery>
 					);
 				})}
 			</section>
