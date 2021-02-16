@@ -40,7 +40,7 @@
 			color: var(--colour_5);
 			background-color: var(--colour_2);
 			transition: transform 500ms;
-			> #interacts {
+			> #buttons {
 				position: absolute;
 				overflow: hidden;
 				right: 0px;
@@ -100,7 +100,7 @@
 				}
 			}
 		}
-		> #interacts {
+		> #buttons {
 			z-index: 1;
 			height: 45px;
 			border-left-width: 0px;
@@ -181,7 +181,8 @@
 			display: none;
 		}
 	}
-	&.interacts {
+	&.unset,
+	&.buttons {
 		#upper {
 			> #discovery {
 				transform: translateY(100%);
@@ -193,7 +194,7 @@
 			> [data-component="lazyload"] {
 				visibility: hidden;
 			}
-			> #interacts {
+			> #buttons {
 				transform: translateY(100%);
 			}
 		}
@@ -204,12 +205,13 @@
 		> #upper {
 			border-color: var(--colour_9);
 		}
-		&.interacts {
+		&.unset,
+		&.buttons {
 			> #upper {
 				> [data-component="lazyload"] {
 					opacity: 100%;
 				}
-				> #interacts {
+				> #buttons {
 					transform: translateY(0%);
 					border-color: var(--colour_9);
 				}

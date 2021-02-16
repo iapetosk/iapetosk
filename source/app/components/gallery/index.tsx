@@ -26,7 +26,7 @@ export type GalleryProps = CommonProps & {
 	handler?: Record<"click", (button: number, key: string, value: string) => void>;
 };
 export type GalleryState = {
-	toggle: "interacts" | "discovery";
+	toggle: "unset" | "buttons" | "discovery";
 };
 
 const [languages_english, languages_local] = [
@@ -43,7 +43,7 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 		super(props);
 		this.props = props;
 		this.state = {
-			toggle: "interacts"
+			toggle: "unset"
 		};
 	}
 	static getDerivedStateFromProps($new: GalleryProps, $old: GalleryProps) {
@@ -55,17 +55,17 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 				<section id="upper" class="contrast">
 					<LazyLoad class={{ "censorship": this.props.options.gallery.tags ? !isNaN(utility.index_of(this.props.options.gallery.tags, censorship)) : false }} options={{ source: this.props.options.gallery.thumbnail[0] }}></LazyLoad>
 					<section id="discovery" class="fluid">
-						<section id="interacts">
+						<section id="buttons">
 							<Button class={{ "contrast": true }} options={{ html: "" }} handler={{
 								click: () => {
-									this.setState({ ...this.state, toggle: "interacts" });
+									this.setState({ ...this.state, toggle: "buttons" });
 								}
 							}}
 							></Button>
 						</section>
 						<section id="scrollable" class="scroll-y">
-							{(this.state.toggle === "discovery" ? (this.config.discovery).map((key, index) => {
-								return (this.props.options.gallery[key as keyof GalleryBlock] ? (
+							{this.state.toggle !== "unset" ? this.config.discovery.map((key, index) => {
+								return this.props.options.gallery[key as keyof GalleryBlock] ? (
 									<legend id="bundle" key={index}>
 										{key}:
 										{utility.wrap(this.props.options.gallery[key as keyof GalleryBlock]).map((value, index) => {
@@ -83,11 +83,11 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 											);
 										})}
 									</legend>
-								) : undefined);
-							}) : undefined)}
+								) : undefined;
+							}) : undefined}
 						</section>
 					</section>
-					<section id="interacts" class="contrast center fluid">
+					<section id="buttons" class="contrast center fluid">
 						{[
 							{
 								html: require(`@/assets/icons/read.svg`),

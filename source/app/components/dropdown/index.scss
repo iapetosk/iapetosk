@@ -3,6 +3,7 @@
 	> input {
 		color: var(--colour_success);
 		padding-left: 10px;
+		padding-right: 10px;
 		background-color: var(--colour_3);
 		transition: border-color var(--transition), background-color var(--transition);
 		&:hover,
@@ -31,8 +32,9 @@
 		}
 		> [data-component="button"] {
 			color: var(--colour_9);
-			padding: 6px 0px 6px 10px;
 			width: 100%;
+			padding: 6px 0px 6px 10px;
+			font-size: 15px;
 			transition: background-color var(--transition);
 			&:hover,
 			&.active {

@@ -21,8 +21,6 @@ class Button extends React.Component<ButtonProps, ButtonState> {
 		super(props);
 		this.props = props;
 		this.state = {};
-
-		console.log(this.props);
 	}
 	public render() {
 		return (
