@@ -2,7 +2,7 @@ import * as React from "react";
 
 import "./index.scss";
 
-import Media from "@/app/components/media.player";
+import MediaPlayer from "@/app/components/media.player";
 
 import DiscordRPC from "@/modules/discord.rpc";
 
@@ -90,7 +90,7 @@ class Reader extends React.Component<ReaderProps> {
 		}
 		return (
 			<section id="reader" class={utility.inline({ "enable": this.props.enable, "right": true })}>
-				<Media options={{ files: this.state.media.options.files }}></Media>
+				<MediaPlayer options={{ files: this.state.media.options.files }}></MediaPlayer>
 			</section>
 		);
 	}

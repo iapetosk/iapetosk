@@ -19,7 +19,7 @@ export type MediaState = {
 	fullscreen: boolean;
 };
 
-class Media extends React.Component<MediaProps, MediaState> {
+class MediaPlayer extends React.Component<MediaProps, MediaState> {
 	public props: MediaProps;
 	public state: MediaState;
 	constructor(props: MediaProps) {
@@ -69,4 +69,4 @@ class Media extends React.Component<MediaProps, MediaState> {
 		);
 	}
 }
-export default Media;
+export default MediaPlayer;

@@ -23,5 +23,5 @@ export enum API_COMMAND {
 };
 export type CommonProps = {
 	id?: string,
-	class?: Record<string, boolean>
+	class?: Record<string, boolean>;
 };

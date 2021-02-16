@@ -10,7 +10,7 @@ import { Config } from "@/modules/settings";
 
 export type LazyLoadProps = CommonProps & {
 	options: {
-		source: string
+		source: string;
 	},
 	handler?: Record<"loaded", () => void>;
 };

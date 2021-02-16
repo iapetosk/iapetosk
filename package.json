@@ -1,12 +1,12 @@
 {
 	"name": "waifu-material",
 	"main": "build/main.js",
-	"version": "1.0.8",
+	"version": "1.0.9",
 	"description": "A light-weight desktop application for hitomi.la",
 	"scripts": {
 		"serve": "node webpack/serve.js",
 		"build": "node webpack/build.js",
-		"update": "npm install"
+		"update": "npm install & node node_modules/electron/install.js"
 	},
 	"devDependencies": {
 		"@types/node": "14.14.28",

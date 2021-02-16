@@ -19,15 +19,15 @@ class Search {
 	private unknown_0([computable, count]: [Computable, number], index: number, per_page: number) {
 		// instance
 		const I = this,
-		// result
-		nozomi = {
-			array: {
-				local: new Array<number>(),
-				global: new Array<number>()
-			},
-			size: 0,
-			singular: is_SINGULAR()
-		};
+			// result
+			nozomi = {
+				array: {
+					local: new Array<number>(),
+					global: new Array<number>()
+				},
+				size: 0,
+				singular: is_SINGULAR()
+			};
 		function is_SINGULAR() {
 			let singular = 0;
 
