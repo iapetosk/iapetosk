@@ -4,7 +4,7 @@ import template from "@/assets/config.json";
 import { StoragePreset } from "@/modules/storage";
 
 export type Config = {
-	galleries: {
+	gallery: {
 		resolution: "L" | "M" | "H",
 		censorship: boolean,
 		discovery: string[];

@@ -18,7 +18,7 @@ const boilerplate = {
 			},
 			{
 				test: [/\.png$/, /\.jpe?g$/, /\.gif$/, /\.svg$/],
-				use: [{ loader: "file-loader" }]
+				use: [{ loader: "html-loader", options: { esModule: false } }]
 			}
 		]
 	},

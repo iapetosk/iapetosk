@@ -1,4 +1,4 @@
-#titlebar {
+[data-component="titlebar"] {
 	display: grid;
 	height: var(--titlebar_height);
 	background-color: var(--colour_1);
@@ -7,19 +7,19 @@
 	grid-template-rows: 1fr;
 	grid-template-columns: 1fr auto auto auto;
 	will-change: display;
-	> * {
+	> [data-component="button"] {
 		width: 45px;
-	}
-	> #focus {
-		grid-area: focus;
-	}
-	> #maximize {
-		grid-area: maximize;
-	}
-	> #close {
-		grid-area: close;
-		&:hover {
-			background-color: var(--colour_error);
+		&#focus {
+			grid-area: focus;
+		}
+		&#maximize {
+			grid-area: maximize;
+		}
+		&#close {
+			grid-area: close;
+			&:hover {
+				background-color: var(--colour_error);
+			}
 		}
 	}
 	&:not(.enable) {

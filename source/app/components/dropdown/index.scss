@@ -1,4 +1,4 @@
-#dropdown {
+[data-component="dropdown"] {
 	position: relative;
 	> input {
 		color: var(--colour_success);
@@ -29,9 +29,10 @@
 			visibility: hidden;
 			opacity: 0%;
 		}
-		> #item {
+		> [data-component="button"] {
 			color: var(--colour_9);
 			padding: 6px 0px 6px 10px;
+			width: 100%;
 			transition: background-color var(--transition);
 			&:hover,
 			&.active {

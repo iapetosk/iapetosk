@@ -2,6 +2,8 @@ import * as React from "react";
 
 import "./index.scss";
 
+import Button from "@/app/components/button";
+
 import utility from "@/modules/utility";
 
 import { BridgeEvent, API_COMMAND, CommonProps } from "@/common";
@@ -50,29 +52,43 @@ class TitleBar extends React.Component<TitleBarProps, TitleBarState> {
 	}
 	public render() {
 		return (
-			<section id="titlebar" class={utility.inline({ "enable": this.props.enable, "draggable": true, "contrast": true })}>
-				<button id="focus" class="un_draggable"
-					onClick={() => {
-						window.API(API_COMMAND.MINIMIZE);
-					}}
-					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/focus.svg`) }}>
-				</button>
-				<button id="maximize" class="un_draggable"
-					onClick={() => {
-						if (this.state.maximize) {
-							window.API(API_COMMAND.UNMAXIMIZE);
-						} else {
-							window.API(API_COMMAND.MAXIMIZE);
+			<section data-component="titlebar" id={this.props.id} class={utility.inline({ "enable": this.props.enable, "contrast": true, "draggable": true, ...this.props.class })}>
+				{[
+					{
+						id: "focus",
+						html: require(`@/assets/icons/focus.svg`),
+						click: () => {
+							window.API(API_COMMAND.MINIMIZE);
 						}
-					}}
-					dangerouslySetInnerHTML={{ __html: require(this.state.maximize ? "!html-loader!@/assets/icons/minimize.svg" : "!html-loader!@/assets/icons/maximize.svg") }}>
-				</button>
-				<button id="close" class="un_draggable"
-					onClick={() => {
-						window.bridge.emit(BridgeEvent.BEFORE_CLOSE);
-					}}
-					dangerouslySetInnerHTML={{ __html: require(`!html-loader!@/assets/icons/close.svg`) }}>
-				</button>
+					},
+					{
+						id: "maximize",
+						html: this.state.maximize ? require(`@/assets/icons/minimize.svg`) : require(`@/assets/icons/maximize.svg`),
+						click: () => {
+							if (this.state.maximize) {
+								window.API(API_COMMAND.UNMAXIMIZE);
+							} else {
+								window.API(API_COMMAND.MAXIMIZE);
+							}
+						}
+					},
+					{
+						id: "close",
+						html: require(`@/assets/icons/close.svg`),
+						click: () => {
+							window.bridge.emit(BridgeEvent.BEFORE_CLOSE);
+						}
+					}
+				].map(({ id, html, click }, index) => {
+					return (
+						<Button id={id} class={{ "un_draggable": true }} options={{ html: html }} key={index} handler={{
+							click: () => {
+								click();
+							}
+						}}
+						></Button>
+					);
+				})}
 			</section>
 		);
 	}

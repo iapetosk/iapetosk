@@ -4,6 +4,7 @@ import "./index.scss";
 
 import DropDown from "@/app/components/dropdown";
 
+import utility from "@/modules/utility";
 import suggest from "@/modules/hitomi/suggest";
 
 import { CommonProps } from "@/common";
@@ -52,7 +53,7 @@ class Query extends React.Component<QueryProps, QueryState> {
 	}
 	public render() {
 		return (
-			<section id="query">
+			<section data-component="query" id={this.props.id} class={utility.inline({ ...this.props.class })}>
 				<DropDown
 					ref={this.refer.dropdown}
 					enable={this.props.enable}
@@ -65,7 +66,7 @@ class Query extends React.Component<QueryProps, QueryState> {
 						highlight: this.query()
 					}}
 					handler={{
-						choose: (value) => {
+						click: (value) => {
 							this.setState({ ...this.state, suggest: [] }, () => {
 								suggest.up();
 								this.set([...this.get()!.split(/\s+/).slice(0, -1), value.replace(/\s+/g, "_")].join("\u0020"));

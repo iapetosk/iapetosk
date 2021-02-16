@@ -2,6 +2,8 @@ import * as React from "react";
 
 import "./index.scss";
 
+import Button from "@/app/components/button";
+
 import utility from "@/modules/utility";
 
 import { CommonProps } from "@/common";
@@ -14,7 +16,7 @@ export type DropDownProps = CommonProps & {
 		items: [string, string][],
 		highlight: string;
 	},
-	handler?: Record<"choose" | "change" | "confirm", (value: string) => void>;
+	handler?: Record<"click" | "change" | "confirm", (value: string) => void>;
 };
 export type DropDownState = {
 	index: number,
@@ -49,7 +51,7 @@ class DropDown extends React.Component<DropDownProps, DropDownState> {
 	}
 	public render() {
 		return (
-			<section id="dropdown">
+			<section data-component="dropdown" id={this.props.id} class={utility.inline({ ...this.props.class })}>
 				<input class="contrast" ref={this.refer.input} readOnly={!this.props.enable || this.props.options.type === "select"} placeholder={this.props.options.value} defaultValue={this.props.options.value}
 					onFocus={() => {
 						this.setState({ ...this.state, focus: true });
@@ -83,7 +85,7 @@ class DropDown extends React.Component<DropDownProps, DropDownState> {
 									if (isNaN(this.state.index)) {
 										this.props.handler?.confirm(this.get()!);
 									} else {
-										this.props.handler?.choose(this.props.options.items[this.state.index][0]);
+										this.props.handler?.click(this.props.options.items[this.state.index][0]);
 									}
 									this.setState({ ...this.state, focus: !isNaN(this.state.index), index: NaN });
 									break;
@@ -95,17 +97,13 @@ class DropDown extends React.Component<DropDownProps, DropDownState> {
 				<section id="expandable" class={utility.inline({ "active": this.state.focus && this.props.options.items.length > 0, "contrast": true })}>
 					{this.props.options.items.map((item, index) => {
 						return (
-							<legend id="item" class={utility.inline({ "center-y": true, "active": this.state.index === index })} data-description={item[1]} key={index}
-								onClick={() => {
-									this.props.handler?.choose(item[0]);
-								}}>
-								{[...item[0].split(this.props.options.highlight)].map((value, index, array) => {
-									return ([
-										value,
-										index < array.length - 1 ? <strong key={index}>{this.props.options.highlight}</strong> : undefined
-									]);
-								})}
-							</legend>
+							<Button class={{ "center-y": true, "active": this.state.index === index }} options={{ html: [...item[0].split(this.props.options.highlight)].map((value, index, array) => { return value + (index < array.length - 1 ? `<strong key=${index}>${this.props.options.highlight}</strong>` : ""); }).join("") }} data-description={item[1]} key={index}
+								handler={{
+									click: () => {
+										this.props.handler?.click(item[0]);
+									}
+								}}
+							></Button>
 						);
 					})}
 				</section>

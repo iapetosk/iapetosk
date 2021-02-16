@@ -1,4 +1,4 @@
-#media {
+[data-component="media_player"] {
 	overflow: hidden;
 	display: grid;
 	width: 100%;
@@ -9,7 +9,7 @@
 	grid-template-columns: auto 1fr;
 	> #scrollable {
 		grid-area: scrollable;
-		> #lazyload {
+		> [data-component="lazyload"] {
 			margin: auto;
 			width: 1000px;
 			height: auto;

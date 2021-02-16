@@ -2,6 +2,8 @@ import * as React from "react";
 
 import "./index.scss";
 
+import Button from "@/app/components/button";
+
 import settings from "@/modules/settings";
 import utility from "@/modules/utility";
 
@@ -40,40 +42,46 @@ class Paging extends React.Component<PagingProps, PagingState> {
 	}
 	public render() {
 		return (
-			<section id="paging" class={utility.inline({ "enable": this.props.enable, "contrast": true, "center": true })}>
-				<button id="first" class={utility.inline({ "enable": this.props.options.index !== 0, "un_draggable": true })}
-					onClick={() => {
-						this.props.handler?.click(0);
+			<section data-component="paging" id={this.props.id} class={utility.inline({ "enable": this.props.enable, "contrast": true, "center": true, ...this.props.class })}>
+				<Button id="first" class={{ "enable": this.props.options.index !== 0 }} options={{ html: require(`@/assets/icons/first.svg`) }}
+					handler={{
+						click: () => {
+							this.props.handler?.click(0);
+						}
 					}}
-					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/first.svg") }}>
-				</button>
-				<button id="backward" class={utility.inline({ "enable": this.props.options.index !== 0, "un_draggable": true })}
-					onClick={() => {
-						this.props.handler?.click(utility.clamp(this.props.options.index - 1, 0, this.props.options.size - 1));
+				></Button>
+				<Button id="backward" class={{ "enable": this.props.options.index !== 0 }} options={{ html: require(`@/assets/icons/backward.svg`) }}
+					handler={{
+						click: () => {
+							this.props.handler?.click(utility.clamp(this.props.options.index - 1, 0, this.props.options.size - 1));
+						}
 					}}
-					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/backward.svg") }}>
-				</button>
+				></Button>
 				{[...new Array<number>(Math.min(this.config.metre, this.props.options.size))].map((value, index) => {
 					return (
-						<button class={utility.inline({ "enable": true, "active": this.props.options.index === this.get_offset(index), "un_draggable": true })} key={index}
-							onClick={() => {
-								this.props.handler?.click(this.get_offset(index));
+						<Button class={{ "enable": true, "active": this.props.options.index === this.get_offset(index) }} options={{ html: String(this.get_offset(index) + 1) }} key={index}
+							handler={{
+								click: () => {
+									this.props.handler?.click(this.get_offset(index));
+								}
 							}}
-						>{this.get_offset(index) + 1}</button>
+						></Button>
 					);
 				})}
-				<button id="forward" class={utility.inline({ "enable": this.props.options.index !== this.props.options.size - 1, "un_draggable": true })}
-					onClick={() => {
-						this.props.handler?.click(utility.clamp(this.props.options.index + 1, 0, this.props.options.size - 1));
+				<Button id="forward" class={{ "enable": this.props.options.index !== this.props.options.size - 1 }} options={{ html: require(`@/assets/icons/forward.svg`) }}
+					handler={{
+						click: () => {
+							this.props.handler?.click(utility.clamp(this.props.options.index + 1, 0, this.props.options.size - 1));
+						}
 					}}
-					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/forward.svg") }}>
-				</button>
-				<button id="last" class={utility.inline({ "enable": this.props.options.index !== this.props.options.size - 1, "un_draggable": true })}
-					onClick={() => {
-						this.props.handler?.click(this.props.options.size - 1);
+				></Button>
+				<Button id="last" class={{ "enable": this.props.options.index !== this.props.options.size - 1 }} options={{ html: require(`@/assets/icons/last.svg`) }}
+					handler={{
+						click: () => {
+							this.props.handler?.click(this.props.options.size - 1);
+						}
 					}}
-					dangerouslySetInnerHTML={{ __html: require("!html-loader!@/assets/icons/last.svg") }}>
-				</button>
+				></Button>
 			</section>
 		);
 	}

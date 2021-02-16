@@ -1,7 +1,7 @@
 
 # Instruction
 
-[Waifu-Material](https://github.com/Any-Material/waifu-material) is highly module driven *Downloader / Reader*, built upon [Imouto-Material](https://github.com/Any-Material/imouto-material), written in [TypeScript](https://github.com/microsoft/TypeScript), and powered by :electron: [Electron](https://github.com/electron).<br>
+[Waifu-Material](https://github.com/Any-Material/waifu-material) is a highly module driven **Downloader** / **Reader**, built upon [Imouto-Material](https://github.com/Any-Material/imouto-material), written in [TypeScript](https://github.com/microsoft/TypeScript), and powered by :electron: [Electron](https://github.com/electron).<br>
 
 # Installation
 

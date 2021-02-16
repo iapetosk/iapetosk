@@ -2,7 +2,7 @@ import * as React from "react";
 
 import "./index.scss";
 
-import Media from "@/app/components/media";
+import Media from "@/app/components/media.player";
 
 import DiscordRPC from "@/modules/discord.rpc";
 
@@ -12,7 +12,7 @@ import read, { GalleryJS } from "@/modules/hitomi/read";
 
 import { API_COMMAND } from "@/common";
 import { StaticEvent } from "@/statics";
-import { MediaProps } from "@/app/components/media";
+import { MediaProps } from "@/app/components/media.player";
 import { Viewport } from "@/statics/router";
 
 export type ReaderProps = {

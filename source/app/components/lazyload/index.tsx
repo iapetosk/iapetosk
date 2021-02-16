@@ -33,7 +33,7 @@ class LazyLoad extends React.Component<LazyLoadProps, LazyLoadState> {
 	}
 	public render() {
 		return (
-			<img id="lazyload" src={base64} class={utility.inline({ ...this.props.class, "error": this.state.error === this.config.retry })} loading="lazy"
+			<img data-component="lazyload" id={this.props.id} src={base64} class={utility.inline({ "error": this.state.error === this.config.retry, ...this.props.class })} loading="lazy"
 				onLoad={(event) => {
 					if ((event.target as HTMLImageElement).src === this.props.options.source) {
 						this.setState({ ...this.state, error: 0 }, () => {

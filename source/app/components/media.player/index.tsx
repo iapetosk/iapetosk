@@ -8,11 +8,12 @@ import utility from "@/modules/utility";
 import router from "@/statics/router";
 
 import { BridgeEvent, CommonProps } from "@/common";
+import Button from "../button";
 
 export type MediaProps = CommonProps & {
 	options: {
 		files: string[];
-	}
+	};
 };
 export type MediaState = {
 	fullscreen: boolean;
@@ -37,23 +38,23 @@ class Media extends React.Component<MediaProps, MediaState> {
 	}
 	public render() {
 		return (
-			<section id="media">
+			<section data-component="media_player" id={this.props.id} class={utility.inline({ ...this.props.class })}>
 				<section id="navigation" class={utility.inline({ "enable": !this.state.fullscreen, "contrast": true, "center-x": true })}>
 					{[
 						{
-							HTML: require(`!html-loader!@/assets/icons/return.svg`),
+							value: require(`@/assets/icons/return.svg`),
 							click: () => {
 								router.set({ view: "browser", options: undefined });
 							}
 						}
-					].map((button, index) => {
+					].map(({ value, click }, index) => {
 						return (
-							<button key={index}
-								onClick={() => {
-									button.click();
-								}}
-								dangerouslySetInnerHTML={{ __html: button.HTML }}>
-							</button>
+							<Button options={{ html: value }} key={index} handler={{
+								click: () => {
+									click();
+								}
+							}}
+							></Button>
 						);
 					})}
 				</section>
