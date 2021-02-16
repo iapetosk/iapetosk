@@ -153,7 +153,7 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 					<legend id="title" class="eclipse">{this.props.options.gallery.title}</legend>
 				</section>
 				<section id="status">
-					<legend id="ribbon" class={utility.inline({ [TaskStatus[this.props.options.status]]: true, "contrast": true, "center": true, "corner": true })}>{TaskStatus[this.props.options.status]}</legend>
+					<legend id="ribbon" class={utility.inline({ [TaskStatus[this.props.options.status]]: true, "contrast": true, "center": true })}>{TaskStatus[this.props.options.status]}</legend>
 				</section>
 			</section>
 		);

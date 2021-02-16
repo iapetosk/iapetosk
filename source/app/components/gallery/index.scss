@@ -151,21 +151,17 @@
 		overflow: hidden;
 		width: 100%;
 		height: 100%;
-		> * {
-			&:not(.active) {
-				display: none;
-			}
-		}
 		> #ribbon {
-			&.corner {
-				overflow: hidden;
-				position: absolute;
-				top: 28px;
-				right: -46px;
-				width: 198.99px;
-				height: 50px;
-				transform: rotate(45deg);
-				color: var(--colour_1);
+			overflow: hidden;
+			position: absolute;
+			top: 28px;
+			right: -46px;
+			width: 198.99px;
+			height: 50px;
+			transform: rotate(45deg);
+			color: var(--colour_1);
+			&.NONE {
+				display: none;
 			}
 			&.QUEUED {
 				background-color: var(--colour_warning);
@@ -176,9 +172,6 @@
 			&.FINISHED {
 				background-color: var(--colour_error);
 			}
-		}
-		&:not(.active) {
-			display: none;
 		}
 	}
 	&.unset,
