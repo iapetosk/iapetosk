@@ -81,13 +81,13 @@ class TitleBar extends React.Component<TitleBarProps, TitleBarState> {
 					}
 				].map(({ id, html, click }, index) => {
 					return (
-						<Button id={id} class={{ "un_draggable": true }} options={{ html: html }} key={index}
+						<Button id={id} class={{ "un_draggable": true }} key={index}
 							handler={{
 								click: () => {
 									click();
 								}
 							}}
-						></Button>
+						>{html}</Button>
 					);
 				})}
 			</section>

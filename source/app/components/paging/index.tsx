@@ -43,45 +43,45 @@ class Paging extends React.Component<PagingProps, PagingState> {
 	public render() {
 		return (
 			<section data-component="paging" id={this.props.id} class={utility.inline({ "enable": this.props.enable, "contrast": true, "center": true, ...this.props.class })}>
-				<Button id="first" class={{ "enable": this.props.options.index !== 0 }} options={{ html: require(`@/assets/icons/first.svg`) }}
+				<Button id="first" class={{ "enable": this.props.options.index !== 0 }}
 					handler={{
 						click: () => {
 							this.props.handler?.click(0);
 						}
 					}}
-				></Button>
-				<Button id="backward" class={{ "enable": this.props.options.index !== 0 }} options={{ html: require(`@/assets/icons/backward.svg`) }}
+				>{require(`@/assets/icons/first.svg`)}</Button>
+				<Button id="backward" class={{ "enable": this.props.options.index !== 0 }}
 					handler={{
 						click: () => {
 							this.props.handler?.click(utility.clamp(this.props.options.index - 1, 0, this.props.options.size - 1));
 						}
 					}}
-				></Button>
+				>{require(`@/assets/icons/backward.svg`)}</Button>
 				{[...new Array<number>(Math.min(this.config.metre, this.props.options.size))].map((value, index) => {
 					return (
-						<Button class={{ "enable": true, "active": this.props.options.index === this.get_offset(index) }} options={{ html: String(this.get_offset(index) + 1) }} key={index}
+						<Button class={{ "enable": true, "active": this.props.options.index === this.get_offset(index) }} key={index}
 							handler={{
 								click: () => {
 									this.props.handler?.click(this.get_offset(index));
 								}
 							}}
-						></Button>
+						>{String(this.get_offset(index) + 1)}</Button>
 					);
 				})}
-				<Button id="forward" class={{ "enable": this.props.options.index !== this.props.options.size - 1 }} options={{ html: require(`@/assets/icons/forward.svg`) }}
+				<Button id="forward" class={{ "enable": this.props.options.index !== this.props.options.size - 1 }}
 					handler={{
 						click: () => {
 							this.props.handler?.click(utility.clamp(this.props.options.index + 1, 0, this.props.options.size - 1));
 						}
 					}}
-				></Button>
-				<Button id="last" class={{ "enable": this.props.options.index !== this.props.options.size - 1 }} options={{ html: require(`@/assets/icons/last.svg`) }}
+				>{require(`@/assets/icons/forward.svg`)}</Button>
+				<Button id="last" class={{ "enable": this.props.options.index !== this.props.options.size - 1 }}
 					handler={{
 						click: () => {
 							this.props.handler?.click(this.props.options.size - 1);
 						}
 					}}
-				></Button>
+				>{require(`@/assets/icons/last.svg`)}</Button>
 			</section>
 		);
 	}

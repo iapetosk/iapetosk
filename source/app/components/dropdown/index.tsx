@@ -97,13 +97,13 @@ class DropDown extends React.Component<DropDownProps, DropDownState> {
 				<section id="expandable" class={utility.inline({ "active": this.state.focus && this.props.options.items.length > 0, "contrast": true })}>
 					{this.props.options.items.map((item, index) => {
 						return (
-							<Button class={{ "center-y": true, "active": this.state.index === index }} options={{ html: [...item[0].split(this.props.options.highlight)].map((value, index, array) => { return value + (index < array.length - 1 ? `<strong key=${index}>${this.props.options.highlight}</strong>` : ""); }).join("") }} data-description={item[1]} key={index}
+							<Button class={{ "center-y": true, "active": this.state.index === index }} data-description={item[1]} key={index}
 								handler={{
 									click: () => {
 										this.props.handler?.click(item[0]);
 									}
 								}}
-							></Button>
+							>{[...item[0].split(this.props.options.highlight)].map((value, index, array) => { return value + (index < array.length - 1 ? `<strong key=${index}>${this.props.options.highlight}</strong>` : ""); }).join("")}</Button>
 						);
 					})}
 				</section>

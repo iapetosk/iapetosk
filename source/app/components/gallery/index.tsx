@@ -56,7 +56,7 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 					<LazyLoad class={{ "censorship": this.props.options.gallery.tags ? !isNaN(utility.index_of(this.props.options.gallery.tags, censorship)) : false }} options={{ source: this.props.options.gallery.thumbnail[0] }}></LazyLoad>
 					<section id="discovery" class="fluid">
 						<section id="buttons">
-							<Button class={{ "contrast": true }} options={{ html: "" }}
+							<Button class={{ "contrast": true }}
 								handler={{
 									click: () => {
 										this.setState({ ...this.state, toggle: "buttons" });
@@ -67,21 +67,19 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 						<section id="scrollable" class="scroll-y">
 							{this.state.toggle !== "unset" ? this.config.discovery.map((key, index) => {
 								// @ts-ignore
-								return (this.props.options.gallery[key as keyof GalleryBlock] instanceof Array ? this.props.options.gallery[key as keyof GalleryBlock].length : this.props.options.gallery[key as keyof GalleryBlock]) ? (
+								return (this.props.options.gallery[key] instanceof Array ? this.props.options.gallery[key].length : this.props.options.gallery[key]) ? (
 									<legend id="bundle" key={index}>
 										{key}:
 										{utility.wrap(this.props.options.gallery[key as keyof GalleryBlock]).map((value, index) => {
 											return (
-												<button id="key" class={utility.inline({ "contrast": true, "center": true, "censorship": typeof value === "string" ? censorship.test(value) : false })} key={index}>
-													<mark id="value" class="eclipse"
-														onMouseUp={(event) => {
-															if (typeof value === "string") {
-																const [$key, $value] = [key === "tags" ? /♂/.test(value) ? "male" : /♀/.test(value) ? "female" : "tag" : key, /language/.test(key) ? languages_english[utility.index_of(languages_local, value)] : value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_")];
-																this.props.handler?.click(event.button, $key, $value);
-															}
-														}}
-													>{value}</mark>
-												</button>
+												<Button id="key" class={{ "contrast": true, "center": true, "censorship": typeof value === "string" ? censorship.test(value) : false }} key={index}
+													handler={{
+														click: () => {
+
+														}
+													}}
+												// @ts-ignore
+												><mark id="value" class="eclipse">{key === "tags" ? `${/♂/.test(value) ? "male" : /♀/.test(value) ? "female" : "tag"}:${value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_")}` : key === "language" ? languages_english[utility.index_of(languages_local, value)] : value}</mark></Button>
 											);
 										})}
 									</legend>
@@ -138,13 +136,13 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 							}
 						].map(({ html, click }, index) => {
 							return (
-								<Button options={{ html: html }} key={index}
+								<Button key={index}
 									handler={{
 										click: () => {
 											click();
 										}
 									}}
-								></Button>
+								>{html}</Button>
 							);
 						})}
 					</section>

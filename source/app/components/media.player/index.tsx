@@ -42,20 +42,20 @@ class MediaPlayer extends React.Component<MediaProps, MediaState> {
 				<section id="navigation" class={utility.inline({ "enable": !this.state.fullscreen, "contrast": true, "center-x": true })}>
 					{[
 						{
-							value: require(`@/assets/icons/return.svg`),
+							html: require(`@/assets/icons/return.svg`),
 							click: () => {
 								router.set({ view: "browser", options: undefined });
 							}
 						}
-					].map(({ value, click }, index) => {
+					].map(({ html, click }, index) => {
 						return (
-							<Button options={{ html: value }} key={index}
+							<Button key={index}
 								handler={{
 									click: () => {
 										click();
 									}
 								}}
-							></Button>
+							>{html}</Button>
 						);
 					})}
 				</section>
