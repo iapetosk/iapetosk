@@ -3,7 +3,7 @@ import * as React from "react";
 import "./index.scss";
 
 import Query from "@/app/components/query";
-import Galleries from "@/app/components/galleries";
+import GalleryList from "@/app/components/gallery.list";
 import Paging from "@/app/components/paging";
 
 import DiscordRPC from "@/modules/discord.rpc";
@@ -18,14 +18,14 @@ import utility from "@/modules/utility";
 import { GalleryBlock } from "@/modules/hitomi/read";
 import { QueryProps } from "@/app/components/query";
 import { PagingProps } from "@/app/components/paging";
-import { GalleriesProps } from "@/app/components/galleries";
+import { GalleryListProps } from "@/app/components/gallery.list";
 
 export type BrowserProps = {
 	enable: boolean;
 };
 export type BrowserState = {
 	query: QueryProps,
-	galleries: GalleriesProps,
+	gallerylist: GalleryListProps,
 	paging: PagingProps,
 	session: {
 		history: [string, number][],
@@ -37,7 +37,7 @@ export type BrowserState = {
 class Browser extends React.Component<BrowserProps> {
 	public props: BrowserProps;
 	public state: BrowserState;
-	public refer: { query: React.RefObject<Query>; galleries: React.RefObject<Galleries>; paging: React.RefObject<Paging>; };
+	public refer: { query: React.RefObject<Query>; gallerylist: React.RefObject<GalleryList>; paging: React.RefObject<Paging>; };
 	constructor(props: BrowserProps) {
 		super(props);
 		this.props = props;
@@ -53,13 +53,13 @@ class Browser extends React.Component<BrowserProps> {
 					}
 				}
 			},
-			galleries: {
+			gallerylist: {
 				options: {
 					blocks: []
 				},
 				handler: {
 					click: (button, key, value) => {
-						return this.galleries_click(button, key, value);
+						return this.gallerylist_click(button, key, value);
 					}
 				}
 			},
@@ -83,7 +83,7 @@ class Browser extends React.Component<BrowserProps> {
 		};
 		this.refer = {
 			query: React.createRef(),
-			galleries: React.createRef(),
+			gallerylist: React.createRef(),
 			paging: React.createRef()
 		};
 		window.addEventListener("keydown", (event) => {
@@ -104,7 +104,7 @@ class Browser extends React.Component<BrowserProps> {
 	public query_keydown(value: string) {
 		this.set_query({ ...this.state.query, options: { ...this.state.query.options, value: value } });
 	}
-	public galleries_click(button: number, key: string, value: string) {
+	public gallerylist_click(button: number, key: string, value: string) {
 		switch (key) {
 			case "title":
 			case "date": {
@@ -155,10 +155,10 @@ class Browser extends React.Component<BrowserProps> {
 					...this.state.query,
 					enable: true,
 				},
-				galleries: {
-					...this.state.galleries,
+				gallerylist: {
+					...this.state.gallerylist,
 					options: {
-						...this.state.galleries.options,
+						...this.state.gallerylist.options,
 						blocks: value[0]
 					}
 				},
@@ -175,10 +175,10 @@ class Browser extends React.Component<BrowserProps> {
 					...this.state.query,
 					enable: false,
 				},
-				galleries: {
-					...this.state.galleries,
+				gallerylist: {
+					...this.state.gallerylist,
 					options: {
-						...this.state.galleries.options,
+						...this.state.gallerylist.options,
 						blocks: []
 					}
 				},
@@ -196,8 +196,8 @@ class Browser extends React.Component<BrowserProps> {
 		suggest.up();
 		settings.set("search", { ...settings.get().search, query: value.options.value });
 	}
-	public set_galleries(value: BrowserState["galleries"]) {
-		this.setState({ ...this.state, galleries: value });
+	public set_gallerylist(value: BrowserState["gallerylist"]) {
+		this.setState({ ...this.state, gallerylist: value });
 	}
 	public set_paging(value: BrowserState["paging"]) {
 		this.setState({ ...this.state, paging: value }, () => {
@@ -230,7 +230,7 @@ class Browser extends React.Component<BrowserProps> {
 			<section id="browser" class={utility.inline({ "enable": this.props.enable, "left": true })}>
 				<section id="scrollable" class="scroll-y">
 					<Query ref={this.refer.query} enable={this.state.query.enable} options={this.state.query.options} handler={this.state.query.handler}></Query>
-					<Galleries ref={this.refer.galleries} options={this.state.galleries.options} handler={this.state.galleries.handler}></Galleries>
+					<GalleryList ref={this.refer.gallerylist} options={this.state.gallerylist.options} handler={this.state.gallerylist.handler}></GalleryList>
 				</section>
 				<Paging ref={this.refer.paging} enable={this.state.paging.enable} options={this.state.paging.options} handler={this.state.paging.handler}></Paging>
 			</section>

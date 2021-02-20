@@ -8,7 +8,7 @@
 	> #scrollable {
 		grid-area: scrollable;
 	}
-	> #paging {
+	> [data-component="paging"] {
 		grid-area: paging;
 	}
 }

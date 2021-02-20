@@ -1,6 +1,6 @@
 # 읽어주세요
 
-*Waifu Material* (이)는 [hitomi.la](https://hitomi.la) (을)를 위한 **Downloader** / **Reader** 입니다.<br>
+*Waifu Material* (이)는 [hitomi.la](https://hitomi.la) (을)를 위한 **Downloader** / **Viewer** 입니다.<br>
 
 ## 1. 전체화면 단축키
 

@@ -12,22 +12,22 @@ import { StaticEvent } from "@/statics";
 import { GalleryBlock } from "@/modules/hitomi/read";
 import { Task, TaskStatus } from "@/modules/download";
 
-export type GalleriesProps = CommonProps & {
+export type GalleryListProps = CommonProps & {
 	options: {
 		blocks: GalleryBlock[];
 	},
 	handler?: Record<"click", (button: number, key: string, value: string) => void>;
 };
-export type GalleriesState = {
+export type GalleryListState = {
 	[key: number]: {
 		status: TaskStatus;
 	};
 };
 
-class Galleries extends React.Component<GalleriesProps, GalleriesState> {
-	public props: GalleriesProps;
-	public state: GalleriesState;
-	constructor(props: GalleriesProps) {
+class GalleryList extends React.Component<GalleryListProps, GalleryListState> {
+	public props: GalleryListProps;
+	public state: GalleryListState;
+	constructor(props: GalleryListProps) {
 		super(props);
 		this.props = props;
 		this.state = Object.assign({}, ...Object.values(worker.get()).map((task) => { return { [task.id]: { status: task.status } }; }));
@@ -46,7 +46,7 @@ class Galleries extends React.Component<GalleriesProps, GalleriesState> {
 			}
 		});
 	}
-	static getDerivedStateFromProps($new: GalleriesProps, $old: GalleriesProps) {
+	static getDerivedStateFromProps($new: GalleryListProps, $old: GalleryListProps) {
 		return $new;
 	}
 	public render() {
@@ -67,4 +67,4 @@ class Galleries extends React.Component<GalleriesProps, GalleriesState> {
 		);
 	}
 }
-export default Galleries;
+export default GalleryList;

@@ -66,7 +66,8 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 						</section>
 						<section id="scrollable" class="scroll-y">
 							{this.state.toggle !== "unset" ? this.config.discovery.map((key, index) => {
-								return this.props.options.gallery[key as keyof GalleryBlock] ? (
+								// @ts-ignore
+								return (this.props.options.gallery[key as keyof GalleryBlock] instanceof Array ? this.props.options.gallery[key as keyof GalleryBlock].length : this.props.options.gallery[key as keyof GalleryBlock]) ? (
 									<legend id="bundle" key={index}>
 										{key}:
 										{utility.wrap(this.props.options.gallery[key as keyof GalleryBlock]).map((value, index) => {

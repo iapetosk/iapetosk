@@ -2,13 +2,13 @@ import * as React from "react";
 
 import "./index.scss";
 
+import Button from "@/app/components/button";
 import LazyLoad from "@/app/components/lazyload";
 
 import utility from "@/modules/utility";
 import router from "@/statics/router";
 
 import { BridgeEvent, CommonProps } from "@/common";
-import Button from "../button";
 
 export type MediaProps = CommonProps & {
 	options: {
@@ -38,7 +38,7 @@ class MediaPlayer extends React.Component<MediaProps, MediaState> {
 	}
 	public render() {
 		return (
-			<section data-component="media_player" id={this.props.id} class={utility.inline({ ...this.props.class })}>
+			<section data-component="media.player" id={this.props.id} class={utility.inline({ ...this.props.class })}>
 				<section id="navigation" class={utility.inline({ "enable": !this.state.fullscreen, "contrast": true, "center-x": true })}>
 					{[
 						{

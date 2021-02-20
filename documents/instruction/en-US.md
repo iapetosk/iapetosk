@@ -1,6 +1,6 @@
 # READ ME
 
-*Waifu Material* is a **Downloader** / **Reader**  for [hitomi.la](https://hitomi.la).<br>
+*Waifu Material* is a **Downloader** / **Viewer**  for [hitomi.la](https://hitomi.la).<br>
 
 ## 1. Fullscreen Shortcut
 

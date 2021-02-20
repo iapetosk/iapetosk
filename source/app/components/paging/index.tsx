@@ -4,8 +4,8 @@ import "./index.scss";
 
 import Button from "@/app/components/button";
 
-import settings from "@/modules/settings";
 import utility from "@/modules/utility";
+import settings from "@/modules/settings";
 
 import { CommonProps } from "@/common";
 import { Config } from "@/modules/settings";
