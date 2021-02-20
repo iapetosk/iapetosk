@@ -51,7 +51,7 @@ class GalleryList extends React.Component<GalleryListProps, GalleryListState> {
 	}
 	public render() {
 		return (
-			<section data-component="galleries" id={this.props.id} class={utility.inline({ ...this.props.class })}>
+			<section data-component="gallery.list" id={this.props.id} class={utility.inline({ ...this.props.class })}>
 				{this.props.options.blocks.map((gallery, index) => {
 					return (
 						<Gallery options={{ gallery: gallery, status: this.state[gallery.id] ? this.state[gallery.id].status : TaskStatus.NONE }} key={index}
