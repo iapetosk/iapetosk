@@ -10,9 +10,10 @@
 	--colour_7: #4c4c4c;
 	--colour_8: #565656;
 	--colour_9: #5f5f5f;
-	--colour_error: #a03c3c;
-	--colour_success: #4b7a4b;
-	--colour_warning: #c2c24b;
+	--colour_level_0: #4b7a4b;
+	--colour_level_1: #4b547a;
+	--colour_level_2: #a7a74c;
+	--colour_level_3: #a03c3c;
 	// common
 	--transition: 250ms ease-in-out;
 	// component(s)
@@ -24,8 +25,7 @@
 html {
 	overflow: hidden;
 }
-body,
-body * {
+body, body * {
 	display: block;
 	margin: 0px;
 	padding: 0px;
@@ -50,18 +50,16 @@ svg {
 ::-webkit-scrollbar {
 	width: 10px;
 }
-::-webkit-scrollbar-track,
-::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-track, ::-webkit-scrollbar-thumb {
 	border-left: thin solid var(--colour_0);
 }
 ::-webkit-scrollbar-track {
 	background-color: var(--colour_1);
 }
 ::-webkit-scrollbar-thumb {
-	background-color: var(--colour_success);
+	background-color: var(--colour_level_0);
 }
-::-webkit-outer-spin-button,
-::-webkit-inner-spin-button {
+::-webkit-outer-spin-button, ::-webkit-inner-spin-button {
 	-webkit-appearance: none;
 }
 // class(es)
@@ -115,14 +113,14 @@ svg {
 		overflow: hidden;
 		position: relative;
 	}
-	> #titlebar {
+	> [data-component="titlebar"] {
 		grid-area: header;
 	}
 	> #content {
 		grid-area: content;
 		border-top-width: 0px;
 		background-color: var(--colour_2);
-		> * {
+		> [data-viewport] {
 			position: absolute;
 			width: 100%;
 			height: 100%;

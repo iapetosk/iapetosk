@@ -227,7 +227,7 @@ class Browser extends React.Component<BrowserProps> {
 			});
 		}
 		return (
-			<section id="browser" class={utility.inline({ "enable": this.props.enable, "left": true })}>
+			<section data-viewport="browser" class={utility.inline({ "enable": this.props.enable, "left": true })}>
 				<section id="scrollable" class="scroll-y">
 					<Query ref={this.refer.query} enable={this.state.query.enable} options={this.state.query.options} handler={this.state.query.handler}></Query>
 					<GalleryList ref={this.refer.gallerylist} options={this.state.gallerylist.options} handler={this.state.gallerylist.handler}></GalleryList>

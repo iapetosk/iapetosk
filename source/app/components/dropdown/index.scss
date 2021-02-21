@@ -1,13 +1,12 @@
 [data-component="dropdown"] {
 	position: relative;
 	> input {
-		color: var(--colour_success);
+		color: var(--colour_level_0);
 		padding-left: 10px;
 		padding-right: 10px;
 		background-color: var(--colour_3);
 		transition: border-color var(--transition), background-color var(--transition);
-		&:hover,
-		&:focus {
+		&:hover, &:focus {
 			border-color: var(--colour_9);
 			background-color: var(--colour_4);
 		}
@@ -36,18 +35,17 @@
 			padding: 6px 0px 6px 10px;
 			font-size: 15px;
 			transition: background-color var(--transition);
-			&:hover,
-			&.active {
+			&:hover, &.active {
 				background-color: var(--colour_3);
 			}
 			&:after {
 				position: absolute;
 				content: attr(data-count);
-				color: var(--colour_success);
+				color: var(--colour_level_0);
 				right: 10px;
 			}
 			> strong {
-				color: var(--colour_success);
+				color: var(--colour_level_0);
 			}
 		}
 	}

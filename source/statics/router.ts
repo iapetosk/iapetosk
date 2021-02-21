@@ -1,7 +1,7 @@
 import { StaticEvent, StaticHandler } from "@/statics";
 
 export type Viewport = {
-	view: string,
+	view: "browser" | "viewer",
 	options: any;
 };
 

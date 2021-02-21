@@ -81,6 +81,17 @@
 						transition: border-color var(--transition), background-color var(--transition);
 						> #value {
 							color: var(--colour_9);
+							> #field {
+								&.male {
+									color: var(--colour_level_0);
+								}
+								&.female {
+									color: var(--colour_level_3);
+								}
+								&.tag {
+									color: var(--colour_level_1);
+								}
+							}
 						}
 						&:hover {
 							border-color: var(--colour_9);
@@ -88,7 +99,7 @@
 						}
 						&.censorship {
 							border-color: var(--colour_1);
-							background-color: var(--colour_error);
+							background-color: var(--colour_level_3);
 							> #value {
 								color: var(--colour_1);
 							}
@@ -164,18 +175,17 @@
 				display: none;
 			}
 			&.QUEUED {
-				background-color: var(--colour_warning);
+				background-color: var(--colour_level_2);
 			}
 			&.WORKING {
-				background-color: var(--colour_success);
+				background-color: var(--colour_level_0);
 			}
 			&.FINISHED {
-				background-color: var(--colour_error);
+				background-color: var(--colour_level_3);
 			}
 		}
 	}
-	&.unset,
-	&.buttons {
+	&.unset, &.buttons {
 		#upper {
 			> #discovery {
 				transform: translateY(100%);
@@ -198,8 +208,7 @@
 		> #upper {
 			border-color: var(--colour_9);
 		}
-		&.unset,
-		&.buttons {
+		&.unset, &.buttons {
 			> #upper {
 				> [data-component="lazyload"] {
 					opacity: 100%;

@@ -8,7 +8,7 @@
 		height: 100%;
 		width: 45px;
 		&.active {
-			color: var(--colour_success);
+			color: var(--colour_level_0);
 		}
 		&:not(.enable) {
 			pointer-events: none;

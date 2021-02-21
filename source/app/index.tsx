@@ -4,7 +4,7 @@ import "./index.scss";
 
 import TitleBar from "@/app/components/titlebar";
 import Browser from "@/app/views/browser";
-import Reader from "@/app/views/reader";
+import Viewer from "@/app/views/viewer";
 
 import router from "@/statics/router";
 
@@ -44,7 +44,7 @@ class App extends React.Component<AppProps, AppState> {
 				<TitleBar enable={!this.state.fullscreen}></TitleBar>
 				<section id="content" class="contrast">
 					<Browser enable={this.state.view === "browser"}></Browser>
-					<Reader enable={this.state.view === "reader"}></Reader>
+					<Viewer enable={this.state.view === "reader"}></Viewer>
 				</section>
 			</>
 		);

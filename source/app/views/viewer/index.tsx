@@ -15,18 +15,18 @@ import { StaticEvent } from "@/statics";
 import { MediaProps } from "@/app/components/media.player";
 import { Viewport } from "@/statics/router";
 
-export type ReaderProps = {
+export type ViewerProps = {
 	enable: boolean;
 };
-export type ReaderState = {
+export type ViewerState = {
 	script?: GalleryJS,
 	media: MediaProps;
 };
 
-class Reader extends React.Component<ReaderProps> {
-	public props: ReaderProps;
-	public state: ReaderState;
-	constructor(props: ReaderProps) {
+class Viewer extends React.Component<ViewerProps> {
+	public props: ViewerProps;
+	public state: ViewerState;
+	constructor(props: ViewerProps) {
 		super(props);
 		this.props = props;
 		this.state = {
@@ -42,7 +42,7 @@ class Reader extends React.Component<ReaderProps> {
 			const [$new, $old] = args as [Viewport, Viewport];
 
 			switch ($new.view) {
-				case "reader": {
+				case "viewer": {
 					this.setState({ ...this.state, script: undefined, media: { ...this.state.media, options: { ...this.state.media.options, files: [] } } });
 					read.script($new.options as number).then(async (script) => {
 						const files = [];
@@ -68,7 +68,7 @@ class Reader extends React.Component<ReaderProps> {
 			}
 		});
 	}
-	static getDerivedStateFromProps($new: ReaderProps, $old: ReaderProps) {
+	static getDerivedStateFromProps($new: ViewerProps, $old: ViewerProps) {
 		return $new;
 	}
 	public render() {
@@ -89,10 +89,10 @@ class Reader extends React.Component<ReaderProps> {
 			});
 		}
 		return (
-			<section id="reader" class={utility.inline({ "enable": this.props.enable, "right": true })}>
+			<section data-viewport="viewer" class={utility.inline({ "enable": this.props.enable, "right": true })}>
 				<MediaPlayer options={{ files: this.state.media.options.files }}></MediaPlayer>
 			</section>
 		);
 	}
 }
-export default Reader;
+export default Viewer;

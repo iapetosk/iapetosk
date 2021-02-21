@@ -71,15 +71,22 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 									<legend id="bundle" key={index}>
 										{key}:
 										{utility.wrap(this.props.options.gallery[key as keyof GalleryBlock]).map((value, index) => {
+											const tag = {
+												// @ts-ignore
+												key: key === "tags" ? /♂/.test(value) ? "male" : /♀/.test(value) ? "female" : "tag" : key,
+												// @ts-ignore
+												value: key === "language" ? languages_english[utility.index_of(languages_local, value)] : value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_")
+											};
 											return (
 												<Button id="key" class={{ "contrast": true, "center": true, "censorship": typeof value === "string" ? censorship.test(value) : false }} key={index}
 													handler={{
-														click: () => {
-
+														click: (button) => {
+															// @ts-ignore
+															this.props.handler?.click(button, tag.key, tag.value);
 														}
 													}}
 												// @ts-ignore
-												><mark id="value" class="eclipse">{key === "tags" ? `${/♂/.test(value) ? "male" : /♀/.test(value) ? "female" : "tag"}:${value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_")}` : key === "language" ? languages_english[utility.index_of(languages_local, value)] : value}</mark></Button>
+												><mark id="value" class="eclipse center-x">{key === "tags" ? <><strong id="field" class={tag.key}>{tag.key}</strong>:<>{tag.value}</></> : tag.value}</mark></Button>
 											);
 										})}
 									</legend>
@@ -92,7 +99,7 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 							{
 								html: require(`@/assets/icons/read.svg`),
 								click: () => {
-									router.set({ view: "reader", options: this.props.options.gallery.id });
+									router.set({ view: "viewer", options: this.props.options.gallery.id });
 								}
 							},
 							...(!isNaN(utility.index_of([TaskStatus.WORKING, TaskStatus.FINISHED, TaskStatus.QUEUED], this.props.options.status)) ? [
