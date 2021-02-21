@@ -78,7 +78,7 @@ class Search {
 					if (status === undefined) {
 						return [];
 					}
-					return Object.values(worker.get()).filter((task) => { return task.status === TaskStatus.QUEUED; }).map((task) => { return task.id; });
+					return Object.values(worker.get()).filter((task) => { return task.status === status; }).map((task) => { return task.id; });
 				}
 				default: {
 					const URL = get_URL(tag);
