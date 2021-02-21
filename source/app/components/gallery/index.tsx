@@ -75,7 +75,7 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 												// @ts-ignore
 												key: key === "tags" ? /♂/.test(value) ? "male" : /♀/.test(value) ? "female" : "tag" : key,
 												// @ts-ignore
-												value: key === "language" ? languages_english[utility.index_of(languages_local, value)] : value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_")
+												value: key === "tags" ? value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_") : key === "language" ? languages_english[utility.index_of(languages_local, value)] : value
 											};
 											return (
 												<Button id="key" class={{ "contrast": true, "center": true, "censorship": typeof value === "string" ? censorship.test(value) : false }} key={index}
