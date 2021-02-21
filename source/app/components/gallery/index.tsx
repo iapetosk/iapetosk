@@ -38,6 +38,7 @@ const [languages_english, languages_local] = [
 class Gallery extends React.Component<GalleryProps, GalleryState> {
 	readonly config: Config["gallery"] = settings.get().gallery;
 	public props: GalleryProps;
+	
 	public state: GalleryState;
 	constructor(props: GalleryProps) {
 		super(props);
@@ -111,7 +112,7 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 										});
 									}
 								}] : []),
-							...(!isNaN(utility.index_of([TaskStatus.WORKING, TaskStatus.QUEUED], this.props.options.status)) ? [
+							...(!isNaN(utility.index_of([TaskStatus.WORKING, TaskStatus.FINISHED], this.props.options.status)) ? [
 								{
 									html: require(`@/assets/icons/open.svg`),
 									click: () => {
