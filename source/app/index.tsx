@@ -14,7 +14,7 @@ import { Viewport } from "@/statics/router";
 
 export type AppProps = {};
 export type AppState = {
-	view: string,
+	view: Viewport["view"],
 	fullscreen: boolean;
 };
 
@@ -44,7 +44,7 @@ class App extends React.Component<AppProps, AppState> {
 				<TitleBar enable={!this.state.fullscreen}></TitleBar>
 				<section id="content" class="contrast">
 					<Browser enable={this.state.view === "browser"}></Browser>
-					<Viewer enable={this.state.view === "reader"}></Viewer>
+					<Viewer enable={this.state.view === "viewer"}></Viewer>
 				</section>
 			</>
 		);
