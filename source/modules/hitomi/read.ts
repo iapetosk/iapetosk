@@ -112,7 +112,8 @@ class Read {
 								...script,
 								files: script.files.map((value, index) => {
 									return {
-										url: I.unknown_0(script.id, script.files[index] as never as GalleryFile),
+										// @ts-ignore
+										url: I.unknown_0(script.id, script.files[index]),
 										width: value.width,
 										height: value.height
 									};

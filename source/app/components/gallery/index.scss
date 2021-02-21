@@ -100,7 +100,7 @@
 						&.censorship {
 							border-color: var(--colour_1);
 							background-color: var(--colour_level_3);
-							> #value {
+							> #value, > #value > #field {
 								color: var(--colour_1);
 							}
 						}

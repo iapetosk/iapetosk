@@ -40,10 +40,9 @@ class DiscordRPC {
 		});
 	}
 	private update() {
-		if (!this.available) {
-			return;
+		if (this.available) {
+			this.client.setActivity(this.activity);
 		}
-		this.client.setActivity(this.activity);
 	}
 	public get_activity() {
 		return this.activity;
