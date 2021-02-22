@@ -76,18 +76,18 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 												// @ts-ignore
 												key: key === "tags" ? /♂/.test(value) ? "male" : /♀/.test(value) ? "female" : "tag" : key,
 												// @ts-ignore
-												value: key === "tags" ? value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_") : key === "language" ? languages_english[utility.index_of(languages_local, value)] : value
+												value: key === "language" ? languages_english[utility.index_of(languages_local, value)] : value
 											};
 											return (
 												<Button id="key" class={{ "contrast": true, "center": true, "censorship": typeof value === "string" ? censorship.test(value) : false }} key={index}
 													handler={{
 														click: (button) => {
 															// @ts-ignore
-															this.props.handler?.click(button, tag.key, tag.value);
+															this.props.handler?.click(button, tag.key, tag.value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_"));
 														}
 													}}
 												// @ts-ignore
-												><mark id="value" class="eclipse center-x">{key === "tags" ? <><strong id="field" class={tag.key}>{tag.key}</strong>:<>{tag.value}</></> : tag.value}</mark></Button>
+												><mark id="value" class="eclipse center-x">{key === "tags" ? <><strong id="field" class={tag.key}>{tag.key}</strong>:<>{tag.value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_")}</></> : tag.value}</mark></Button>
 											);
 										})}
 									</legend>

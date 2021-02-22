@@ -24,7 +24,7 @@ export type GalleryFile = {
 	hasavifsmalltn: boolean;
 };
 export type GalleryJS = Merge<{
-	id: number,
+	id: string,
 	title: string,
 	japanese_title?: string,
 	language: string,

@@ -216,7 +216,7 @@ export class Download {
 						return resolve(
 							new Task(url, script.title, script.files.map((value, index) => {
 								return new TaskFile(value.url, node_path.join(TaskFolder.DOWNLOADS, String(script.id), `${index}.${value.url.split(/\./).pop()}`));
-							}), { headers: { "referer": "https://hitomi.la" } }, script.id)
+							}), { headers: { "referer": "https://hitomi.la" } }, Number(script.id))
 						);
 					});
 				}
