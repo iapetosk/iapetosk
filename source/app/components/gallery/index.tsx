@@ -8,6 +8,8 @@ import LazyLoad from "@/app/components/lazyload";
 import * as path from "path";
 import * as process from "child_process";
 
+import language from "@/assets/language.json";
+
 import settings from "@/modules/settings";
 import download from "@/modules/download";
 import utility from "@/modules/utility";
@@ -29,11 +31,7 @@ export type GalleryState = {
 	toggle: "unset" | "buttons" | "discovery";
 };
 
-const [languages_english, languages_local] = [
-	["all", "indonesian", "catalan", "cebuano", "czech", "danish", "german", "estonian", "english", "spanish", "esperanto", "french", "italian", "latin", "hungarian", "dutch", "norwegian", "polish", "portuguese", "romanian", "albanian", "slovak", "finnish", "swedish", "tagalog", "vietnamese", "turkish", "greek", "mongolian", "russian", "ukrainian", "hebrew", "arabic", "persian", "thai", "korean", "chinese", "japanese"],
-	["all", "Bahasa Indonesia", "català", "Cebuano", "Čeština", "Dansk", "Deutsch", "eesti", "English", "Español", "Esperanto", "Français", "Italiano", "Latina", "magyar", "Nederlands", "norsk", "polski", "Português", "română", "shqip", "Slovenčina", "Suomi", "Svenska", "Tagalog", "tiếng việt", "Türkçe", "Ελληνικά", "Монгол", "Русский", "Українська", "עברית", "العربية", "فارسی", "ไทย", "한국어", "中文", "日本語"]
-],
-	censorship = new RegExp("(" + ["guro", "ryona", "snuff", "blood", "torture", "amputee", "cannibalism"].join("|") + ")");
+const censorship = new RegExp("(" + ["guro", "ryona", "snuff", "blood", "torture", "amputee", "cannibalism"].join("|") + ")");
 
 class Gallery extends React.Component<GalleryProps, GalleryState> {
 	readonly config: Config["gallery"] = settings.get().gallery;
@@ -76,7 +74,7 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 												// @ts-ignore
 												key: key === "tags" ? /♂/.test(value) ? "male" : /♀/.test(value) ? "female" : "tag" : key,
 												// @ts-ignore
-												value: key === "language" ? languages_english[utility.index_of(languages_local, value)] : value
+												value: key === "language" ? Object.keys(language)[utility.index_of(Object.values(language), value)] : value
 											};
 											return (
 												<Button id="key" class={{ "contrast": true, "center": true, "censorship": typeof value === "string" ? censorship.test(value) : false }} key={index}
