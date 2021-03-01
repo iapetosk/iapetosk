@@ -1,0 +1,10 @@
+[data-viewport="terminal"] {
+	output {
+		&.bold {
+			font-weight: bold;
+		}
+		&.italic {
+			font-style: italic;
+		}
+	}
+}

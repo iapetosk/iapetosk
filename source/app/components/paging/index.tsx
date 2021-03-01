@@ -42,7 +42,7 @@ class Paging extends React.Component<PagingProps, PagingState> {
 	}
 	public render() {
 		return (
-			<section data-component="paging" id={this.props.id} class={utility.inline({ "enable": this.props.enable, "contrast": true, "center": true, ...this.props.class })}>
+			<section data-component="paging" id={this.props.id} class={utility.inline({ "enable": this.props.enable, "active": this.props.options.size > 1, "contrast": true, "center": true, ...this.props.class })}>
 				<Button id="first" class={{ "enable": this.props.options.index !== 0 }}
 					handler={{
 						click: () => {

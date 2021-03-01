@@ -29,7 +29,7 @@ export type Computable = [
 
 const [TAG, PRF] = [
 	// TAG
-	new RegExp(["^", "(", Object.values(Prefix).join("|").replace(/[+]/g, "\\$&"), ")", "(", Object.values(Field).join("|"), ")", ":", "(", "[a-zA-Z0-9_]+", ")", "$"].join("")),
+	new RegExp(["^", "(", Object.values(Prefix).join("|").replace(/[+]/g, "\\$&"), ")", "(", Object.values(Field).join("|"), ")", ":", "(", "[\\D\\d]+", ")", "$"].join("")),
 	// PRF
 	new RegExp(["(", Object.values(Prefix).join("|").replace(/[+]/g, "\\$&"), ")", "$"].join(""))
 ];
@@ -66,7 +66,7 @@ class Filter {
 				if (!pre[x][y]) {
 					continue;
 				}
-				for (const chunk of ("\u0020" + pre[x][y]).split("\u0020")) {
+				for (const chunk of (pre[x][y] + "\u0020").split("\u0020")) {
 					/*
 					0: unused
 					1: prefix

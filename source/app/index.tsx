@@ -3,6 +3,7 @@ import * as React from "react";
 import "./index.scss";
 
 import TitleBar from "@/app/components/titlebar";
+import Overlay from "@/app/views/overlay";
 import Browser from "@/app/views/browser";
 import Viewer from "@/app/views/viewer";
 
@@ -45,6 +46,7 @@ class App extends React.Component<AppProps, AppState> {
 				<section id="content" class="contrast">
 					<Browser enable={this.state.view === "browser"}></Browser>
 					<Viewer enable={this.state.view === "viewer"}></Viewer>
+					<Overlay enable={true}></Overlay>
 				</section>
 			</>
 		);
