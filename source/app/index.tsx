@@ -16,6 +16,7 @@ import { Viewport } from "@/statics/router";
 export type AppProps = {};
 export type AppState = {
 	view: Viewport["view"],
+	terminal: boolean,
 	fullscreen: boolean;
 };
 
@@ -25,7 +26,7 @@ class App extends React.Component<AppProps, AppState> {
 	constructor(props: AppProps) {
 		super(props);
 		this.props = props;
-		this.state = { view: router.get().view, fullscreen: false };
+		this.state = { view: router.get().view, terminal: false, fullscreen: false };
 
 		window.static.on(StaticEvent.ROUTER, (args) => {
 			const [$new, $old] = args as [Viewport, Viewport];
@@ -38,6 +39,14 @@ class App extends React.Component<AppProps, AppState> {
 		window.bridge.on(BridgeEvent.LEAVE_FULL_SCREEN, () => {
 			this.setState({ ...this.state, fullscreen: false });
 		});
+		window.bridge.on(BridgeEvent.OPEN_TERMINAL, () => {
+			console.log("open")
+			this.setState({ ...this.state, terminal: true });
+		});
+		window.bridge.on(BridgeEvent.CLOSE_TERMINAL, () => {
+			console.log("close")
+			this.setState({ ...this.state, terminal: false });
+		});
 	}
 	public render() {
 		return (
@@ -46,7 +55,7 @@ class App extends React.Component<AppProps, AppState> {
 				<section id="content" class="contrast">
 					<Browser enable={this.state.view === "browser"}></Browser>
 					<Viewer enable={this.state.view === "viewer"}></Viewer>
-					<Overlay enable={true}></Overlay>
+					<Overlay enable={this.state.terminal}></Overlay>
 				</section>
 			</>
 		);

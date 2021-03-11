@@ -85,7 +85,7 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 														}
 													}}
 												// @ts-ignore
-												><mark id="value" class="eclipse center-x">{key === "tags" ? <><strong id="field" class={tag.key}>{tag.key}</strong>:<>{tag.value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_")}</></> : tag.value}</mark></Button>
+												><legend id="value" class="eclipse center-x">{key === "tags" ? <><strong id="field" class={tag.key}>{tag.key}</strong>:<>{tag.value.replace(/♂|♀/, "").replace(/^\s|\s$/g, "").replace(/\s+/g, "_")}</></> : tag.value}</legend></Button>
 											);
 										})}
 									</legend>

@@ -1,6 +1,8 @@
-import { app, session, BrowserWindow, ipcMain } from "electron";
+import { app, session, globalShortcut, BrowserWindow, ipcMain } from "electron";
 
 import { BridgeEvent, API_COMMAND } from "@/common";
+
+let terminal = false;
 
 app.on("ready", () => {
 	// create window
@@ -71,6 +73,11 @@ app.on("ready", () => {
 	});
 	window.on(BridgeEvent.LEAVE_FULL_SCREEN, () => {
 		window.webContents.send(BridgeEvent.LEAVE_FULL_SCREEN);
+	});
+	globalShortcut.register("F5", () => {
+		window.webContents.send(terminal ? BridgeEvent.CLOSE_TERMINAL : BridgeEvent.OPEN_TERMINAL);
+		// switch state
+		terminal = !terminal;
 	});
 	// preload communication
 	ipcMain.handle("API", async (event, command: API_COMMAND, args: any[]) => {

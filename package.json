@@ -9,15 +9,15 @@
 		"update": "npm install & node node_modules/electron/install.js"
 	},
 	"devDependencies": {
-		"@types/node": "14.14.31",
-		"@types/react": "17.0.2",
-		"@types/react-dom": "17.0.1",
-		"css-loader": "5.1.0",
+		"@types/node": "14.14.33",
+		"@types/react": "17.0.3",
+		"@types/react-dom": "17.0.2",
+		"css-loader": "5.1.2",
 		"discord-rpc": "github:discordjs/RPC",
-		"electron": "11.3.0",
-		"electron-builder": "22.9.1",
-		"html-loader": "2.1.1",
-		"html-webpack-plugin": "5.2.0",
+		"electron": "12.0.1",
+		"electron-builder": "22.10.5",
+		"html-loader": "2.1.2",
+		"html-webpack-plugin": "5.3.1",
 		"js-sha256": "0.9.0",
 		"react": "17.0.1",
 		"react-dom": "17.0.1",
@@ -25,8 +25,8 @@
 		"sass-loader": "11.0.1",
 		"style-loader": "2.0.0",
 		"ts-loader": "8.0.17",
-		"typescript": "4.2.2",
-		"webpack": "5.24.2"
+		"typescript": "4.2.3",
+		"webpack": "5.24.4"
 	},
 	"author": "Sombian"
 }

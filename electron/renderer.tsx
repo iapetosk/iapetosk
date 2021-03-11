@@ -35,6 +35,12 @@ ipcRenderer.on(BridgeEvent.ENTER_FULL_SCREEN, () => {
 ipcRenderer.on(BridgeEvent.LEAVE_FULL_SCREEN, () => {
 	window.bridge.emit(BridgeEvent.LEAVE_FULL_SCREEN);
 });
+ipcRenderer.on(BridgeEvent.OPEN_TERMINAL, () => {
+	window.bridge.emit(BridgeEvent.OPEN_TERMINAL);
+});
+ipcRenderer.on(BridgeEvent.CLOSE_TERMINAL, () => {
+	window.bridge.emit(BridgeEvent.CLOSE_TERMINAL);
+});
 // upvotes
 window.bridge.on(BridgeEvent.CLOSE, (args) => {
 	const [$vote] = args as [string];
@@ -54,7 +60,7 @@ DiscordRPC.set_activity({
 	details: "Starting...",
 	startTimestamp: Date.now(),
 	largeImageKey: "waifu_material",
-	largeImageText: "Sombian#7963",
+	largeImageText: "Sômbiàn#7940",
 	smallImageKey: "discord",
 	smallImageText: "discord.gg/Gp7tWCe",
 	partyId: "https://github.com/Any-Material",

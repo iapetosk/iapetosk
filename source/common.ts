@@ -7,7 +7,9 @@ export enum BridgeEvent {
 	UNMAXIMIZE = "unmaximize",
 	ENTER_FULL_SCREEN = "enter-full-screen",
 	LEAVE_FULL_SCREEN = "leave-full-screen",
-	BEFORE_CLOSE = "before-close"
+	BEFORE_CLOSE = "before-close",
+	OPEN_TERMINAL = "open-terminal",
+	CLOSE_TERMINAL = "close-terminal"
 };
 export enum API_COMMAND {
 	CLOSE,
