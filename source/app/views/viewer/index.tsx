@@ -73,20 +73,8 @@ class Viewer extends React.Component<ViewerProps> {
 	}
 	public render() {
 		if (this.props.enable) {
-			// RPC
-			DiscordRPC.set_activity({
-				...(this.state.script ? {
-					details: this.state.script.title + "#" + this.state.script.id,
-					state: "Reading",
-					partySize: undefined,
-					partyMax: undefined
-				} : {
-					details: undefined,
-					state: "Fetching",
-					partySize: undefined,
-					partyMax: undefined
-				})
-			});
+			// discord rich presence
+			DiscordRPC.set_activity({ ...(this.state.script ? { details: this.state.script.title + "#" + this.state.script.id, state: "Reading", partySize: undefined, partyMax: undefined } : { details: undefined, state: "Fetching", partySize: undefined, partyMax: undefined }) });
 		}
 		return (
 			<section data-viewport="viewer" class={utility.inline({ "enable": this.props.enable, "right": true })}>

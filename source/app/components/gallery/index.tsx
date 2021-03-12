@@ -105,7 +105,7 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 								{
 									html: require(`@/assets/icons/delete.svg`),
 									click: () => {
-										download.destroy(this.props.options.gallery.id).then(() => {
+										download.delete(this.props.options.gallery.id).then(() => {
 											// TODO: none
 										});
 									}

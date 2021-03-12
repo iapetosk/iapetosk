@@ -1,6 +1,8 @@
 import * as node_fs from "fs";
 import * as node_path from "path";
 
+import scheme from "@/assets/scheme.json";
+
 import read from "@/modules/hitomi/read";
 import settings from "@/modules/settings";
 import storage from "@/modules/storage";
@@ -66,10 +68,10 @@ export class Download {
 			const [$index, $new, $old] = args as [number, Task | undefined, Task | undefined];
 
 			if (storage.exist(String($index)) && $old) {
-				// first time destroyed
+				// first time deleteed
 				if (!$new) {
-					// destroy
-					this.destroy($index);
+					// delete
+					this.delete($index);
 				} else {
 					// update storage
 					storage.set_data(String($index), { ...$new });
@@ -196,7 +198,7 @@ export class Download {
 			return spawn(0);
 		});
 	}
-	public destroy(id: number) {
+	public delete(id: number) {
 		return new Promise<void>((resolve, reject) => {
 			// remove storage
 			storage.un_register(String(id));
@@ -210,8 +212,8 @@ export class Download {
 	}
 	public evaluate(url: string) {
 		return new Promise<Task>((resolve, reject) => {
-			for (const RegExp of [/^https?:\/\/hitomi.la\/galleries\/([\d]+).html$/, /^https?:\/\/hitomi.la\/(reader|manga|doujinshi|gamecg|cg)\/([\D\d]+)-([\D\d]+)-([\d]+).html$/]) {
-				if (RegExp.test(url)) {
+			for (const schema of scheme) {
+				if (new RegExp(schema).test(url)) {
 					return read.script(Number(/([0-9]+).html$/.exec(url)![1])).then((script) => {
 						return resolve(
 							new Task(url, script.title, script.files.map((value, index) => {

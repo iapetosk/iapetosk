@@ -212,19 +212,8 @@ class Browser extends React.Component<BrowserProps> {
 	}
 	public render() {
 		if (this.props.enable) {
-			// RPC
-			DiscordRPC.set_activity({
-				details: this.state.query.options.value,
-				...(this.state.paging.enable ? {
-					state: "Browsing",
-					partySize: this.state.paging.options.index + 1,
-					partyMax: this.state.paging.options.size
-				} : {
-					state: "Fetching",
-					partySize: undefined,
-					partyMax: undefined
-				})
-			});
+			// discord rich presence
+			DiscordRPC.set_activity({ details: this.state.query.options.value, ...(this.state.paging.enable ? { state: "Browsing", partySize: this.state.paging.options.index + 1, partyMax: this.state.paging.options.size } : { state: "Fetching", partySize: undefined, partyMax: undefined }) });
 		}
 		return (
 			<section data-viewport="browser" class={utility.inline({ "enable": this.props.enable, "left": true })}>

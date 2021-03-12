@@ -39,13 +39,8 @@ class App extends React.Component<AppProps, AppState> {
 		window.bridge.on(BridgeEvent.LEAVE_FULL_SCREEN, () => {
 			this.setState({ ...this.state, fullscreen: false });
 		});
-		window.bridge.on(BridgeEvent.OPEN_TERMINAL, () => {
-			console.log("open")
-			this.setState({ ...this.state, terminal: true });
-		});
-		window.bridge.on(BridgeEvent.CLOSE_TERMINAL, () => {
-			console.log("close")
-			this.setState({ ...this.state, terminal: false });
+		window.bridge.on(BridgeEvent.TOGGLE_TERMINAL, () => {
+			this.setState({ ...this.state, terminal: !this.state.terminal });
 		});
 	}
 	public render() {

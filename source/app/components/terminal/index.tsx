@@ -5,7 +5,6 @@ import "./index.scss";
 import utility from "@/modules/utility";
 
 import { CommonProps } from "@/common";
-import { rejects } from "node:assert";
 
 export type TerminalProps = CommonProps & {
 	options: Record<string, (args: Args, flags: Flags) => void>;
@@ -33,16 +32,11 @@ class Terminal extends React.Component<TerminalProps> {
 			history: [{ value: "I'll be thine amaranth", color: "coral" }]
 		};
 	}
-	public write(message: Message) {
-		return new Promise<void>((resolve, reject) => {
-			this.setState({ ...this.state, index: this.state.index + 1, history: [...this.state.history, message] });
-			return resolve();
-		});
+	public write(message: Message[]) {
+		this.setState({ ...this.state, index: this.state.index + message.length, history: [...this.state.history, ...message] });
 	}
 	public error(value: string) {
-		return new Promise<void>((resolve, reject) => {
-			this.write({ value: `(Error) ${value}`, color: "red", style: "italic" });
-		});
+		this.write([{ value: `(Error) ${value}`, color: "red", style: "italic" }]);
 	}
 	public parse(value: string) {
 		const parsed = {
@@ -73,6 +67,7 @@ class Terminal extends React.Component<TerminalProps> {
 					}
 					case 1: {
 						scope.string = content;
+						parsed.args[scope.string] = "";
 						break;
 					}
 					case 2: {
@@ -116,29 +111,21 @@ class Terminal extends React.Component<TerminalProps> {
 									// built-in
 									const command: TerminalProps["options"] = {
 										say: (args: Args, flags: Flags) => {
-											if (Object.values(args).length) {
-												this.write({ value: Object.values(args).join("\u0020"), color: "grey", style: "italic" });	
-											} else {
-												this.error("Invalid arguments");
+											if (!Object.values(args).length) {
+												return this.error("Invalid arguments");
 											}
+											this.write([{ value: Object.values(args).join("\u0020"), color: "grey", style: "italic" }]);
 										},
 										clear: (args: Args, flags: Flags) => {
 											this.setState({ ...this.state, index: 0, history: [{ value: "An amaranth that never fades away...", color: "coral" }] });
 										},
 										help: (args: Args, flags: Flags) => {
-											const I = this, list = ["say", "clear", "help", ...Object.keys(this.props.options)]; let index = 0;
-
-											this.write({ value: "List of commands:", style: "bold" }).then(() => {
-												function recursive() {
-													I.write({ value: `- ${list[index]}`, color: "grey" }).then(() => {
-														if (index < list.length - 1) {
-															index++;
-															recursive();
-														}
-													});
-												}
-												recursive();
-											});
+											this.write([
+												{ value: "List of commands:", style: "bold", color: "grey" },
+												...["say", "clear", "help", ...Object.keys(this.props.options)].map((command) => {
+													return { value: `-${command}` };
+												})
+											]);
 										},
 										...this.props.options
 									};

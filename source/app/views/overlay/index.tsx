@@ -37,31 +37,33 @@ class Overlay extends React.Component<OverlayProps> {
 					<Terminal ref={this.refer.terminal} options={{
 						// Prefix.EXCLUDE tags are considered as argument given how terminal parse the query
 						download: (args, flags) => {
-							let count = 0;
+							if (!Object.keys(args).length) {
+								return this.refer.terminal.current?.error("Invalid Argument");
+							}
+							this.refer.terminal.current?.write([{ value: `Downloading...`, color: "grey" }]); let count = 0;
 
-							this.refer.terminal.current?.write({ value: `Downloading...` });
-
-							search.get(filter.get(Object.values(args).join("\u0020")), 0, 0).then((galleries) => {
+							search.get(filter.get((Object.keys(args).map((key) => { return /[0-9]+/.test(key) ? args[key] : "-" + key }).join("\u0020"))), 0, 0).then((galleries) => {
 								for (const gallery of galleries.array) {
 									download.evaluate(`https://hitomi.la/galleries/${gallery}.html`).then((task) => {
 										download.create(task).then(() => {
 											count++;
-											this.refer.terminal.current?.write({ value: `Created (${count}/${galleries.array.length})`, color: "grey" });
+											this.refer.terminal.current?.write([{ value: `Created (${count}/${galleries.array.length})` }]);
 										});
 									})
 								}
 							});
 						},
 						delete: (args, flags) => {
-							let count = 0;
+							if (!Object.keys(args).length) {
+								return this.refer.terminal.current?.error("Invalid Argument");
+							}
+							this.refer.terminal.current?.write([{ value: `Deleting...`, color: "grey" }]); let count = 0;
 
-							this.refer.terminal.current?.write({ value: `Deleting...` });
-
-							search.get(filter.get(Object.values(args).join("\u0020")), 0, 0).then((galleries) => {
+							search.get(filter.get((Object.keys(args).map((key) => { return /[0-9]+/.test(key) ? args[key] : "-" + key }).join("\u0020"))), 0, 0).then((galleries) => {
 								for (const gallery of galleries.array) {
-									download.destroy(gallery).then(() => {
+									download.delete(gallery).then(() => {
 										count++;
-										this.refer.terminal.current?.write({ value: `Destroyed (${count}/${galleries.array.length})`, color: "grey" });
+										this.refer.terminal.current?.write([{ value: `Deleted (${count}/${galleries.array.length})` }]);
 									});
 								}
 							});

@@ -8,8 +8,7 @@ export enum BridgeEvent {
 	ENTER_FULL_SCREEN = "enter-full-screen",
 	LEAVE_FULL_SCREEN = "leave-full-screen",
 	BEFORE_CLOSE = "before-close",
-	OPEN_TERMINAL = "open-terminal",
-	CLOSE_TERMINAL = "close-terminal"
+	TOGGLE_TERMINAL = "toggle-terminal"
 };
 export enum API_COMMAND {
 	CLOSE,
