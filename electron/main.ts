@@ -73,7 +73,9 @@ app.on("ready", () => {
 		window.webContents.send(BridgeEvent.LEAVE_FULL_SCREEN);
 	});
 	globalShortcut.register("F5", () => {
-		window.webContents.send(BridgeEvent.TOGGLE_TERMINAL);
+		if (window.isFocused()) {
+			window.webContents.send(BridgeEvent.TOGGLE_TERMINAL)
+		}
 	});
 	// preload communication
 	ipcMain.handle("API", async (event, command: API_COMMAND, args: any[]) => {
