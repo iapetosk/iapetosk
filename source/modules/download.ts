@@ -68,7 +68,7 @@ export class Download {
 			const [$index, $new, $old] = args as [number, Task | undefined, Task | undefined];
 
 			if (storage.exist(String($index)) && $old) {
-				// first time deleteed
+				// first delete attempt
 				if (!$new) {
 					// delete
 					this.delete($index);

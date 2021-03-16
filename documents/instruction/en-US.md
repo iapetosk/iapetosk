@@ -23,7 +23,7 @@ Press <kbd>F11</kbd> will **enter** fullscreen.<br>
 Press <kbd>F11</kbd> again will **leave** fullscreen.<br>
 Also, upon **enter**ing fullscreen, both **TitleBar**, and **Paging** will become invisible.<br>
 
-## Terminal 단축키
+## Terminal Shortcut
 
 Press <kbd>F5</kbd> will activate **Terminal**,<br>
 Where you can write commands to run miscelious tasks.<br>
