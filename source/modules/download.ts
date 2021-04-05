@@ -3,7 +3,7 @@ import * as node_path from "path";
 
 import scheme from "@/assets/scheme.json";
 
-import read, { GalleryBlock } from "@/modules/hitomi/read";
+import read from "@/modules/hitomi/read";
 import settings from "@/modules/settings";
 import storage from "@/modules/storage";
 import request from "@/modules/request";

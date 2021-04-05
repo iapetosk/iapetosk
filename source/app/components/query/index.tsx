@@ -59,11 +59,11 @@ class Query extends React.Component<QueryProps, QueryState> {
 					enable={this.props.enable}
 					options={{
 						type: "input",
-						value: this.props.options.value,
 						items: this.state.suggest.map((suggest) => {
 							return [`${suggest.index}:${suggest.value}`, String(suggest.count)];
 						}),
-						highlight: this.query()
+						highlight: this.query(),
+						placeholder: this.props.options.value
 					}}
 					handler={{
 						click: (value) => {

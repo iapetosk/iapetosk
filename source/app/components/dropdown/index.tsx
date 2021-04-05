@@ -12,9 +12,9 @@ export type DropDownProps = CommonProps & {
 	enable: boolean,
 	options: {
 		type: "input" | "select",
-		value: string,
 		items: [string, string][],
-		highlight: string;
+		highlight: string,
+		placeholder: string;
 	},
 	handler?: Record<"click" | "change" | "confirm", (value: string) => void>;
 };
@@ -52,7 +52,7 @@ class DropDown extends React.Component<DropDownProps, DropDownState> {
 	public render() {
 		return (
 			<section data-component="dropdown" id={this.props.id} class={utility.inline({ ...this.props.class })}>
-				<input class="contrast" ref={this.refer.input} readOnly={!this.props.enable || this.props.options.type === "select"} placeholder={this.props.options.value} defaultValue={this.props.options.value}
+				<input class="contrast" ref={this.refer.input} readOnly={!this.props.enable || this.props.options.type === "select"} placeholder={this.props.options.placeholder} defaultValue={this.props.options.placeholder}
 					onFocus={() => {
 						this.setState({ ...this.state, focus: true });
 					}}
