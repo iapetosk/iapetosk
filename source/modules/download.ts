@@ -3,7 +3,7 @@ import * as node_path from "path";
 
 import scheme from "@/assets/scheme.json";
 
-import read from "@/modules/hitomi/read";
+import read, { GalleryBlock } from "@/modules/hitomi/read";
 import settings from "@/modules/settings";
 import storage from "@/modules/storage";
 import request from "@/modules/request";
@@ -13,6 +13,8 @@ import { BridgeEvent } from "@/common";
 import { StaticEvent } from "@/statics";
 import { PartialOptions, RequestProgress } from "@/modules/request";
 
+const config = settings.get().download;
+
 export enum TaskStatus {
 	NONE,
 	FINISHED,
@@ -20,11 +22,6 @@ export enum TaskStatus {
 	QUEUED,
 	PAUSED,
 	ERROR
-};
-export enum TaskFolder {
-	DEBUGS = "debugs",
-	BUNDLES = "bundles",
-	DOWNLOADS = "downloads"
 };
 export class TaskFile {
 	public url: string;
@@ -79,18 +76,18 @@ export class Download {
 			}
 		});
 		// if folder exists
-		if (node_fs.existsSync(TaskFolder.BUNDLES)) {
+		if (node_fs.existsSync("bundles")) {
 			// loop files within
-			for (const file of node_fs.readdirSync(TaskFolder.BUNDLES)) {
+			for (const file of node_fs.readdirSync("bundles")) {
 				// check if file is .json
-				if (node_fs.statSync(node_path.join(TaskFolder.BUNDLES, file)).isFile() && node_path.extname(file) === ".json") {
+				if (node_fs.statSync(node_path.join("bundles", file)).isFile() && node_path.extname(file) === ".json") {
 					/*
 					0: name
 					1: extension
 					*/
 					const [ID] = file.split(/\./) as [string, string];
 					// register task from .json
-					storage.register(ID, node_path.join(TaskFolder.BUNDLES, file), "@import");
+					storage.register(ID, node_path.join("bundles", file), "@import");
 					// create task from .json
 					const task = storage.get_data<Task>(ID);
 					// restart download
@@ -173,7 +170,7 @@ export class Download {
 			});
 			// register storage
 			if (!storage.exist(String(task.id))) {
-				storage.register(String(task.id), node_path.join(TaskFolder.BUNDLES, String(task.id) + ".json"), { ...task });
+				storage.register(String(task.id), node_path.join("bundles", String(task.id) + ".json"), { ...task });
 			}
 			// task counts reached its limit
 			if (this.max_threads <= Object.values(worker.get()).filter(($task) => { return $task.status === TaskStatus.WORKING; }).length) {
@@ -200,14 +197,29 @@ export class Download {
 	}
 	public delete(id: number) {
 		return new Promise<void>((resolve, reject) => {
-			// remove storage
-			storage.un_register(String(id));
-			// remove directory
-			node_fs.rmdirSync(node_path.join(TaskFolder.DOWNLOADS, String(id)), { recursive: true });
-			// remove worker
-			worker.set(id, undefined);
-			// resolve
-			return resolve();
+			this.placeholder(id).then((folder) => {
+				// remove storage
+				storage.un_register(String(id));
+				// remove directory
+				node_fs.rmdirSync(node_path.join(config.directory, folder), { recursive: true });
+				// remove worker
+				worker.set(id, undefined);
+				// resolve
+				return resolve();
+			});
+		});
+	}
+	public placeholder(id: number) {
+		return new Promise<string>((resolve, reject) => {
+			read.block(id).then((block) => {
+				let hardcoded = config.folder;
+	
+				for (const key of Object.keys(block)) {
+					// @ts-ignore
+					hardcoded = hardcoded.replace(`\{${key}\}`, block[key]);
+				}
+				return resolve(hardcoded.replace(/[\/:*?\"|<>]/g, ""));
+			});
 		});
 	}
 	public evaluate(url: string) {
@@ -215,11 +227,13 @@ export class Download {
 			for (const schema of scheme) {
 				if (new RegExp(schema).test(url)) {
 					return read.script(Number(/([0-9]+).html$/.exec(url)![1])).then((script) => {
-						return resolve(
-							new Task(url, script.title, script.files.map((value, index) => {
-								return new TaskFile(value.url, node_path.join(TaskFolder.DOWNLOADS, String(script.id), `${index}.${value.url.split(/\./).pop()}`));
-							}), { headers: { "referer": "https://hitomi.la" } }, Number(script.id))
-						);
+						return this.placeholder(Number(script.id)).then((folder) => {
+							return resolve(
+								new Task(url, script.title, script.files.map((value, index) => {
+									return new TaskFile(value.url, node_path.join(config.directory, folder, `${index}.${value.url.split(/\./).pop()}`));
+								}), { headers: { "referer": "https://hitomi.la" } }, Number(script.id))
+							);
+						});
 					});
 				}
 				return reject();
@@ -227,4 +241,4 @@ export class Download {
 		});
 	}
 }
-export default (new Download(settings.get().download.max_threads, settings.get().download.max_working));
+export default (new Download(config.max_threads, config.max_working));
