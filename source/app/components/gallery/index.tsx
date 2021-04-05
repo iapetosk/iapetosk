@@ -5,8 +5,8 @@ import "./index.scss";
 import Button from "@/app/components/button";
 import LazyLoad from "@/app/components/lazyload";
 
-import * as path from "path";
-import * as process from "child_process";
+import * as node_path from "path";
+import * as node_process from "child_process";
 
 import language from "@/assets/language.json";
 
@@ -18,7 +18,7 @@ import router from "@/statics/router";
 import { CommonProps } from "@/common";
 import { Config } from "@/modules/settings";
 import { GalleryBlock } from "@/modules/hitomi/read";
-import { TaskStatus, TaskFolder } from "@/modules/download";
+import { TaskStatus } from "@/modules/download";
 
 export type GalleryProps = CommonProps & {
 	options: {
@@ -114,7 +114,9 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 								{
 									html: require(`@/assets/icons/open.svg`),
 									click: () => {
-										process.exec(`start "" "${path.resolve(TaskFolder.DOWNLOADS, String(this.props.options.gallery.id))}"`);
+										download.placeholder(this.props.options.gallery.id).then((folder) => {
+											node_process.exec(`start "" "${node_path.resolve(settings.get().download.directory, folder)}"`);
+										});
 									}
 								}] : []),
 							...(!isNaN(utility.index_of([TaskStatus.NONE], this.props.options.status)) ? [
