@@ -4,11 +4,12 @@ import * as node_path from "path";
 import { BridgeEvent } from "@/common";
 
 export enum StoragePreset {
-	CONFIG = "config"
+	CONFIG = "config",
+	FAVORITE = "favorite"
 };
 export type StorageState = {
 	path: string,
-	data: Record<string, string | boolean | number | object> | "@import";
+	data: Record<string, string | boolean | number | object> | Array<string | number | object> | "@import";
 };
 class Storage {
 	private container: Record<string, StorageState> = {};
@@ -107,6 +108,10 @@ class Storage {
 export default (new Storage({
 	[StoragePreset.CONFIG]: {
 		path: "./config.json",
+		data: "@import"
+	},
+	[StoragePreset.FAVORITE]: {
+		path: "./favorite.json",
 		data: "@import"
 	}
 }));

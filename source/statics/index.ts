@@ -1,6 +1,7 @@
 export enum StaticEvent {
 	ROUTER = "route",
-	WORKER = "worker"
+	WORKER = "worker",
+	FAVORITE = "favorite"
 };
 export class StaticHandler<State> {
 	private state: State;

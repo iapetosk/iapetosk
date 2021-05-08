@@ -1,5 +1,6 @@
 import worker from "@/statics/worker";
 import request from "@/modules/request";
+import favorite from "@/statics/favorite";
 
 import { TaskStatus } from "@/modules/download";
 import { RequestResponse } from "@/modules/request";
@@ -72,6 +73,9 @@ class Search {
 					return [Number(value)];
 				}
 				case Field.STATUS: {
+					if (value == "favorite") {
+						return Object.keys(favorite.get());
+					}
 					// @ts-ignore
 					const status: TaskStatus | undefined = TaskStatus[value.toUpperCase()];
 

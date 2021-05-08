@@ -26,7 +26,7 @@ const compiler_main = webpack({
 							builder.build({
 								targets: builder.Platform.WINDOWS.createTarget("zip"),
 								config: {
-									appId: "org.sombian.waifu.material",
+									appId: "org.sombian.nozomi.material",
 									files: [
 										"build/*.js",
 										"build/*.json",

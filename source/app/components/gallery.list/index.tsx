@@ -4,6 +4,7 @@ import "./index.scss";
 
 import Gallery from "@/app/components/gallery";
 
+import favorite from "@/statics/favorite";
 import utility from "@/modules/utility";
 import worker from "@/statics/worker";
 
@@ -20,7 +21,8 @@ export type GalleryListProps = CommonProps & {
 };
 export type GalleryListState = {
 	[key: number]: {
-		status: TaskStatus;
+		task: TaskStatus,
+		favorite: boolean;
 	};
 };
 
@@ -30,21 +32,46 @@ class GalleryList extends React.Component<GalleryListProps, GalleryListState> {
 	constructor(props: GalleryListProps) {
 		super(props);
 		this.props = props;
-		this.state = Object.assign({}, ...Object.values(worker.get()).map((task) => { return { [task.id]: { status: task.status } }; }));
+		this.state = this.initState();
 
 		window.static.on(StaticEvent.WORKER, (args) => {
 			const [$index, $new] = args as [number, Task | undefined, Task | undefined];
 
 			switch ($new ? $new.status : TaskStatus.NONE) {
-				case this.state[$index]?.status: {
+				case this.state[$index]?.task: {
 					break;
 				}
 				default: {
-					this.setState({ ...this.state, [$index]: { ...this.state[$index], status: $new ? $new.status : TaskStatus.NONE } });
+					this.setState({ ...this.state, [$index]: { ...this.state[$index], task: $new ? $new.status : TaskStatus.NONE } });
 					break;
 				}
 			}
 		});
+		window.static.on(StaticEvent.FAVORITE, (args) => {
+			const [$index, $new] = args as [number, number | undefined, number | undefined];
+
+			this.setState({ ...this.state, [$index]: { ...this.state[$index], favorite: $new } });
+		});
+	}
+	private initState() {
+		const state: GalleryListState = {};
+		
+		for (const task of Object.values(worker.get())) {
+			state[task.id] = {
+				task: task.status,
+				favorite: false
+			};
+		}
+		for (const id of Object.keys(favorite.get())) {
+			// @ts-ignore
+			state[id] = {
+			// @ts-ignore
+				...state[id],
+			// @ts-ignore
+				favorite: favorite.get()[id]
+			};
+		}
+		return state;
 	}
 	static getDerivedStateFromProps($new: GalleryListProps, $old: GalleryListProps) {
 		return $new;
@@ -54,7 +81,7 @@ class GalleryList extends React.Component<GalleryListProps, GalleryListState> {
 			<section data-component="gallery.list" id={this.props.id} class={utility.inline({ ...this.props.class })}>
 				{this.props.options.blocks.map((gallery, index) => {
 					return (
-						<Gallery options={{ gallery: gallery, status: this.state[gallery.id] ? this.state[gallery.id].status : TaskStatus.NONE }} key={index}
+						<Gallery options={{ gallery: gallery, status: { task: this.state[gallery.id]?.task || TaskStatus.NONE, favorite: this.state[gallery.id]?.favorite || false } }} key={index}
 							handler={{
 								click: (button, key, value) => {
 									this.props.handler?.click(button, key, value);

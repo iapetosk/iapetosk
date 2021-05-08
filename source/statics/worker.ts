@@ -2,7 +2,6 @@ import { Task } from "@/modules/download";
 import { StaticEvent, StaticHandler } from "@/statics";
 
 class Worker extends StaticHandler<Record<string, Task>> {
-
 	public get() {
 		return this["state"];
 	}

@@ -19,10 +19,14 @@ import { CommonProps } from "@/common";
 import { Config } from "@/modules/settings";
 import { GalleryBlock } from "@/modules/hitomi/read";
 import { TaskStatus } from "@/modules/download";
+import favorite from "@/statics/favorite";
 
 export type GalleryProps = CommonProps & {
 	options: {
-		status: TaskStatus,
+		status: {
+			task: TaskStatus,
+			favorite: boolean;
+		},
 		gallery: GalleryBlock;
 	},
 	handler?: Record<"click", (button: number, key: string, value: string) => void>;
@@ -36,7 +40,6 @@ const censorship = new RegExp("(" + ["guro", "ryona", "snuff", "blood", "torture
 class Gallery extends React.Component<GalleryProps, GalleryState> {
 	readonly config: Config["gallery"] = settings.get().gallery;
 	public props: GalleryProps;
-	
 	public state: GalleryState;
 	constructor(props: GalleryProps) {
 		super(props);
@@ -101,7 +104,16 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 									router.set({ view: "viewer", options: this.props.options.gallery.id });
 								}
 							},
-							...(!isNaN(utility.index_of([TaskStatus.WORKING, TaskStatus.FINISHED, TaskStatus.QUEUED], this.props.options.status)) ? [
+							{
+								html: require(`@/assets/icons/favorite.svg`),
+								click: () => {
+									favorite.set(this.props.options.gallery.id, !favorite.get()[this.props.options.gallery.id]);
+								},
+								style: {
+									"highlight": this.props.options.status.favorite
+								}
+							},
+							...(!isNaN(utility.index_of([TaskStatus.WORKING, TaskStatus.FINISHED, TaskStatus.QUEUED], this.props.options.status.task)) ? [
 								{
 									html: require(`@/assets/icons/delete.svg`),
 									click: () => {
@@ -110,7 +122,7 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 										});
 									}
 								}] : []),
-							...(!isNaN(utility.index_of([TaskStatus.WORKING, TaskStatus.FINISHED], this.props.options.status)) ? [
+							...(!isNaN(utility.index_of([TaskStatus.WORKING, TaskStatus.FINISHED], this.props.options.status.task)) ? [
 								{
 									html: require(`@/assets/icons/open.svg`),
 									click: () => {
@@ -119,7 +131,7 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 										});
 									}
 								}] : []),
-							...(!isNaN(utility.index_of([TaskStatus.NONE], this.props.options.status)) ? [
+							...(!isNaN(utility.index_of([TaskStatus.NONE], this.props.options.status.task)) ? [
 								{
 									html: require(`@/assets/icons/download.svg`),
 									click: () => {
@@ -142,9 +154,9 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 									this.setState({ ...this.state, toggle: "discovery" });
 								}
 							}
-						].map(({ html, click }, index) => {
+						].map(({ html, click, style }, index) => {
 							return (
-								<Button key={index}
+								<Button class={style} key={index}
 									handler={{
 										click: () => {
 											click();
@@ -160,7 +172,7 @@ class Gallery extends React.Component<GalleryProps, GalleryState> {
 					<legend id="title" class="eclipse">{this.props.options.gallery.title}</legend>
 				</section>
 				<section id="status">
-					<legend id="ribbon" class={utility.inline({ [TaskStatus[this.props.options.status]]: true, "contrast": true, "center": true })}>{TaskStatus[this.props.options.status]}</legend>
+					<legend id="ribbon" class={utility.inline({ [TaskStatus[this.props.options.status.task]]: true, "contrast": true, "center": true })}>{TaskStatus[this.props.options.status.task]}</legend>
 				</section>
 			</section>
 		);

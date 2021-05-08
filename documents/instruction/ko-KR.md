@@ -1,6 +1,6 @@
 # 읽어주세요
 
-*Waifu Material* (은)는 [hitomi.la](https://hitomi.la) (을)를 위한 **Downloader** / **Viewer** 입니다.<br>
+*Nozomi Material* (은)는 [hitomi.la](https://hitomi.la) (을)를 위한 **Downloader** / **Viewer** 입니다.<br>
 
 - [추가 상호작용](#추가-상호작용)
   * [전체화면 단축키](#전체화면-단축키)
@@ -12,6 +12,8 @@
   * [Prefix](#prefix)
   * [Grouping](#grouping)
   * [종합 예시](#종합-예시)
+- [설정 심화](#설정-심화)
+  * [Download](#Download)
 
 # 추가 상호작용
 
@@ -48,7 +50,7 @@
 
 ## Tag
 
-*Waifu Material* (은)는 추가 검색어 `id:<number>`, `status:<NONE/FINISHED/WORKING/QUEUED/PAUSED/ERROR>` (을)를 지원합니다.<br>
+*Nozomi Material* (은)는 추가 검색어 `id:<number>`, `status:<NONE/FINISHED/WORKING/QUEUED/PAUSED/ERROR/FAVORITE>` (을)를 지원합니다.<br>
 
 ## Prefix
 
@@ -94,3 +96,26 @@ tag:uncensored -(type:manga -(language:korean))
 ```
 
 *한국어로 번역된 미검열 (만화가 아닌)갤러리를 연산합니다.*<br>
+
+# 설정 심화
+
+해당 단락은 **config.json** 의 설정 심화를 기술하고 있습니다.<br>
+
+## Download
+
+```json
+	"download": {
+		"folder": "{id}",
+		"directory": "./download",
+		"max_threads": 5,
+		"max_working": 5
+	}
+```
+**Folder** 는 **GalleryBlock** 이 지원하는 모든 속성을 지원하며 해당 Gallery 의 대응하는 속성 값을 삽입 가능합니다.<br>
+다음은 Gallery#9(Eat The Rich!) 를 대상으로 **folder** 에 속성 값을 추가한 예시입니다.<br>
+
+```json
+{
+	"folder": "[{type}]_{id}_{title}" // [doujinshi]_9_Eat The Rich!
+}
+```

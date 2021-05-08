@@ -108,7 +108,7 @@ app.on("ready", () => {
 				return app.isPackaged;
 			}
 			case API_COMMAND.GET_PATH: {
-				return app.getPath("exe").replace(/(electron|waifu-material).exe$/, "");
+				return app.getPath("exe").replace(/(electron|nozomi-material).exe$/, "");
 			}
 		}
 	});
